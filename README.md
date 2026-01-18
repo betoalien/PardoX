@@ -103,15 +103,18 @@ Hardware: MacBook Pro M2, 16GB RAM.
 
 We are building the universal data engine. Here is what's coming next:
 
-    v0.1 (Current): Python Core, Arithmetic, I/O, Basic Aggregations.
+**v0.1 (Current):** Python Core, Arithmetic, I/O, Basic Aggregations.
 
-    v0.2 (Planned):
+**Por ser liberado:**
+* Universal SDKs: Bindings for Node.js, Go, and PHP.
 
-        Universal SDKs: Bindings for Node.js, Go, and PHP.
+**v0.2 (Planned):**
+* Advanced Types: String manipulation kernels (Regex, Splitting).
+* ML Bridge: Zero-Copy export to NumPy and Arrow.
 
-        Advanced Types: String manipulation kernels (Regex, Splitting).
+📘 **[View Full Documentation](https://betoalien.github.io/PardoX/)**
 
-        ML Bridge: Zero-Copy export to NumPy and Arrow.
+---
 
 ## 🤝 Contributing
 
@@ -121,6 +124,7 @@ We welcome contributions! Please see our Contributing Guide for details on how t
 
 This project is licensed under the MIT License.
 
-<p align="center"> Built with ❤️ by Alberto Cardenas
+---
 
+<p align="center"> Built with ❤️ by Alberto Cardenas<br>
 <a href="https://www.albertocardenas.com">www.albertocardenas.com</a> </p>
