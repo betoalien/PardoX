@@ -37,6 +37,7 @@ Select a topic to start building faster pipelines:
 
 ### 📓 Examples & Notebooks
 * [**Jupyter Notebooks**](https://github.com/betoalien/PardoX/tree/master/notebooks) - Interactive examples and tutorials showcasing PardoX capabilities, including the v0.1 Beta Showcase with real-world ETL scenarios.
+* [**Benchmark Scripts**](https://github.com/betoalien/PardoX/tree/master/python%20files) - Production-ready example for processing 640 million rows and transforming data into `.prdx` format, demonstrating real-world performance at scale.
 
 ---
 
