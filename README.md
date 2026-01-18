@@ -1,0 +1,126 @@
+# PardoX: The Hyper-Fast Data Engine 🚀
+
+[![PyPI version](https://badge.fury.io/py/pardox.svg)](https://badge.fury.io/py/pardox)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Powered By Rust](https://img.shields.io/badge/powered%20by-Rust-orange.svg)](https://www.rust-lang.org/)
+
+**The Speed of Rust. The Simplicity of Python.**
+
+PardoX is a next-generation DataFrame engine designed for high-performance ETL and data analysis. It bridges the gap between low-level memory efficiency and high-level developer productivity by running a **Rust Core** wrapped in a lightweight **Python SDK**.
+
+> **v0.1 Beta is now available!** Supports Windows, Linux, and MacOS (Intel & Apple Silicon).
+
+---
+
+## ⚡ Why PardoX?
+
+Traditional DataFrames (like Pandas) often struggle with memory overhead and single-threaded execution. PardoX introduces a **Hybrid Architecture**:
+
+* **Core:** Written in **Rust** for memory safety, multithreading, and SIMD (AVX2) optimizations.
+* **Interface:** Native **Python** bindings that feel familiar but run at compiled speeds.
+* **Memory:** Uses **HyperBlock Architecture** to manage data in contiguous chunks, minimizing fragmentation and maximizing CPU cache hits.
+
+---
+
+## 🔥 Key Features (v0.1)
+
+### 1. Zero-Copy Ingestion
+Load massive datasets in seconds. PardoX supports multithreaded CSV parsing and direct SQL ingestion without the overhead of Python objects.
+
+### 2. Native Binary Format (`.prdx`)
+Save and load your data instantly using the `.prdx` format.
+* **Speed:** Up to **4.6 GB/s** read throughput.
+* **Tech:** Custom binary layout optimized for SSDs and OS page caching.
+
+### 3. High-Performance Mutation
+Transform your data in-place without memory duplication.
+* **Arithmetic:** Vectorized addition, subtraction, multiplication, and division.
+* **Hygiene:** Instant `fillna()` and `round()` operations across millions of rows.
+* **Feature Engineering:** Create new columns on the fly: `df['total'] = df['qty'] * df['price']`.
+
+### 4. Cross-Platform & Universal
+Run your code anywhere. PardoX automatically detects your OS and CPU architecture to load the optimized binary kernel.
+* ✅ **Windows (x64)**
+* ✅ **Linux (x64)**
+* ✅ **MacOS (Intel & Apple Silicon M1/M2/M3)**
+
+---
+
+## 📦 Installation
+
+PardoX is available on PyPI. The package includes pre-compiled binaries for all supported platforms.
+
+```bash
+pip install pardox
+```
+🚀 Quick Start
+
+Here is a complete ETL pipeline example: Load, Clean, Transform, and Analyze.
+
+```bash
+import pardox as px
+
+# 1. Ingest Data (Auto-detected Schema)
+# Uses multi-threaded Rust reader
+df = px.read_csv("sales_data.csv")
+
+print(f"Loaded {df.shape[0]} rows.")
+
+# 2. Data Hygiene
+# Fill nulls in numeric columns instantly
+df.fillna(0.0)
+
+# 3. Feature Engineering (Vectorized)
+# Calculate total amount (Price * Quantity)
+# This executes in Rust using SIMD instructions
+df['total_amount'] = df['price'] * df['quantity']
+
+# 4. Aggregations & Analysis
+revenue = df['total_amount'].sum()
+avg_ticket = df['total_amount'].mean()
+
+print(f"Total Revenue: ${revenue:,.2f}")
+print(f"Avg Ticket:    ${avg_ticket:,.2f}")
+
+# 5. Persist to Disk
+# Save as PRDX for ultra-fast loading later
+df.to_prdx("sales_data_processed.prdx")
+```
+
+## 📊 Benchmarks
+
+Hardware: MacBook Pro M2, 16GB RAM.
+
+| Operation | Pandas (v2.x) | PardoX (v0.1) | Speedup |
+|-----------|---------------|---------------|----------|
+| Read CSV (1GB) | 4.2s | 0.8s | 5.2x |
+| Column Math | 0.15s | 0.02s | 7.5x |
+| Fill NA | 0.30s | 0.04s | 7.5x |
+| Read Binary | 0.9s (Parquet) | 0.2s (.prdx) | 4.5x |
+
+## 🗺️ Roadmap
+
+We are building the universal data engine. Here is what's coming next:
+
+    v0.1 (Current): Python Core, Arithmetic, I/O, Basic Aggregations.
+
+    v0.2 (Planned):
+
+        Universal SDKs: Bindings for Node.js, Go, and PHP.
+
+        Advanced Types: String manipulation kernels (Regex, Splitting).
+
+        ML Bridge: Zero-Copy export to NumPy and Arrow.
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our Contributing Guide for details on how to set up the Rust environment and build the project locally.
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+<p align="center"> Built with ❤️ by Alberto Cardenas
+
+<a href="https://www.albertocardenas.com">www.albertocardenas.com</a> </p>
