@@ -3,21 +3,21 @@ from .wrapper import lib, c_double, c_longlong, c_int32
 
 class Series:
     """
-    Representa una columna individual de un PardoX DataFrame.
-    Habilita operaciones vectorizadas (Aritmética Híbrida CPU/GPU) utilizando el motor Rust.
+    Represents an individual column of a PardoX DataFrame.
+    Enables vectorized operations (Hybrid CPU/GPU Arithmetic) using the Rust engine.
     """
     def __init__(self, df, col_name):
         self._df = df
         self.name = col_name
 
     def __repr__(self):
-        # Muestra la tabla ASCII delegando al DataFrame padre.
-        # Esto asegura que se vea bonito en Jupyter, reutilizando la lógica de frame.py
+        # Displays the ASCII table delegating to the parent DataFrame.
+        # This ensures it looks nice in Jupyter, reusing the logic from frame.py
         return self._df.__repr__()
 
     @property
     def dtype(self):
-        """Devuelve el tipo de dato de la serie consultando al DataFrame padre."""
+        """Returns the data type of the series by querying the parent DataFrame."""
         return self._df.dtypes.get(self.name, "Unknown")
 
     # =========================================================================
@@ -26,16 +26,16 @@ class Series:
 
     def head(self, n=5):
         """
-        Devuelve una NUEVA Series con las primeras N filas.
+        Returns a NEW Series with the first N rows.
         """
-        # Obtenemos un DataFrame recortado (gracias a los cambios en frame.py)
+        # Get a sliced DataFrame (thanks to changes in frame.py)
         new_df = self._df.head(n)
-        # Devolvemos una Series apuntando a la columna correspondiente en ese nuevo DF
+        # Return a Series pointing to the corresponding column in that new DF
         return new_df[self.name]
 
     def tail(self, n=5):
         """
-        Devuelve una NUEVA Series con las últimas N filas.
+        Returns a NEW Series with the last N rows.
         """
         new_df = self._df.tail(n)
         return new_df[self.name]
@@ -52,8 +52,8 @@ class Series:
 
     def _validate_ops(self, other):
         """
-        Verifica que la operación sea segura.
-        Permite Aritmética Cross-Manager si la cantidad de filas coincide.
+        Verifies that the operation is safe.
+        Allows Cross-Manager Arithmetic if the row count matches.
         """
         if not isinstance(other, Series):
             raise TypeError(f"Operands must be PardoX Series objects. Got {type(other)}")
@@ -65,8 +65,8 @@ class Series:
 
     def _wrap_result(self, res_ptr):
         """
-        Envuelve el puntero resultante en una Series.
-        Esto permite encadenar operaciones: (A + B) + C
+        Wraps the resulting pointer in a Series.
+        This allows chaining operations: (A + B) + C
         """
         if not res_ptr:
             raise RuntimeError("Operation failed (Rust returned null pointer).")
@@ -77,7 +77,7 @@ class Series:
         if len(new_df.columns) == 0:
              raise RuntimeError("Compute engine returned empty result schema.")
              
-        # Rust devuelve un nombre generado (ej. result_add), lo tomamos dinámicamente
+        # Rust returns a generated name (e.g. result_add), we take it dynamically
         return new_df[new_df.columns[0]]
 
     # --- Operators ---

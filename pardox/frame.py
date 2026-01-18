@@ -31,22 +31,22 @@ class DataFrame:
     
     def __repr__(self):
         """
-        Esta es la función mágica que Jupyter llama para mostrar el objeto.
-        En lugar de devolver el objeto raw, devolvemos la tabla ASCII.
+        This is the magic function that Jupyter calls to display the object.
+        Instead of returning the raw object, we return the ASCII table.
         """
-        # Por defecto mostramos 10 filas al imprimir el objeto
+        # By default we display 10 rows when printing the object
         return self._fetch_ascii_table(10) or "<Empty PardoX DataFrame>"
 
     def head(self, n=5):
         """
-        Ahora devuelve un NUEVO DataFrame con las primeras n filas.
-        Al devolver un objeto, Jupyter llamará a su __repr__ y se verá bonito.
+        Now returns a NEW DataFrame with the first n rows.
+        By returning an object, Jupyter will call its __repr__ and display it nicely.
         """
         return self.iloc[0:n]
 
     def tail(self, n=5):
         """
-        Devuelve un NUEVO DataFrame con las últimas n filas.
+        Returns a NEW DataFrame with the last n rows.
         """
         if not hasattr(lib, 'pardox_tail_manager'):
             raise NotImplementedError("tail() API not available in Core.")
@@ -126,7 +126,7 @@ class DataFrame:
             if not hasattr(lib, 'pardox_apply_filter'):
                 raise NotImplementedError("Filter application API missing in Core.")
             
-            # Ahora sí accedemos al puntero a través del dataframe padre de la serie
+            # Now we access the pointer through the Series' parent DataFrame
             mask_ptr = key._df._ptr 
             mask_col = key.name.encode('utf-8')
             
@@ -349,7 +349,7 @@ class DataFrame:
         Enables column assignment: df['new_col'] = df['a'] * df['b']
         """
         # 1. Check if value is a PardoX Series (Result of arithmetic)
-        # CORRECCIÓN: Cambiamos '_col_name' por 'name' para coincidir con series.py
+        # FIX: Changed '_col_name' to 'name' to match series.py
         if hasattr(value, '_df') and hasattr(value, 'name'):
             # It's a Series! We need to fuse it into this DataFrame.
             
@@ -379,7 +379,7 @@ class DataFrame:
         #     self._assign_scalar(key, value)
         
         else:
-            # Tip de Debugging: Imprimimos los atributos disponibles para ver qué pasó
+            # Debugging tip: Print available attributes to see what happened
             available_attrs = dir(value)
             raise TypeError(f"Assignment only supported for PardoX Series. Got: {type(value)}. Attributes detected: {available_attrs}")
 

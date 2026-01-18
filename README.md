@@ -105,7 +105,7 @@ We are building the universal data engine. Here is what's coming next:
 
 **v0.1 (Current):** Python Core, Arithmetic, I/O, Basic Aggregations.
 
-**Por ser liberado:**
+**To be released:**
 * Universal SDKs: Bindings for Node.js, Go, and PHP.
 
 **v0.2 (Planned):**
@@ -126,7 +126,7 @@ This project is licensed under the MIT License.
 
 ---
 
-<p align="center"> Built with ❤️ by Alberto Cardenas<br>
+<p align="center"> by Alberto Cardenas<br>
 <a href="https://www.albertocardenas.com">www.albertocardenas.com</a> </p>
 
 <p align="center"> More info: <a href="https://www.pardox.io">www.pardox.io</a> </p>
