@@ -1,8 +1,8 @@
 site_name: PardoX Documentation
-site_url: https://tu_usuario.github.io/pardox/
+site_url: https://betoalien.github.io/pardox/
 site_description: The Hyper-Fast Data Engine powered by Rust.
-repo_url: https://github.com/tu_usuario/pardox
-repo_name: tu_usuario/pardox
+repo_url: https://github.com/betoalien/pardox
+repo_name: betoalien/pardox
 edit_uri: ""  # Deshabilitado para Closed Core
 
 theme:

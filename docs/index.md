@@ -35,6 +35,9 @@ Select a topic to start building faster pipelines:
 ### ⚙️ API Reference
 * [**Full Reference**](reference.md) - Detailed documentation of classes and functions.
 
+### 📓 Examples & Notebooks
+* [**Jupyter Notebooks**](https://github.com/betoalien/PardoX/tree/master/notebooks) - Interactive examples and tutorials showcasing PardoX capabilities, including the v0.1 Beta Showcase with real-world ETL scenarios.
+
 ---
 
 ## 📦 Installation
