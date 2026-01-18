@@ -50,3 +50,5 @@ pip install pardox
 ```
 
 <p align="center"> <small>Open Source Project distributed under the MIT License.</small> </p>
+
+<p align="center"> More info: <a href="https://www.pardox.io">www.pardox.io</a> </p>

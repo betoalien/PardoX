@@ -1,4 +1,4 @@
-# PardoX: The Hyper-Fast Data Engine 🚀
+# PardoX: The Hyper-Fast Data Engine 
 
 [![PyPI version](https://badge.fury.io/py/pardox.svg)](https://badge.fury.io/py/pardox)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -128,3 +128,5 @@ This project is licensed under the MIT License.
 
 <p align="center"> Built with ❤️ by Alberto Cardenas<br>
 <a href="https://www.albertocardenas.com">www.albertocardenas.com</a> </p>
+
+<p align="center"> More info: <a href="https://www.pardox.io">www.pardox.io</a> </p>
