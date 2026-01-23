@@ -317,3 +317,17 @@ try:
 
 except Exception as e:
     print(f"[PardoX Wrapper Warning] Compute/Mutation APIs missing: {e}")
+
+# =========================================================================
+# API 9: MEMORY INGESTION (Dummy Data / JSON Bridge)
+# =========================================================================
+try:
+    # Ingest JSON Bytes directly from Memory
+    # fn pardox_read_json_bytes(json_bytes: *const u8, len: usize) -> *mut HyperBlockManager
+    if hasattr(lib, 'pardox_read_json_bytes'):
+        lib.pardox_read_json_bytes.argtypes = [c_char_p, c_size_t]
+        # CRITICAL CHANGE: Returns a POINTER to the new Manager, not an ID.
+        lib.pardox_read_json_bytes.restype = c_void_p 
+
+except Exception as e:
+    print(f"[PardoX Wrapper Warning] Memory Ingestion APIs missing: {e}")

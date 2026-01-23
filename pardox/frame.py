@@ -3,50 +3,78 @@ import json
 from .wrapper import lib, c_char_p, c_size_t, c_int32, c_double
 
 class DataFrame:
-    def __init__(self, manager_ptr):
+    def __init__(self, data, schema=None):
         """
         Initializes a PardoX DataFrame.
-        DO NOT call directly. Use:
-        - px.read_csv()   (Native)
-        - px.read_sql()   (Native via Postgres/ODBC)
-        - px.from_arrow() (Universal Bridge)
         """
-        if not manager_ptr:
-            raise ValueError("Null pointer received when creating DataFrame.")
-        self._ptr = manager_ptr
+        self._ptr = None
 
-    def __del__(self):
-        """
-        Destructor: Frees Rust memory when the Python object dies.
-        """
-        if self._ptr and lib:
-            # Check if lib is still available (interpreter shutdown safety)
-            if hasattr(lib, 'pardox_free_manager'):
-                lib.pardox_free_manager(self._ptr)
-            self._ptr = None
+        # ---------------------------------------------------------
+        # CASE 1: IN-MEMORY DATA (List of Dicts)
+        # ---------------------------------------------------------
+        if isinstance(data, list):
+            if not data:
+                raise ValueError("Cannot create DataFrame from empty list.")
+            
+            # CRITICAL FIX: Convert to NDJSON (Newline Delimited)
+            # Arrow Reader prefers:
+            # {"col":1}
+            # {"col":2}
+            # Instead of [{"col":1}, {"col":2}]
+            try:
+                # Generamos un string largo con saltos de línea
+                ndjson_str = "\n".join([json.dumps(record) for record in data])
+                json_bytes = ndjson_str.encode('utf-8')
+                json_len = len(json_bytes)
+            except Exception as e:
+                raise ValueError(f"Failed to serialize data to NDJSON: {e}")
 
+            # 2. Check Core Availability
+            if not hasattr(lib, 'pardox_read_json_bytes'):
+                raise NotImplementedError("Core API 'pardox_read_json_bytes' missing. Re-compile Rust.")
+
+            # 3. Call Rust -> Returns a NEW Pointer (Isolated Manager)
+            new_ptr = lib.pardox_read_json_bytes(json_bytes, json_len)
+            
+            if not new_ptr:
+                # Si Rust devuelve Null, lanzamos error aquí mismo.
+                raise RuntimeError("PardoX Core failed to ingest data (returned null pointer). Check console logs.")
+            
+            self._ptr = new_ptr
+
+        # ---------------------------------------------------------
+        # CASE 2: EXISTING POINTER (Internal / Native IO)
+        # ---------------------------------------------------------
+        elif isinstance(data, (int, ctypes.c_void_p)) or str(type(data)).find("LP_") != -1:
+            if not data:
+                raise ValueError("Null pointer received.")
+            self._ptr = data
+
+        else:
+            raise TypeError(f"Invalid input type: {type(data)}")
+        
     # =========================================================================
     # VISUALIZATION MAGIC
     # =========================================================================
     
     def __repr__(self):
         """
-        This is the magic function that Jupyter calls to display the object.
-        Instead of returning the raw object, we return the ASCII table.
+        Esta es la función mágica que Jupyter llama para mostrar el objeto.
+        En lugar de devolver el objeto raw, devolvemos la tabla ASCII.
         """
-        # By default we display 10 rows when printing the object
+        # Por defecto mostramos 10 filas al imprimir el objeto
         return self._fetch_ascii_table(10) or "<Empty PardoX DataFrame>"
 
     def head(self, n=5):
         """
-        Now returns a NEW DataFrame with the first n rows.
-        By returning an object, Jupyter will call its __repr__ and display it nicely.
+        Ahora devuelve un NUEVO DataFrame con las primeras n filas.
+        Al devolver un objeto, Jupyter llamará a su __repr__ y se verá bonito.
         """
         return self.iloc[0:n]
 
     def tail(self, n=5):
         """
-        Returns a NEW DataFrame with the last n rows.
+        Devuelve un NUEVO DataFrame con las últimas n filas.
         """
         if not hasattr(lib, 'pardox_tail_manager'):
             raise NotImplementedError("tail() API not available in Core.")
@@ -126,7 +154,7 @@ class DataFrame:
             if not hasattr(lib, 'pardox_apply_filter'):
                 raise NotImplementedError("Filter application API missing in Core.")
             
-            # Now we access the pointer through the Series' parent DataFrame
+            # Ahora sí accedemos al puntero a través del dataframe padre de la serie
             mask_ptr = key._df._ptr 
             mask_col = key.name.encode('utf-8')
             
@@ -349,7 +377,7 @@ class DataFrame:
         Enables column assignment: df['new_col'] = df['a'] * df['b']
         """
         # 1. Check if value is a PardoX Series (Result of arithmetic)
-        # FIX: Changed '_col_name' to 'name' to match series.py
+        # CORRECCIÓN: Cambiamos '_col_name' por 'name' para coincidir con series.py
         if hasattr(value, '_df') and hasattr(value, 'name'):
             # It's a Series! We need to fuse it into this DataFrame.
             
@@ -379,7 +407,7 @@ class DataFrame:
         #     self._assign_scalar(key, value)
         
         else:
-            # Debugging tip: Print available attributes to see what happened
+            # Tip de Debugging: Imprimimos los atributos disponibles para ver qué pasó
             available_attrs = dir(value)
             raise TypeError(f"Assignment only supported for PardoX Series. Got: {type(value)}. Attributes detected: {available_attrs}")
 

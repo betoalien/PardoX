@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pardox"
-version = "0.1.0"
+version = "0.1.2"
 description = "High-Performance DataFrame Engine powered by Rust (The PardoX Project)"
 readme = "README.md"
 authors = [
