@@ -1,2 +1,5 @@
 include README.md
-recursive-include pardox/libs *.dll *.so *.dylib
+include pardox/libs/Win/*.dll
+include pardox/libs/Linux/*.so
+include pardox/libs/Mac/*.dylib
+recursive-include pardox/libs *
