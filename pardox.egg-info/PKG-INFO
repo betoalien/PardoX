@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: pardox
-Version: 0.1.0
+Version: 0.1.2
 Summary: High-Performance DataFrame Engine powered by Rust (The PardoX Project)
 Author-email: Alberto Cardenas <iam@albertocardenas.com>
 License: MIT
@@ -14,7 +14,7 @@ Classifier: Topic :: Scientific/Engineering :: Information Analysis
 Requires-Python: >=3.8
 Description-Content-Type: text/markdown
 
-# PardoX: The Hyper-Fast Data Engine 🚀
+# PardoX: The Hyper-Fast Data Engine 
 
 [![PyPI version](https://badge.fury.io/py/pardox.svg)](https://badge.fury.io/py/pardox)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -119,15 +119,18 @@ Hardware: MacBook Pro M2, 16GB RAM.
 
 We are building the universal data engine. Here is what's coming next:
 
-    v0.1 (Current): Python Core, Arithmetic, I/O, Basic Aggregations.
+**v0.1 (Current):** Python Core, Arithmetic, I/O, Basic Aggregations.
 
-    v0.2 (Planned):
+**To be released:**
+* Universal SDKs: Bindings for Node.js, Go, and PHP.
 
-        Universal SDKs: Bindings for Node.js, Go, and PHP.
+**v0.2 (Planned):**
+* Advanced Types: String manipulation kernels (Regex, Splitting).
+* ML Bridge: Zero-Copy export to NumPy and Arrow.
 
-        Advanced Types: String manipulation kernels (Regex, Splitting).
+📘 **[View Full Documentation](https://betoalien.github.io/PardoX/)**
 
-        ML Bridge: Zero-Copy export to NumPy and Arrow.
+---
 
 ## 🤝 Contributing
 
@@ -137,6 +140,9 @@ We welcome contributions! Please see our Contributing Guide for details on how t
 
 This project is licensed under the MIT License.
 
-<p align="center"> Built with ❤️ by Alberto Cardenas
+---
 
+<p align="center"> by Alberto Cardenas<br>
 <a href="https://www.albertocardenas.com">www.albertocardenas.com</a> </p>
+
+<p align="center"> More info: <a href="https://www.pardox.io">www.pardox.io</a> </p>
