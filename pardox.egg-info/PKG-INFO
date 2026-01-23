@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: pardox
-Version: 0.1.2
+Version: 0.1.3
 Summary: High-Performance DataFrame Engine powered by Rust (The PardoX Project)
 Author-email: Alberto Cardenas <iam@albertocardenas.com>
 License: MIT

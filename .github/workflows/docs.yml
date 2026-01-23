@@ -33,6 +33,4 @@ jobs:
             mkdocs-material-
             
       - run: pip install mkdocs-material 
-      
-      # Este comando mágico construye el sitio y lo empuja a la rama 'gh-pages'
       - run: mkdocs gh-deploy --force
