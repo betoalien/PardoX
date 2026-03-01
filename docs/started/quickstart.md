@@ -1,74 +1,217 @@
 # Quick Start
 
-This guide will walk you through a complete high-performance data pipeline: loading data, cleaning it, performing vector calculations, and saving it in the native **PRDX** format.
+This guide walks through a complete v0.3.1 data pipeline: loading a CSV, running vectorized math, inspecting results, and writing to a relational database — all in native Rust speed.
 
-## The "Hello World" of Data
+---
 
-Copy and paste the following code into a Python script (e.g., `main.py`) or a Jupyter Notebook.
+## Hello World
 
 ```python
 import pardox as px
 
-# 1. Ingest Data (Zero-Copy)
-# PardoX automatically detects headers and infers data types.
-print("Loading data...")
+# 1. Load data — parallel Rust CSV parser, automatic type inference
 df = px.read_csv("sales_data.csv")
+print(f"Loaded {df.shape[0]:,} rows × {df.shape[1]} columns")
 
-print(f"Loaded {df.shape[0]} rows.")
+# 2. Inspect columns
+print(df.columns)
+df.show(5)   # ASCII table preview
 
-# 2. Data Hygiene
-# Fill missing values in numeric columns instantly.
-# This operation happens in-place within the Rust HyperBlock.
-df.fillna(0.0)
+# 3. Cast and compute
+df.cast("quantity", "Float64")
+revenue_df = df.mul("price", "quantity")   # new DataFrame with 'result_mul'
 
-# 3. Feature Engineering (SIMD Accelerated)
-# Create a new column 'total_amount' by multiplying price * quantity.
-# PardoX executes this using AVX2/NEON instructions.
-df['total_amount'] = df['price'] * df['quantity']
+# 4. Statistics
+std_val = revenue_df.std("result_mul")
+print(f"Revenue std dev: {std_val:,.2f}")
 
-# 4. Aggregations & Analysis
-# Calculate business metrics immediately.
-revenue = df['total_amount'].sum()
-avg_ticket = df['total_amount'].mean()
-
-print("-" * 30)
-print(f"Total Revenue: ${revenue:,.2f}")
-print(f"Avg Ticket:    ${avg_ticket:,.2f}")
-print("-" * 30)
-
-# 5. Persist to Disk
-# Save the processed dataframe to the ultra-fast .prdx binary format.
-# This format is optimized for memory mapping and instant loading.
-df.to_prdx("sales_processed.prdx")
-print("Data saved to 'sales_processed.prdx'")
+# 5. Write to PostgreSQL (COPY FROM STDIN auto-activated for > 10k rows)
+from pardox.io import execute_sql
+CONN = "postgresql://user:password@localhost:5432/mydb"
+execute_sql(CONN, "CREATE TABLE IF NOT EXISTS sales (price FLOAT, quantity FLOAT)")
+rows = df.to_sql(CONN, "sales", mode="append")
+print(f"Written {rows:,} rows to PostgreSQL")
 ```
+
+---
 
 ## Step-by-Step Breakdown
 
 ### 1. Ingestion (`read_csv`)
 
-Unlike standard libraries that parse text line-by-line in Python, PardoX spawns a **Rust Thread Pool** to parse chunks of the CSV in parallel.
+PardoX spawns a Rust thread pool to parse chunks of the CSV file in parallel. No Python objects are created during ingestion — data flows directly into Rust-managed memory buffers.
 
-!!! tip "Zero-Copy Architecture"
-    No intermediate Python objects are created during ingestion. Data flows directly from disk into Rust-managed memory.
+```python
+df = px.read_csv("dataset.csv")
+```
 
-### 2. Mutation (`fillna`)
+!!! tip "Type inference"
+    The engine scans the first rows to classify each column as `Int64`, `Float64`, or `Utf8` (string). You can override with an explicit schema:
 
-Data cleaning operations are **mutations**. They modify the memory buffer directly. There is no need to reassign the variable (e.g., `df = df.fillna()` is not needed, just `df.fillna()`).
+    ```python
+    df = px.read_csv("data.csv", schema={"price": "Float64", "id": "Int64"})
+    ```
 
-!!! info "In-Place Operations"
-    All mutation operations happen in the Rust HyperBlock, avoiding expensive Python allocations.
+---
 
-### 3. Vectorization (`df['a'] * df['b']`)
+### 2. Inspect (`show`, `shape`, `columns`, `dtypes`)
 
-Mathematical operations do not happen in the Python interpreter. The wrapper sends pointers to the Rust engine, which uses **SIMD** (Single Instruction, Multiple Data) to process thousands of rows per CPU cycle.
+```python
+print(df.shape)      # (50000, 14)
+print(df.columns)    # ['id', 'price', 'quantity', ...]
+print(df.dtypes)     # {'id': 'Utf8', 'price': 'Float64', ...}
+df.show(5)           # ASCII table, first 5 rows
+```
 
-!!! success "SIMD Acceleration"
-    PardoX automatically leverages AVX2 (Intel/AMD) or NEON (ARM) instructions for maximum throughput.
+---
 
-### 4. Serialization (`to_prdx`)
+### 3. Type Casting (`cast`)
 
-The `.prdx` format is a custom binary layout. It allows PardoX to "snapshot" the memory state to disk. Reading a `.prdx` file is typically **5x to 10x faster** than reading a CSV or Parquet file.
+When a column is inferred as `Int64` but you need `Float64` for arithmetic:
 
-!!! example "Performance Benchmark"
-    Loading a 2GB dataset: CSV ~8s, Parquet ~3s, PRDX ~0.5s
+```python
+df.cast("quantity", "Float64")
+```
+
+Supported types: `Int64`, `Float64`, `Utf8`.
+
+---
+
+### 4. Vectorized Arithmetic
+
+```python
+# Series operators (via Proxy / __getitem__)
+df['total'] = df['price'] * df['quantity']
+df['tax']   = df['total'] * 0.16
+
+# DataFrame-level methods (return new DataFrame)
+revenue_df    = df.mul("price", "quantity")   # result column: 'result_mul'
+profit_df     = df.sub("revenue", "cost")     # result column: 'result_sub'
+```
+
+---
+
+### 5. Native Math Methods
+
+```python
+# Standard deviation (pure Rust, no NumPy)
+std_val = revenue_df.std("result_mul")
+
+# Min-Max normalization → new DataFrame with 'result_minmax' column
+normed_df = df.min_max_scale("price")
+
+# Sort by column (CPU or GPU)
+sorted_df = df.sort_values("price", ascending=False)
+sorted_df = df.sort_values("price", ascending=True, gpu=True)  # GPU Bitonic sort
+```
+
+---
+
+### 6. Observer — Data Inspection & Export
+
+```python
+# Value frequency table
+state_counts = df.value_counts("state")
+print(state_counts)   # {'TX': 6345, 'CA': 6301, ...}
+
+# Unique values in a column
+unique_cats = df.unique("category")
+
+# Export full DataFrame to Python
+records = df.to_dict()   # list of dicts — 50k records
+json_str = df.to_json()  # JSON string "[{...}, ...]"
+```
+
+---
+
+### 7. Database Write (Relational Conqueror)
+
+```python
+from pardox.io import execute_sql, execute_mysql, read_sql
+
+PG_CONN    = "postgresql://pardox:secret@localhost:5432/mydb"
+MYSQL_CONN = "mysql://pardox:secret@localhost:3306/mydb"
+
+# PostgreSQL — auto COPY FROM STDIN for > 10k rows
+execute_sql(PG_CONN, "CREATE TABLE IF NOT EXISTS sales (price FLOAT, quantity FLOAT)")
+rows = df.to_sql(PG_CONN, "sales", mode="append")
+print(f"Postgres: {rows:,} rows written")
+
+# MySQL — chunked batch INSERT (auto LOAD DATA if server allows)
+execute_mysql(MYSQL_CONN, "CREATE TABLE IF NOT EXISTS sales (price DOUBLE, quantity DOUBLE)")
+rows = df.to_mysql(MYSQL_CONN, "sales", mode="append")
+print(f"MySQL: {rows:,} rows written")
+
+# Read back from PostgreSQL
+df_check = read_sql(PG_CONN, "SELECT COUNT(*) FROM sales")
+```
+
+---
+
+### 8. Zero-Copy NumPy Integration
+
+```python
+import numpy as np
+
+# Direct pointer from Rust buffer — no data copy
+arr = np.array(df["price"])
+print(arr.dtype)   # float64
+print(arr.mean())  # same value as df["price"].mean()
+```
+
+---
+
+### 9. Persist to .prdx
+
+```python
+# Save
+df.to_prdx("sales_processed.prdx")
+
+# Load (4.6 GB/s read throughput)
+df2 = px.read_prdx("sales_processed.prdx")
+```
+
+!!! example "Performance benchmark"
+    Loading 2 GB of data: CSV ~8s · Parquet ~3s · **PRDX ~0.5s**
+
+---
+
+## Full Pipeline Example
+
+```python
+import pardox as px
+from pardox.io import execute_sql
+
+CONN = "postgresql://pardox:secret@localhost:5432/analytics"
+
+# Load
+df = px.read_csv("sales_50k.csv")
+df.cast("quantity", "Float64")
+
+# Transform
+df.fillna(0.0)
+df['revenue'] = df['price'] * df['quantity']
+df['tax']     = df['revenue'] * 0.08
+
+# Analyze
+print(f"Total revenue : ${df['revenue'].sum():,.2f}")
+print(f"Avg ticket    : ${df['revenue'].mean():,.2f}")
+print(f"Std deviation : {df['revenue'].std():,.2f}")
+
+# Inspect
+top_states = df.value_counts("state")
+print("Top states:", list(top_states.items())[:5])
+
+# Write
+execute_sql(CONN, "DROP TABLE IF EXISTS sales_results")
+execute_sql(CONN, (
+    "CREATE TABLE sales_results "
+    "(price FLOAT, quantity FLOAT, revenue FLOAT, tax FLOAT)"
+))
+rows = df.to_sql(CONN, "sales_results", mode="append")
+print(f"\nWrote {rows:,} rows to PostgreSQL")
+
+# Save locally
+df.to_prdx("sales_results.prdx")
+print("Saved to sales_results.prdx")
+```

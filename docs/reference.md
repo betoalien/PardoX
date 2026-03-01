@@ -1,45 +1,30 @@
 # API Reference
 
-This document details the classes and functions exposed by the PardoX Python SDK.
+Complete documentation of all classes, functions, and methods in the PardoX Python SDK v0.3.1.
 
 ---
 
-## Top-Level Functions
+## Top-Level Functions (`import pardox as px`)
 
 ### `read_csv`
-Reads a Comma Separated Value (CSV) file into a DataFrame using the multi-threaded Rust engine.
+
+Reads a CSV file into a DataFrame using the multi-threaded Rust parser.
 
 ```python
-def read_csv(path: str, has_headers: bool = True) -> DataFrame
+def read_csv(path: str, schema: dict | None = None) -> DataFrame
 ```
-
-**Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `path` | `str` | Path to the .csv file. |
-| `has_headers` | `bool` | Whether the first row contains column names. Default: `True`. |
+| `path` | `str` | Path to the `.csv` file. |
+| `schema` | `dict` or `None` | Optional column type overrides: `{"col": "Float64", ...}`. Supported types: `Int64`, `Float64`, `Utf8`. |
 
 **Returns:** `DataFrame`
-
----
-
-### `read_sql`
-
-Executes a SQL query against a Postgres database and loads the result directly.
 
 ```python
-def read_sql(connection_string: str, query: str) -> DataFrame
+df = px.read_csv("sales.csv")
+df = px.read_csv("sales.csv", schema={"price": "Float64", "id": "Int64"})
 ```
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `connection_string` | `str` | URI format: `postgres://user:pass@host:port/db` |
-| `query` | `str` | The SQL SELECT statement to execute. |
-
-**Returns:** `DataFrame`
 
 ---
 
@@ -48,187 +33,567 @@ def read_sql(connection_string: str, query: str) -> DataFrame
 Loads a native PardoX binary file (`.prdx`).
 
 ```python
-def read_prdx(path: str) -> DataFrame
+def read_prdx(path: str) -> list[dict]
 ```
-
-**Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `path` | `str` | Path to the .prdx file. |
+| `path` | `str` | Path to the `.prdx` file. |
 
-**Returns:** `DataFrame`
+**Returns:** `list[dict]` (preview rows)
 
 ---
 
 ### `from_arrow`
 
-Zero-Copy conversion from a PyArrow Table.
+Zero-copy conversion from a PyArrow Table or RecordBatch.
 
 ```python
-def from_arrow(table: pyarrow.Table) -> DataFrame
+def from_arrow(data: pyarrow.Table | pyarrow.RecordBatch) -> DataFrame
 ```
 
-**Parameters:**
+```python
+import pyarrow as pa, pardox as px
+arrow_table = pa.Table.from_pydict({"a": [1, 2, 3]})
+df = px.from_arrow(arrow_table)
+```
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `table` | `pyarrow.Table` | PyArrow Table to convert. |
+---
 
-**Returns:** `DataFrame`
+## `pardox.io` — Database I/O
+
+All database functions bypass the Python runtime — connection and data transfer happen entirely in the Rust core.
+
+### PostgreSQL
+
+#### `read_sql(connection_string, query) → DataFrame`
+
+```python
+from pardox.io import read_sql
+df = read_sql("postgresql://user:pass@localhost:5432/db", "SELECT * FROM orders")
+```
+
+#### `execute_sql(connection_string, query) → int`
+
+Executes DDL or DML. Returns rows affected (0 for DDL).
+
+```python
+from pardox.io import execute_sql
+execute_sql(CONN, "DROP TABLE IF EXISTS orders")
+execute_sql(CONN, "CREATE TABLE orders (id BIGINT, amount FLOAT)")
+n = execute_sql(CONN, "DELETE FROM orders WHERE status = 'cancelled'")
+```
+
+**Raises:** `RuntimeError` on connection or SQL failure.
+
+---
+
+### MySQL
+
+#### `read_mysql(connection_string, query) → DataFrame`
+
+```python
+from pardox.io import read_mysql
+df = read_mysql("mysql://user:pass@localhost:3306/db", "SELECT * FROM products")
+```
+
+#### `execute_mysql(connection_string, query) → int`
+
+```python
+from pardox.io import execute_mysql
+execute_mysql(CONN, "CREATE TABLE IF NOT EXISTS products (id BIGINT, price DOUBLE)")
+```
+
+---
+
+### SQL Server
+
+#### `read_sqlserver(connection_string, query) → DataFrame`
+
+```python
+from pardox.io import read_sqlserver
+CONN = "Server=localhost,1433;Database=mydb;UID=sa;PWD=MyPwd;TrustServerCertificate=Yes"
+df = read_sqlserver(CONN, "SELECT TOP 1000 * FROM dbo.orders")
+```
+
+#### `execute_sqlserver(connection_string, query) → int`
+
+```python
+from pardox.io import execute_sqlserver
+execute_sqlserver(CONN, "DROP TABLE IF EXISTS dbo.orders_bak")
+```
+
+!!! warning "Password special characters"
+    Avoid `!` in SQL Server passwords. Known tiberius v0.12 bug — fix planned for v0.3.2.
+
+---
+
+### MongoDB
+
+#### `read_mongodb(connection_string, db_dot_collection) → DataFrame`
+
+```python
+from pardox.io import read_mongodb
+df = read_mongodb("mongodb://admin:pass@localhost:27017", "mydb.orders")
+```
+
+#### `execute_mongodb(connection_string, database, command_json) → int`
+
+```python
+from pardox.io import execute_mongodb
+execute_mongodb("mongodb://...", "mydb", '{"drop": "orders_archive"}')
+```
 
 ---
 
 ## Class: `DataFrame`
 
-The main data structure holding the HyperBlock memory manager.
+The main data structure. Holds an opaque pointer to a Rust `HyperBlockManager`.
+
+### Construction
+
+```python
+# From CSV
+df = px.read_csv("file.csv")
+
+# From SQL
+df = read_sql(conn, "SELECT …")
+
+# From MySQL / SQL Server / MongoDB
+df = read_mysql(conn, query)
+df = read_sqlserver(conn, query)
+df = read_mongodb(conn, "db.collection")
+
+# From Arrow
+df = px.from_arrow(arrow_table)
+```
 
 ### Properties
 
-- **`shape`**: Returns a tuple `(rows, cols)` representing the dimensions.
-- **`columns`**: Returns a list of column names.
-
-### Methods
-
-#### `head(n=5)`
-
-Returns the first `n` rows as a list of dictionaries. Useful for inspection.
+#### `shape → tuple[int, int]`
 
 ```python
-df.head(10)  # Show first 10 rows
+rows, cols = df.shape
+print(f"{rows:,} rows × {cols} columns")
 ```
 
-#### `tail(n=5)`
-
-Returns the last `n` rows as a list of dictionaries.
+#### `columns → list[str]`
 
 ```python
-df.tail(10)  # Show last 10 rows
+print(df.columns)   # ['id', 'price', 'quantity', ...]
 ```
 
-#### `to_prdx(path)`
+#### `dtypes → dict[str, str]`
 
-Saves the current DataFrame state to a binary file.
+```python
+print(df.dtypes)    # {'id': 'Utf8', 'price': 'Float64', 'quantity': 'Int64'}
+```
+
+---
+
+### Inspection
+
+#### `show(n=10)`
+
+Prints the first `n` rows as an ASCII table to stdout.
+
+```python
+df.show(5)
+```
+
+#### `head(n=5) → DataFrame`
+
+Returns a new DataFrame with the first `n` rows.
+
+```python
+top5 = df.head(5)
+```
+
+#### `tail(n=5) → DataFrame`
+
+Returns a new DataFrame with the last `n` rows.
+
+```python
+last5 = df.tail(5)
+```
+
+#### `iloc(start, end) → DataFrame`
+
+Returns rows in the range `[start, end)`.
+
+```python
+subset = df.iloc(100, 200)   # rows 100–199
+```
+
+---
+
+### Type Operations
+
+#### `cast(col, target_type) → DataFrame`
+
+Converts a column to a new type in-place. Returns `self`.
+
+```python
+df.cast("quantity", "Float64")
+df.cast("id",       "Utf8")
+```
+
+**Supported types:** `Int64`, `Float64`, `Utf8`
+
+---
+
+### Arithmetic Methods
+
+All arithmetic methods return a **new DataFrame** with the result stored in a named column.
+
+#### `mul(col_a, col_b) → DataFrame`
+
+```python
+revenue_df = df.mul("price", "quantity")   # result column: 'result_mul'
+```
+
+#### `add(col_a, col_b) → DataFrame`
+
+```python
+total_df = df.add("price", "tax")          # result column: 'result_add'
+```
+
+#### `sub(col_a, col_b) → DataFrame`
+
+```python
+profit_df = df.sub("revenue", "cost")      # result column: 'result_sub'
+```
+
+#### `std(col) → float`
+
+Sample standard deviation of a column. Pure Rust, no NumPy.
+
+```python
+std_val = revenue_df.std("result_mul")
+```
+
+#### `min_max_scale(col) → DataFrame`
+
+Normalizes column values to `[0, 1]`. Returns new DataFrame with `result_minmax`.
+
+```python
+normed_df = df.min_max_scale("price")
+```
+
+---
+
+### Sorting
+
+#### `sort_values(by, ascending=True, gpu=False) → DataFrame`
+
+Sorts the DataFrame by a `Float64` column. Returns a **new sorted DataFrame**.
+
+```python
+sorted_df = df.sort_values("price", ascending=True)
+sorted_df = df.sort_values("price", ascending=False, gpu=True)
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `by` | `str` | Column name to sort by. Must be `Float64`. |
+| `ascending` | `bool` | `True` = ascending (default). |
+| `gpu` | `bool` | Use GPU Bitonic sort. Falls back to CPU if GPU unavailable. |
+
+---
+
+### Filtering
+
+#### `filter(mask: Series) → DataFrame`
+
+Applies a boolean Series as a row filter. Returns a new DataFrame.
+
+```python
+mask   = df['price'] > 100.0
+result = df.filter(mask)
+```
+
+---
+
+### Data Cleaning
+
+#### `fillna(value: float) → DataFrame`
+
+Fills `NaN` / null values in all numeric columns in-place.
+
+```python
+df.fillna(0.0)
+```
+
+#### `round(decimals: int) → DataFrame`
+
+Rounds all numeric columns in-place.
+
+```python
+df.round(2)
+```
+
+---
+
+### Observer — Export & Inspection
+
+#### `to_dict() → list[dict]`
+
+Returns all rows as a list of dictionaries (records format).
+
+```python
+records = df.to_dict()
+# [{'price': 19.99, 'state': 'TX', ...}, ...]
+```
+
+**Returns:** `list[dict]`
+
+#### `to_json() → str`
+
+Returns all rows as a JSON string `"[{...}, ...]"`.
+
+```python
+json_str = df.to_json()
+```
+
+**Returns:** `str`
+
+#### `value_counts(col) → dict[str, int]`
+
+Frequency of each unique value in a column, sorted by count descending.
+
+```python
+state_dist = df.value_counts("state")
+# {'TX': 6345, 'CA': 6301, ...}
+```
+
+**Returns:** `dict[str, int]`
+
+#### `unique(col) → list`
+
+Unique values in a column in insertion order.
+
+```python
+cats = df.unique("category")
+# ['Electronics', 'Books', ...]
+```
+
+**Returns:** `list`
+
+---
+
+### Joins
+
+#### `join(other, on=None, left_on=None, right_on=None) → DataFrame`
+
+Hash-join two DataFrames on a key column.
+
+```python
+result = orders.join(customers, on="customer_id")
+result = orders.join(customers, left_on="cust_id", right_on="id")
+```
+
+---
+
+### Writers
+
+#### `to_prdx(path) → bool`
+
+Saves DataFrame to native binary format.
 
 ```python
 df.to_prdx("output.prdx")
 ```
 
-**Parameters:**
+#### `to_csv(path) → bool`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `path` | `str` | Path to save the .prdx file. |
-
-#### `fillna(value)`
-
-Fills NaN / null values in all compatible columns with the given scalar.
+Exports DataFrame to a CSV file.
 
 ```python
-df.fillna(0.0)  # Replace all nulls with 0
+df.to_csv("output.csv")
 ```
 
-!!! note "Current Limitation"
-    Currently supports filling numeric columns with float values.
+#### `to_sql(connection_string, table_name, mode="append", conflict_cols=[]) → int`
 
-**Parameters:**
+Writes to PostgreSQL.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `value` | `float` | The value to replace nulls with. |
+```python
+rows = df.to_sql(CONN, "orders", mode="append")
+rows = df.to_sql(CONN, "orders", mode="upsert", conflict_cols=["id"])
+```
+
+| Parameter | Type | Values |
+|-----------|------|--------|
+| `mode` | `str` | `"append"`, `"upsert"` |
+| `conflict_cols` | `list[str]` | Columns for `ON CONFLICT` clause (upsert only) |
+
+**Returns:** `int` — rows written. **Raises:** `RuntimeError` on failure.
+
+#### `to_mysql(connection_string, table_name, mode="append", conflict_cols=[]) → int`
+
+Writes to MySQL.
+
+```python
+rows = df.to_mysql(CONN, "products", mode="append")
+rows = df.to_mysql(CONN, "products", mode="replace")
+rows = df.to_mysql(CONN, "products", mode="upsert", conflict_cols=["id"])
+```
+
+| Parameter | Type | Values |
+|-----------|------|--------|
+| `mode` | `str` | `"append"`, `"replace"`, `"upsert"` |
+
+#### `to_sqlserver(connection_string, table_name, mode="append", conflict_cols=[]) → int`
+
+Writes to SQL Server (batch INSERT 500 rows/stmt).
+
+```python
+rows = df.to_sqlserver(CONN, "dbo.orders", mode="append")
+rows = df.to_sqlserver(CONN, "dbo.orders", mode="upsert", conflict_cols=["id"])
+```
+
+| Parameter | Type | Values |
+|-----------|------|--------|
+| `mode` | `str` | `"append"`, `"replace"`, `"upsert"` |
+
+#### `to_mongodb(connection_string, db_dot_collection, mode="append") → int`
+
+Writes to MongoDB (10,000 docs/batch, `ordered: false`).
+
+```python
+rows = df.to_mongodb(CONN, "mydb.orders", mode="append")
+rows = df.to_mongodb(CONN, "mydb.orders", mode="replace")
+```
+
+| Parameter | Type | Values |
+|-----------|------|--------|
+| `mode` | `str` | `"append"`, `"replace"` |
 
 ---
 
 ## Class: `Series`
 
-Represents a single column within a DataFrame. Returned when selecting a column (e.g., `df['price']`).
+A single column view into a DataFrame. Returned by `df['col_name']`. Does **not** own the underlying memory — the parent DataFrame does.
 
-### Arithmetic
+### Properties
 
-**Supported operators:** `+`, `-`, `*`, `/`
+#### `name → str`
 
-Operations are vectorized (SIMD) and return a new Series or modify in-place if assigned back.
+Column name.
+
+#### `dtype → str`
+
+Column type (`"Int64"`, `"Float64"`, `"Utf8"`).
+
+---
+
+### Arithmetic Operators
+
+Operations dispatch to SIMD-accelerated Rust kernels. All return a new `Series`.
 
 ```python
-# Vector arithmetic
-df['total'] = df['price'] * df['quantity']
-df['tax'] = df['total'] * 0.16
+total = df['price'] * df['quantity']
+net   = df['total'] - df['discount']
+tax   = df['total'] + df['tax_amount']
+unit  = df['revenue'] / df['quantity']
 ```
+
+---
+
+### Comparison Operators
+
+Return a boolean `Series` usable as a filter mask.
+
+| Method | Meaning |
+|--------|---------|
+| `s.eq(val)` | `==` |
+| `s.neq(val)` | `!=` |
+| `s.gt(val)` | `>` |
+| `s.gte(val)` | `>=` |
+| `s.lt(val)` | `<` |
+| `s.lte(val)` | `<=` |
+
+```python
+mask = df['price'].gt(100.0)
+df_filtered = df.filter(mask)
+
+mask2 = df['state'].eq("TX")
+df_tx = df.filter(mask2)
+```
+
+---
 
 ### Aggregations
 
-#### `sum()`
+All aggregation methods return a Python scalar.
 
-Returns the sum of all values.
-
-```python
-total = df['amount'].sum()
-```
-
-**Returns:** `float`
-
-#### `mean()`
-
-Returns the arithmetic average.
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `sum()` | `float` | Sum of all non-null values |
+| `mean()` | `float` | Arithmetic mean |
+| `min()` | `float` | Minimum value |
+| `max()` | `float` | Maximum value |
+| `std()` | `float` | Sample standard deviation |
+| `count()` | `int` | Count of non-null values |
 
 ```python
-average = df['amount'].mean()
+total   = df['revenue'].sum()
+average = df['revenue'].mean()
+high    = df['revenue'].max()
+low     = df['revenue'].min()
+spread  = df['revenue'].std()
+valid   = df['id'].count()
 ```
 
-**Returns:** `float`
-
-#### `min()`
-
-Returns the minimum value.
-
-```python
-lowest = df['amount'].min()
-```
-
-**Returns:** `float`
-
-#### `max()`
-
-Returns the maximum value.
-
-```python
-highest = df['amount'].max()
-```
-
-**Returns:** `float`
-
-#### `std()`
-
-Returns the standard deviation (population).
-
-```python
-volatility = df['amount'].std()
-```
-
-**Returns:** `float`
-
-#### `count()`
-
-Returns the count of non-null values.
-
-```python
-valid_count = df['amount'].count()
-```
-
-**Returns:** `int`
+---
 
 ### Transformations
 
-#### `round(decimals)`
-
-Rounds values to the specified number of decimal places in-place.
+#### `fillna(value) → Series`
 
 ```python
-df['price'].round(2)  # Round to 2 decimals
+df['price'].fillna(0.0)
 ```
 
-**Parameters:**
+#### `round(decimals) → Series`
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `decimals` | `int` | Number of decimal places. |
+```python
+df['price'].round(2)
+```
+
+---
+
+### NumPy Zero-Copy
+
+```python
+import numpy as np
+
+# Direct pointer into Rust buffer — no allocation
+arr = np.array(df['price'])   # dtype: float64
+```
+
+Works on `Float64` columns. Cast `Int64` columns first:
+
+```python
+df.cast("quantity", "Float64")
+arr = np.array(df["quantity"])
+```
+
+---
+
+## Error Codes
+
+All database functions raise `RuntimeError` with a descriptive message on failure. The underlying Rust function returns integer error codes:
+
+| Code | Meaning |
+|------|---------|
+| `-1` | Invalid manager pointer (null) |
+| `-2` | Invalid connection string |
+| `-3` | Invalid table / query string |
+| `-4` | Invalid mode string |
+| `-5` | Invalid conflict columns JSON |
+| `-100` | Operation failed — check stderr for Rust error details |
+
+!!! tip "Stderr logging"
+    When `-100` is returned, the Rust core logs the actual database error to stderr before returning. Run with stderr visible to diagnose connection or schema issues.
+
+A hierarchical error code system (connection errors, SQL syntax errors, constraint violations, etc.) is planned for v0.3.2.

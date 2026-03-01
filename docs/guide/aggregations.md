@@ -1,111 +1,259 @@
-# Aggregations & Analytics
+# Aggregations, Analytics & The Observer
 
-Once data is loaded and cleaned, the next step is extracting insights. PardoX provides a suite of **Analytical Kernels** that compute summary statistics over entire columns instantly.
+PardoX provides two layers of data insight:
 
-Unlike iterating through a list in Python (which is slow), PardoX aggregations run entirely in native machine code, leveraging CPU parallelism to scan memory buffers at maximum bandwidth.
+1. **Aggregation kernels** — reduce a column to a scalar (sum, mean, std, etc.)
+2. **The Observer** — export and inspect the full DataFrame (value_counts, unique, to_dict, to_json)
+
+All operations run entirely in native Rust machine code.
 
 ---
 
-## 1. Basic Metrics
+## 1. Column Aggregations (Series)
 
-You can access aggregation methods directly on any **numeric `Series`**.
+Access aggregation methods directly on any numeric `Series` object (obtained via `df['col']`).
 
-### Summation (`sum`)
-Calculates the total sum of values in the column.
+### `sum()`
 
 ```python
-# Calculate Total Revenue
 total_revenue = df['amount'].sum()
-print(f"Total: ${total_revenue}")
+print(f"Total: ${total_revenue:,.2f}")
 ```
 
-### Averages (`mean`)
+**Returns:** `float`
 
-Calculates the arithmetic mean.
+### `mean()`
 
 ```python
-# Calculate Average Transaction Size
 avg_ticket = df['amount'].mean()
 ```
 
-### Extremes (`min` / `max`)
+**Returns:** `float`
 
-Finds the lowest and highest values in the dataset. Useful for range detection and outlier identification.
+### `min()` / `max()`
 
 ```python
-highest_sale = df['amount'].max()
-lowest_sale  = df['amount'].min()
+highest = df['amount'].max()
+lowest  = df['amount'].min()
 ```
 
----
+**Returns:** `float`
 
-## 2. Statistical Analysis
+### `std()`
 
-PardoX v0.1 includes kernels for statistical dispersion and counting.
-
-### Standard Deviation (`std`)
-
-Measures the amount of variation or dispersion of a set of values.
-
-!!! info "Interpretation"
-    - **Low std**: Values are close to the mean.
-    - **High std**: Values are spread out over a wider range.
-
+Sample standard deviation.
 
 ```python
-# Analyze Sales Volatility
 volatility = df['amount'].std()
 ```
 
-### Counting (`count`)
+**Returns:** `float`
 
-Returns the number of valid (non-null) entries in the column. This is different from the DataFrame shape, as it excludes missing values.
+!!! info "Interpretation"
+    Low std → values cluster near the mean. High std → values are widely spread.
+
+### `count()`
+
+Number of non-null values in the column.
 
 ```python
 valid_transactions = df['transaction_id'].count()
 ```
 
----
-
-## 3. Handling Null Values
-
-PardoX aggregations are **Null-Aware**.
-
-!!! note "Null Handling Strategy"
-    - **Skip Strategy**: By default, all aggregation functions ignore null / NaN values. They calculate the metric based only on valid data points.
-    - **Consistency**: This matches the behavior of SQL and other major DataFrame libraries.
+**Returns:** `int`
 
 ---
 
-## 4. Performance vs Python
+## 2. DataFrame-Level Standard Deviation
 
-Why use `df['col'].sum()` instead of Python's built-in `sum()`?
+`df.std(col)` is a DataFrame method (distinct from the Series `.std()`) that computes the sample standard deviation for a named column and returns a Python float. Useful when working with derived DataFrames from `df.mul()`, `df.add()`, etc.
+
+```python
+revenue_df = df.mul("price", "quantity")
+std_val    = revenue_df.std("result_mul")
+print(f"Revenue std dev: {std_val:,.4f}")
+```
+
+---
+
+## 3. Null Value Handling
+
+All aggregation functions are **null-aware**: they skip `NaN` / null values and compute metrics only over valid data points. This matches SQL and Pandas behavior.
+
+To fill nulls before aggregation:
+
+```python
+df.fillna(0.0)
+total = df['amount'].sum()
+```
+
+---
+
+## 4. Performance
 
 | Method | Mechanism | Speed (10M rows) |
-|--------|-----------|------------------|
-| Python `sum(df['col'])` | Iterates objects one by one | ~1.5s |
-| PardoX `.sum()` | SIMD Vectorized Accumulator | ~0.02s |
+|--------|-----------|-----------------|
+| Python `sum(list)` | Iterates `PyObject` one by one | ~1.5s |
+| PardoX `.sum()` | SIMD vectorized accumulator | ~0.02s |
 
-!!! tip "Under the Hood"
-    When you call `.sum()`, PardoX passes the memory pointer to a Rust function that uses **AVX2** instructions to add 4 to 8 numbers simultaneously per CPU cycle, without ever converting the data back to Python objects.
+!!! tip "Under the hood"
+    `.sum()` passes the memory pointer directly to a Rust function. AVX2 instructions add 4–8 values per CPU cycle without ever materializing Python objects.
 
 ---
 
-## 5. GroupBy Operations (Roadmap)
+## 5. The Observer — Full DataFrame Export
 
-**Current Status (v0.1 Beta):** PardoX currently supports global aggregations (reducing the entire column to a scalar).
+The Observer module provides functions to export or inspect the entire DataFrame. All string results are **heap-allocated** (proper ownership) and freed after the Python string is created.
 
-!!! warning "Coming in v0.2"
-    We are actively developing the **Split-Apply-Combine** engine to support:
-    
-    ```python
-    # COMING SOON in v0.2
-    df.groupby('region').sum('amount')
-    ```
+### `to_dict()`
 
-!!! tip "Workaround"
-    For now, you can filter datasets using boolean masks (coming in v0.1.5) or perform global analysis on subsets.
+Returns all rows as a list of dictionaries (records format). Equivalent to Pandas' `df.to_dict('records')`.
 
+```python
+records = df.to_dict()
+# [{'price': 19.99, 'quantity': 3, ...}, ...]
 
+print(f"Total records: {len(records)}")
+first_row = records[0]
+print(first_row['price'])
+```
 
+**Returns:** `list[dict]`
 
+### `to_json()`
+
+Returns all rows as a JSON string `"[{...}, ...]"`. Useful for API responses or file writing.
+
+```python
+json_str = df.to_json()
+with open("output.json", "w") as f:
+    f.write(json_str)
+```
+
+**Returns:** `str`
+
+### `value_counts(col)`
+
+Returns the frequency of each unique value in a column, sorted by count descending.
+
+```python
+state_counts = df.value_counts("state")
+# {'TX': 6345, 'CA': 6301, 'CO': 6304, ...}
+
+print(f"Unique states: {len(state_counts)}")
+
+# Top 5
+for state, count in list(state_counts.items())[:5]:
+    print(f"  {state}: {count:,}")
+```
+
+**Returns:** `dict[str, int]`
+
+### `unique(col)`
+
+Returns the unique values of a column in insertion order.
+
+```python
+categories = df.unique("category")
+# ['Electronics', 'Books', 'Clothing', ...]
+
+print(f"Distinct categories: {len(categories)}")
+```
+
+**Returns:** `list`
+
+---
+
+## 6. Observer — PHP and Node.js
+
+### Node.js
+
+```js
+// value_counts
+const stateCounts = df.valueCounts('state');
+console.log(`States: ${Object.keys(stateCounts).length}`);
+
+// unique
+const cats = df.unique('category');
+
+// Full export
+const records = df.toDict();       // array of objects
+const jsonStr = df.toJson();       // JSON string
+
+// tolist — array of arrays (values only)
+const matrix = df.tolist();
+```
+
+### PHP
+
+```php
+// value_counts
+$stateCounts = $df->value_counts('state');
+echo count($stateCounts) . " unique states\n";
+
+// unique
+$cats = $df->unique('category');
+
+// Full export
+$records = $df->to_dict();    // array of assoc arrays
+$json    = $df->to_json();    // JSON string
+
+// tolist — array of arrays
+$matrix  = $df->tolist();
+```
+
+---
+
+## 7. Complete Analysis Pipeline
+
+```python
+import pardox as px
+from pardox.io import execute_sql
+
+df = px.read_csv("sales_50k.csv")
+df.cast("quantity", "Float64")
+
+# Feature engineering
+revenue_df = df.mul("price", "quantity")
+
+# Aggregations
+print(f"Total revenue : ${df['price'].sum():,.2f}")
+print(f"Avg price     : ${df['price'].mean():,.4f}")
+print(f"Max price     : ${df['price'].max():,.2f}")
+print(f"Revenue std   : {revenue_df.std('result_mul'):,.2f}")
+print(f"Valid rows    : {df['transaction_id'].count():,}")
+
+# EDA inspection
+state_counts  = df.value_counts("state")
+categories    = df.unique("category")
+print(f"\nTop 3 states: {list(state_counts.items())[:3]}")
+print(f"Categories:   {categories}")
+
+# Full export
+records = df.to_dict()
+print(f"\nExported {len(records):,} records to Python list")
+```
+
+---
+
+## 8. GroupBy (Roadmap)
+
+Vectorized `groupby` with a Rust hash-aggregation engine is planned for **v0.3.2**.
+
+```python
+# Coming in v0.3.2
+summary = df.groupby("region").agg({
+    "revenue": "sum",
+    "quantity": "mean",
+    "transaction_id": "count"
+})
+```
+
+For now, use `value_counts` for frequency analysis and filter + aggregate on subsets:
+
+```python
+# Workaround: filter then aggregate
+tx_mask = df['state'].eq("TX")
+tx_df   = df.filter(tx_mask)
+print(f"TX revenue: ${tx_df['amount'].sum():,.2f}")
+```
