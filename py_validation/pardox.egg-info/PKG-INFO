@@ -1,0 +1,338 @@
+Metadata-Version: 2.4
+Name: pardox
+Version: 0.3.1
+Summary: High-Performance DataFrame Engine powered by Rust (The PardoX Project)
+Author-email: Alberto Cardenas <iam@albertocardenas.com>
+License: MIT
+Project-URL: Homepage, https://www.albertocardenas.com
+Project-URL: Source, https://github.com/betoalien/pardox
+Keywords: dataframe,rust,etl,big-data,simd
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Rust
+Classifier: Operating System :: OS Independent
+Classifier: Topic :: Scientific/Engineering :: Information Analysis
+Requires-Python: >=3.8
+Description-Content-Type: text/markdown
+
+# PardoX — High-Performance DataFrame Engine
+
+[![PyPI version](https://badge.fury.io/py/pardox.svg)](https://badge.fury.io/py/pardox)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![Powered By Rust](https://img.shields.io/badge/powered%20by-Rust-orange.svg)](https://www.rust-lang.org/)
+
+**The Speed of Rust. The Simplicity of Python.**
+
+PardoX is a next-generation DataFrame engine for high-performance ETL, data analysis, and database integration. A single **Rust core** powers the entire computation layer — Python is just the interface.
+
+> **v0.3.1 is now available.** Native database connectivity, GPU sort, zero-copy NumPy, and full Observer export added.
+
+---
+
+## ⚡ Why PardoX?
+
+| Capability | How |
+|------------|-----|
+| **Zero-copy ingestion** | Multi-threaded Rust CSV parser, data flows directly into HyperBlock buffers |
+| **SIMD arithmetic** | AVX2 / NEON instructions — 5x–20x faster than Python loops |
+| **Native database I/O** | Connect to PostgreSQL, MySQL, SQL Server, MongoDB — no `psycopg2`, no `pymysql`, no ORM |
+| **GPU sort** | WebGPU Bitonic sort with transparent CPU fallback |
+| **NumPy bridge** | Zero-copy `np.array(df['col'])` — direct pointer into Rust buffer |
+| **Cross-platform** | Linux x64 · Windows x64 · macOS Intel · macOS Apple Silicon — binaries pre-packaged |
+
+---
+
+## 📦 Installation
+
+```bash
+pip install pardox
+```
+
+No Rust compiler. No C extensions to build. No database drivers to install.
+
+**Requirements:** Python 3.10+
+
+---
+
+## 🚀 Quick Start
+
+```python
+import pardox as px
+from pardox.io import execute_sql
+
+# Load 50,000 rows — parallel Rust CSV parser
+df = px.read_csv("sales_data.csv")
+print(f"Loaded {df.shape[0]:,} rows × {df.shape[1]} columns")
+
+# Compute revenue (SIMD-accelerated)
+df.cast("quantity", "Float64")
+df['revenue'] = df['price'] * df['quantity']
+
+# Statistics — pure Rust, no NumPy needed
+print(f"Total revenue : ${df['revenue'].sum():,.2f}")
+print(f"Avg ticket    : ${df['revenue'].mean():,.2f}")
+print(f"Std deviation : {df['revenue'].std():,.2f}")
+
+# Value frequency table
+state_counts = df.value_counts("state")
+print(state_counts)   # {'TX': 6345, 'CA': 6301, ...}
+
+# Write to PostgreSQL — COPY FROM STDIN auto-activated for > 10k rows
+CONN = "postgresql://user:password@localhost:5432/mydb"
+execute_sql(CONN, "CREATE TABLE IF NOT EXISTS sales (price FLOAT, quantity FLOAT, revenue FLOAT)")
+rows = df.to_sql(CONN, "sales", mode="append")
+print(f"Written {rows:,} rows to PostgreSQL")
+
+# Save locally — 4.6 GB/s read throughput
+df.to_prdx("sales_processed.prdx")
+```
+
+---
+
+## 🗄️ What's New in v0.3.1
+
+### 1. Relational Conqueror — Native Database I/O
+
+Connect to **PostgreSQL, MySQL, SQL Server, and MongoDB** entirely through the Rust core. No Python database drivers installed or imported.
+
+```python
+from pardox.io import (
+    read_sql, execute_sql,           # PostgreSQL
+    read_mysql, execute_mysql,       # MySQL
+    read_sqlserver, execute_sqlserver,  # SQL Server
+    read_mongodb, execute_mongodb,   # MongoDB
+)
+
+# Read from any database
+df = read_sql("postgresql://user:pass@localhost:5432/db", "SELECT * FROM orders")
+df = read_mysql("mysql://user:pass@localhost:3306/db", "SELECT * FROM products")
+df = read_sqlserver("Server=host,1433;UID=sa;PWD=Pwd;TrustServerCertificate=Yes", "SELECT TOP 1000 * FROM dbo.orders")
+df = read_mongodb("mongodb://admin:pass@localhost:27017", "mydb.orders")
+
+# Execute DDL / DML
+execute_sql(PG_CONN, "CREATE TABLE sales (id BIGINT, amount FLOAT)")
+execute_mysql(MY_CONN, "DROP TABLE IF EXISTS temp_data")
+execute_sqlserver(MS_CONN, "TRUNCATE TABLE dbo.staging")
+execute_mongodb(MG_CONN, "mydb", '{"drop": "old_collection"}')
+
+# Write with automatic bulk optimization
+rows = df.to_sql(PG_CONN, "sales", mode="append")       # COPY FROM STDIN for > 10k rows
+rows = df.to_mysql(MY_CONN, "products", mode="upsert", conflict_cols=["id"])
+rows = df.to_sqlserver(MS_CONN, "dbo.sales", mode="append")  # 500 rows/stmt batch INSERT
+rows = df.to_mongodb(MG_CONN, "mydb.sales", mode="append")   # 10k docs/batch, ordered:false
+```
+
+**Write modes:**
+
+| Database | `append` | `replace` | `upsert` |
+|----------|----------|-----------|----------|
+| PostgreSQL | INSERT (COPY for >10k) | — | ON CONFLICT DO UPDATE |
+| MySQL | INSERT 1k/stmt (LOAD DATA for >10k) | REPLACE INTO | ON DUPLICATE KEY UPDATE |
+| SQL Server | INSERT 500/stmt | INSERT 500/stmt | MERGE INTO |
+| MongoDB | insert_many 10k/batch | drop + insert_many | — |
+
+---
+
+### 2. The Observer — Full DataFrame Export & EDA
+
+```python
+# Value frequency table
+state_counts = df.value_counts("state")
+# {'TX': 6345, 'CA': 6301, 'CO': 6304, ...}
+
+# Unique values (insertion order)
+categories = df.unique("category")
+# ['Electronics', 'Books', 'Clothing', ...]
+
+# Full export to Python
+records  = df.to_dict()   # list of dicts — all rows
+json_str = df.to_json()   # JSON string "[{...}, ...]"
+```
+
+---
+
+### 3. Native Math Foundation
+
+Pure Rust arithmetic — no NumPy dependency.
+
+```python
+# New DataFrame methods (return new DataFrame)
+revenue_df = df.mul("price", "quantity")      # result column: 'result_mul'
+profit_df  = df.sub("revenue", "cost")        # result column: 'result_sub'
+total_df   = df.add("amount", "tax")          # result column: 'result_add'
+
+# Standard deviation (scalar)
+std_val = revenue_df.std("result_mul")
+
+# Min-Max normalization to [0, 1]
+normed_df = df.min_max_scale("price")         # result column: 'result_minmax'
+
+# Sort
+sorted_df = df.sort_values("price", ascending=False)
+```
+
+---
+
+### 4. GPU Awakening — Bitonic Sort
+
+```python
+# GPU Bitonic sort via WebGPU / wgpu — falls back to CPU silently
+sorted_df = df.sort_values("revenue", ascending=True, gpu=True)
+```
+
+If a compatible GPU (Vulkan / Metal / DX12) is not available, PardoX automatically uses the parallel CPU sort. The result is identical either way.
+
+---
+
+### 5. Zero-Copy NumPy Bridge
+
+```python
+import numpy as np
+
+# Direct pointer into Rust buffer — no data copy
+arr = np.array(df["price"])   # dtype: float64
+
+# Compatible with Scikit-Learn and PyTorch out of the box
+from sklearn.linear_model import LinearRegression
+X = np.column_stack([np.array(df["price"]), np.array(df["quantity"])])
+y = np.array(df["tax"])
+model = LinearRegression().fit(X, y)
+```
+
+---
+
+## 📊 Benchmarks
+
+Hardware: MacBook Pro M2, 16 GB RAM.
+
+| Operation | Pandas v2.x | PardoX v0.3.1 | Speedup |
+|-----------|------------|---------------|---------|
+| Read CSV (1 GB) | 4.2s | 0.8s | **5.2x** |
+| Column multiply | 0.15s | 0.02s | **7.5x** |
+| Fill NA | 0.30s | 0.04s | **7.5x** |
+| Read binary | 0.9s (Parquet) | 0.2s (.prdx) | **4.5x** |
+| PostgreSQL write 50k rows | ~18s (psycopg2 executemany) | ~0.6s (COPY) | **~30x** |
+| MySQL write 50k rows | ~22s (pymysql) | ~3s (batch INSERT) | **~7x** |
+
+---
+
+## 📋 Full API Overview
+
+### Top-level functions
+
+```python
+import pardox as px
+
+df = px.read_csv("file.csv", schema={"price": "Float64"})
+df = px.read_prdx("file.prdx")
+df = px.from_arrow(arrow_table)   # zero-copy from PyArrow
+```
+
+### DataFrame properties & inspection
+
+```python
+df.shape          # (rows, cols)
+df.columns        # ['col1', 'col2', ...]
+df.dtypes         # {'col1': 'Float64', ...}
+df.show(10)       # ASCII table preview
+df.head(5)        # → DataFrame
+df.tail(5)        # → DataFrame
+df.iloc(0, 100)   # → DataFrame (rows 0-99)
+```
+
+### Arithmetic & transform
+
+```python
+df['total'] = df['price'] * df['quantity']   # Series operators
+df.cast("col", "Float64")
+df.fillna(0.0)
+df.round(2)
+revenue_df   = df.mul("price", "quantity")
+profit_df    = df.sub("revenue", "cost")
+normed_df    = df.min_max_scale("price")
+std_val      = df.std("price")             # float
+sorted_df    = df.sort_values("price", ascending=True, gpu=False)
+```
+
+### Filtering
+
+```python
+mask = df['price'].gt(100.0)
+df_filtered = df.filter(mask)
+```
+
+### Aggregations
+
+```python
+df['col'].sum()    # float
+df['col'].mean()   # float
+df['col'].min()    # float
+df['col'].max()    # float
+df['col'].std()    # float
+df['col'].count()  # int
+```
+
+### Observer
+
+```python
+df.value_counts("col")   # dict[str, int]
+df.unique("col")         # list
+df.to_dict()             # list[dict]
+df.to_json()             # str
+```
+
+### Write
+
+```python
+df.to_prdx("out.prdx")
+df.to_csv("out.csv")
+df.to_sql(conn, "table", mode="append", conflict_cols=[])
+df.to_mysql(conn, "table", mode="append", conflict_cols=[])
+df.to_sqlserver(conn, "table", mode="append", conflict_cols=[])
+df.to_mongodb(conn, "db.collection", mode="append")
+```
+
+### NumPy
+
+```python
+import numpy as np
+arr = np.array(df["price"])   # zero-copy Float64 array
+```
+
+---
+
+## 🗺️ Roadmap
+
+| Version | Status | Highlights |
+|---------|--------|------------|
+| v0.1 | ✅ Released | CSV, arithmetic, aggregations, .prdx format |
+| v0.3.1 | ✅ Released | Databases (PG/MySQL/MSSQL/MongoDB), Observer, Math, GPU sort, NumPy bridge |
+| v0.3.2 | 🔜 Planned | SQL Server `!` password fix, error hierarchy, GroupBy, Parquet reader, fake PG server |
+
+---
+
+## 🌐 Platform Support
+
+| OS | Architecture | Status |
+|----|-------------|--------|
+| Linux | x86_64 | ✅ Stable |
+| Windows | x86_64 | ✅ Stable |
+| macOS | ARM64 (M1/M2/M3) | ✅ Stable |
+| macOS | x86_64 (Intel) | ✅ Stable |
+
+---
+
+## 📘 Documentation
+
+[**Full Documentation →**](https://betoalien.github.io/PardoX/)
+
+---
+
+## 📄 License
+
+MIT License — free for commercial and personal use.
+
+---
+
+<p align="center">by Alberto Cardenas<br>
+<a href="https://www.albertocardenas.com">www.albertocardenas.com</a> · <a href="https://www.pardox.io">www.pardox.io</a></p>

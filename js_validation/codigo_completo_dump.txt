@@ -1,0 +1,2118 @@
+[[README.md]]
+# PardoX for Node.js — High-Performance DataFrame Engine
+
+[![npm version](https://badge.fury.io/js/%40pardox%2Fpardox.svg)](https://www.npmjs.com/package/@pardox/pardox)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js 18+](https://img.shields.io/badge/node-18+-339933.svg)](https://nodejs.org/)
+[![Powered By Rust](https://img.shields.io/badge/powered%20by-Rust-orange.svg)](https://www.rust-lang.org/)
+
+**The Speed of Rust. The Simplicity of JavaScript.**
+
+PardoX is a high-performance DataFrame engine for Node.js. A single **Rust core** handles all computation — CSV parsing, arithmetic, database I/O, and sorting — exposed to JavaScript through [koffi](https://koffi.dev/) FFI. No Python. No native Node addons to compile. No database drivers.
+
+> **v0.3.1 is now available.** Native database connectivity for PostgreSQL, MySQL, SQL Server, and MongoDB. Full Observer export. GPU sort. All from Node.js.
+
+---
+
+## ⚡ Why PardoX for Node.js?
+
+| Capability | How |
+|------------|-----|
+| **Zero-copy ingestion** | Multi-threaded Rust CSV parser — no JS string processing |
+| **SIMD arithmetic** | AVX2 / NEON — 5x–20x faster than JS loops |
+| **Native database I/O** | Rust drivers for PostgreSQL, MySQL, SQL Server, MongoDB — no `pg`, no `mysql2`, no Mongoose |
+| **GPU sort** | WebGPU Bitonic sort with transparent CPU fallback |
+| **Proxy-based subscript** | `df['col']` returns a Series; `df['col'] = series` assigns a column — native JS syntax |
+| **Cross-platform** | Linux x64 · Windows x64 · macOS Intel · macOS Apple Silicon |
+
+---
+
+## 📦 Installation
+
+```bash
+npm install @pardox/pardox
+```
+
+**Requirements:**
+- Node.js 18 or higher
+- No native compilation needed — prebuilt Rust binaries included
+
+---
+
+## 🚀 Quick Start
+
+```js
+const { DataFrame, read_csv, executeSql } = require('@pardox/pardox');
+
+// Load 50,000 rows — parallel Rust CSV parser
+const df = read_csv('./sales_data.csv');
+console.log(`Loaded ${df.shape[0].toLocaleString()} rows × ${df.shape[1]} columns`);
+
+// Cast and compute revenue (SIMD-accelerated)
+df.cast('quantity', 'Float64');
+const revenueDf = df.mul('price', 'quantity');   // result column: 'result_mul'
+
+// Statistics — pure Rust, no math libraries needed
+console.log(`Total revenue : $${df['price'].sum().toFixed(2)}`);
+console.log(`Avg ticket    : $${df['price'].mean().toFixed(2)}`);
+console.log(`Std deviation : ${df.std('price').toFixed(2)}`);
+
+// Value frequency table
+const stateCounts = df.valueCounts('state');
+console.log(stateCounts);   // { TX: 6345, CA: 6301, ... }
+
+// Write to PostgreSQL — COPY FROM STDIN auto-activated for > 10k rows
+const PG = 'postgresql://user:password@localhost:5432/mydb';
+executeSql(PG, 'CREATE TABLE IF NOT EXISTS sales (price FLOAT, quantity FLOAT)');
+const rows = df.toSql(PG, 'sales', 'append');
+console.log(`Written ${rows.toLocaleString()} rows to PostgreSQL`);
+
+// Save locally — 4.6 GB/s read throughput
+df.toPrdx('./sales_processed.prdx');
+```
+
+---
+
+## 🗄️ What's New in v0.3.1
+
+### 1. Relational Conqueror — Native Database I/O
+
+Connect to **PostgreSQL, MySQL, SQL Server, and MongoDB** entirely through the Rust core. No `pg`, no `mysql2`, no MongoDB Node driver installed or imported.
+
+```js
+const {
+    read_csv,
+    read_sql, executeSql,                    // PostgreSQL
+    read_mysql, execute_mysql,               // MySQL
+    read_sqlserver, execute_sqlserver,       // SQL Server
+    read_mongodb, execute_mongodb,           // MongoDB
+} = require('@pardox/pardox');
+
+// ── PostgreSQL ──────────────────────────────────────────────────────
+const PG = 'postgresql://user:pass@localhost:5432/db';
+
+const df = read_sql(PG, "SELECT * FROM orders WHERE status = 'active'");
+executeSql(PG, 'DROP TABLE IF EXISTS orders_archive');
+executeSql(PG, 'CREATE TABLE orders_archive (id BIGINT, amount FLOAT, region TEXT)');
+
+// COPY FROM STDIN auto-activated for > 10,000 rows
+const rowsPg = df.toSql(PG, 'orders_archive', 'append');
+
+// Upsert — INSERT … ON CONFLICT DO UPDATE
+const rowsUp = df.toSql(PG, 'orders_archive', 'upsert', ['id']);
+
+// ── MySQL ───────────────────────────────────────────────────────────
+const MY = 'mysql://user:pass@localhost:3306/db';
+
+const dfMy = read_mysql(MY, 'SELECT * FROM products WHERE active = 1');
+execute_mysql(MY, 'CREATE TABLE IF NOT EXISTS products_bak (id BIGINT, price DOUBLE)');
+
+dfMy.toMysql(MY, 'products_bak', 'append');           // chunked INSERT 1k/stmt
+dfMy.toMysql(MY, 'products_bak', 'replace');          // REPLACE INTO
+dfMy.toMysql(MY, 'products_bak', 'upsert', ['id']);   // ON DUPLICATE KEY UPDATE
+
+// ── SQL Server ──────────────────────────────────────────────────────
+const MS = 'Server=localhost,1433;Database=mydb;UID=sa;PWD=MyPwd;TrustServerCertificate=Yes';
+
+const dfMs = read_sqlserver(MS, 'SELECT TOP 5000 * FROM dbo.transactions');
+execute_sqlserver(MS, 'DROP TABLE IF EXISTS dbo.transactions_bak');
+
+dfMs.toSqlserver(MS, 'dbo.transactions_bak', 'append');          // 500 rows/stmt batch INSERT
+dfMs.toSqlserver(MS, 'dbo.transactions_bak', 'upsert', ['id']); // MERGE INTO
+
+// ── MongoDB ─────────────────────────────────────────────────────────
+const MG = 'mongodb://admin:pass@localhost:27017';
+
+const dfMg = read_mongodb(MG, 'mydb.orders');
+execute_mongodb(MG, 'mydb', '{"drop": "orders_archive"}');
+
+dfMg.toMongodb(MG, 'mydb.orders_archive', 'append');   // 10k docs/batch, ordered:false
+dfMg.toMongodb(MG, 'mydb.orders_archive', 'replace');  // drop + insert_many
+```
+
+**Write modes:**
+
+| Database | `append` | `replace` | `upsert` |
+|----------|----------|-----------|----------|
+| PostgreSQL | INSERT (COPY for >10k rows) | — | ON CONFLICT DO UPDATE |
+| MySQL | INSERT 1k/stmt (LOAD DATA for >10k) | REPLACE INTO | ON DUPLICATE KEY UPDATE |
+| SQL Server | INSERT 500/stmt | INSERT 500/stmt | MERGE INTO |
+| MongoDB | insert_many 10k/batch | drop + insert_many | — |
+
+> **Note on SQL Server passwords:** Avoid using `!` in SQL Server passwords. A known issue in the tiberius v0.12 Rust driver causes authentication failure when `!` is present when connecting via TCP. Use only `[A-Za-z0-9_\-@#$]`. Fix planned for v0.3.2.
+
+---
+
+### 2. The Observer — Full DataFrame Export & EDA
+
+```js
+// Value frequency table
+const stateCounts = df.valueCounts('state');
+// { TX: 6345, CA: 6301, CO: 6304, ... }
+
+// Unique values (insertion order)
+const categories = df.unique('category');
+// ['Electronics', 'Books', 'Clothing', ...]
+
+// Full export to JavaScript
+const records = df.toDict();    // Array of objects — all rows
+const matrix  = df.toList();    // Array of arrays — values only
+const jsonStr = df.toJson();    // JSON string "[{...}, ...]"
+```
+
+---
+
+### 3. Native Math Foundation
+
+Pure Rust arithmetic — no numeric libraries needed.
+
+```js
+// DataFrame arithmetic methods — return new DataFrame
+const revenueDf = df.mul('price', 'quantity');   // result column: 'result_mul'
+const profitDf  = df.sub('revenue', 'cost');     // result column: 'result_math_sub'
+const totalDf   = df.add('amount', 'tax');       // result column: 'result_math_add'
+
+// Standard deviation (scalar)
+const stdVal = revenueDf.std('result_mul');
+console.log(`Revenue std dev: ${stdVal.toFixed(2)}`);
+
+// Min-Max normalization to [0, 1]
+const normedDf = df.minMaxScale('price');        // result column: 'result_minmax'
+
+// Sort
+const sortedDf = df.sortValues('price', false);  // descending, CPU sort
+```
+
+---
+
+### 4. GPU Sort — Bitonic Sort via WebGPU
+
+```js
+// GPU Bitonic sort — falls back to CPU silently if GPU unavailable
+const sortedDf = df.sortValues('revenue', true, true);  // (by, ascending, gpu)
+```
+
+If a compatible GPU (Vulkan / Metal / DX12) is not available, PardoX automatically uses the parallel CPU sort. The result is identical either way.
+
+---
+
+### 5. Proxy-Based Column Syntax
+
+PardoX wraps every DataFrame in a JavaScript `Proxy` so that column access and assignment feel native:
+
+```js
+// Column access → Series
+const prices = df['price'];
+
+// Arithmetic between Series → new Series
+const revenue = df['price'].mul(df['quantity']);
+
+// Column assignment from Series
+df['revenue'] = df['price'].mul(df['quantity']);
+
+// Filter using a boolean Series mask
+const mask     = df['price'].gt(100.0);
+const filtered = df.filter(mask);
+```
+
+---
+
+## 📋 Full API Overview
+
+### Top-level functions
+
+```js
+const {
+    DataFrame,
+    Series,
+    read_csv,
+    read_sql,    executeSql,
+    read_mysql,  execute_mysql,
+    read_sqlserver, execute_sqlserver,
+    read_mongodb,   execute_mongodb,
+    read_prdx,
+} = require('@pardox/pardox');
+
+const df = read_csv('./file.csv', { price: 'Float64' });  // optional schema
+const df = read_sql(pgConn, 'SELECT * FROM orders');
+const df = read_mysql(myConn, 'SELECT * FROM products');
+const df = read_sqlserver(msConn, 'SELECT TOP 100 * FROM dbo.t');
+const df = read_mongodb(mgConn, 'mydb.collection');
+
+const rows = read_prdx('./file.prdx', 100);  // Array of objects (preview)
+
+// Factory from in-memory JS array of objects
+const df = DataFrame.fromArray([{ id: 1, val: 2.5 }, { id: 2, val: 3.1 }]);
+```
+
+### DataFrame — Properties
+
+```js
+df.shape      // [rows, cols]
+df.columns    // ['col1', 'col2', ...]
+df.dtypes     // { col1: 'Float64', ... }
+```
+
+### DataFrame — Inspection
+
+```js
+df.show(10);              // ASCII table (stdout)
+df.head(5);               // → DataFrame
+df.tail(5);               // → DataFrame
+df.iloc(0, 100);          // → DataFrame (rows 0–99)
+df.toJson(50);            // JSON string, first 50 rows (preview)
+```
+
+### DataFrame — Arithmetic & Transform
+
+```js
+df.cast('quantity', 'Float64');
+df.fillna(0.0);                        // returns this (chainable)
+df.round(2);                           // returns this (chainable)
+df.mul('price', 'quantity');           // → DataFrame with 'result_mul'
+df.sub('revenue', 'cost');             // → DataFrame with 'result_math_sub'
+df.add('amount', 'tax');               // → DataFrame with 'result_math_add'
+df.std('column');                      // float
+df.minMaxScale('col');                 // → DataFrame with 'result_minmax'
+df.sortValues('col', true);            // → DataFrame (ascending)
+df.sortValues('col', false, true);     // → DataFrame (descending, GPU)
+```
+
+### DataFrame — Join & Filter
+
+```js
+df.join(other, { on: 'id' });                          // hash join, same key name
+df.join(other, { leftOn: 'order_id', rightOn: 'id' }); // different key names
+df.filter(mask);                                        // → DataFrame
+```
+
+### Series — Column Access & Arithmetic
+
+```js
+const col  = df['price'];              // → Series
+const rev  = df['price'].mul(df['quantity']);  // → Series
+
+df['revenue'] = df['price'].mul(df['quantity']); // column assignment
+```
+
+### Series — Aggregations
+
+```js
+df['col'].sum();    // float
+df['col'].mean();   // float
+df['col'].min();    // float
+df['col'].max();    // float
+df['col'].std();    // float
+df['col'].count();  // int
+```
+
+### Series — Comparisons (filter masks)
+
+```js
+df['price'].eq(100);      // ===
+df['price'].neq(100);     // !==
+df['price'].gt(100);      // >
+df['price'].gte(100);     // >=
+df['price'].lt(100);      // <
+df['price'].lte(100);     // <=
+```
+
+### Observer
+
+```js
+df.valueCounts('col');   // { 'value': count, ... }
+df.unique('col');        // ['val1', 'val2', ...]
+df.toDict();             // [{ col: val, ... }, ...]  — all rows
+df.toList();             // [[val, val, ...], ...]    — values only
+df.toJson();             // JSON string — all rows
+```
+
+### Write
+
+```js
+df.toPrdx('./out.prdx');
+df.toCsv('./out.csv');
+df.toSql(pgConn, 'table', 'append', ['id']);
+df.toMysql(myConn, 'table', 'upsert', ['id']);
+df.toSqlserver(msConn, 'dbo.table', 'append');
+df.toMongodb(mgConn, 'db.collection', 'append');
+```
+
+### IO — Standalone execute helpers
+
+```js
+executeSql(pgConn,       'CREATE TABLE ...');
+execute_mysql(myConn,    'DROP TABLE IF EXISTS ...');
+execute_sqlserver(msConn,'TRUNCATE TABLE dbo.staging');
+execute_mongodb(mgConn,  'mydb', '{"drop": "col"}');
+```
+
+---
+
+## 📊 Benchmarks
+
+| Operation | Node.js (js-native) | PardoX v0.3.1 | Speedup |
+|-----------|---------------------|---------------|---------|
+| Read CSV (1 GB) | ~10s | ~0.8s | **~12x** |
+| Column multiply (1M rows) | ~0.6s | ~0.02s | **~30x** |
+| PostgreSQL write 50k rows | ~20s (pg execute) | ~0.6s (COPY) | **~33x** |
+| MySQL write 50k rows | ~25s (mysql2) | ~3s (batch INSERT) | **~8x** |
+
+---
+
+## 🗺️ Roadmap
+
+| Version | Status | Highlights |
+|---------|--------|------------|
+| v0.1 | ✅ Released | CSV, arithmetic, aggregations, .prdx format |
+| v0.3.1 | ✅ Released | Databases (PG/MySQL/MSSQL/MongoDB), Observer, Math, GPU sort |
+| v0.3.2 | 🔜 Planned | SQL Server `!` password fix, error hierarchy, GroupBy, Parquet reader |
+
+---
+
+## 🌐 Platform Support
+
+| OS | Architecture | Status |
+|----|-------------|--------|
+| Linux | x86_64 | ✅ Stable |
+| Windows | x86_64 | ✅ Stable |
+| macOS | ARM64 (M1/M2/M3) | ✅ Stable |
+| macOS | x86_64 (Intel) | ✅ Stable |
+
+---
+
+## 📘 Documentation
+
+[**Full Documentation →**](https://betoalien.github.io/PardoX/)
+
+---
+
+## 📄 License
+
+MIT License — free for commercial and personal use.
+
+---
+
+<p align="center">by Alberto Cardenas<br>
+<a href="https://www.albertocardenas.com">www.albertocardenas.com</a> · <a href="https://www.pardox.io">www.pardox.io</a></p>
+
+
+[[test_e2e.js]]
+'use strict';
+/**
+ * PardoX Engine v0.3.1 — End-to-End Node.js Validation
+ * =====================================================
+ * Tests: CSV ingestion, mul(), GPU sort, Observer (heap-alloc JSON),
+ *        PostgreSQL write.
+ */
+
+const path  = require('path');
+// Resolve pardox SDK from local folder (simulating npm local install)
+process.chdir(__dirname);
+const pardox = require('./pardox/src/index');
+const { executeSql } = pardox;
+
+// ---------------------------------------------------------------------------
+// Connection strings (local Docker instances)
+// ---------------------------------------------------------------------------
+const POSTGRES_CONN = 'postgresql://pardox:pardox123@localhost:5434/pardox_test';
+
+function sep(title) {
+    console.log('\n' + '='.repeat(60));
+    console.log('  ' + title);
+    console.log('='.repeat(60));
+}
+
+async function main() {
+
+    // -----------------------------------------------------------------------
+    // Task 1: Load 50k CSV
+    // -----------------------------------------------------------------------
+    sep('Task 1: Load hardcore_sales_50k.csv');
+    const df = pardox.read_csv('./hardcore_sales_50k.csv');
+    const rows = df.shape[0];
+    console.log(`  Rows loaded : ${rows.toLocaleString()}`);
+    console.log(`  Columns     : ${df.columns.join(', ')}`);
+    if (rows !== 50000) throw new Error(`Expected 50000 rows, got ${rows}`);
+    console.log('  [PASS] CSV loaded successfully.');
+
+    // -----------------------------------------------------------------------
+    // Task 2: Math — total_tax = tax * quantity
+    // -----------------------------------------------------------------------
+    sep('Task 2: mul(tax, quantity)');
+    // quantity is inferred as Int64; pardox_series_mul requires Float64 — cast first
+    df.cast('quantity', 'Float64');
+    const taxDf = df.mul('tax', 'quantity');
+    console.log(`  taxDf columns : ${taxDf.columns.join(', ')}`);
+    if (!taxDf.columns.includes('result_mul'))
+        throw new Error("Expected column 'result_mul'");
+    const taxStd = taxDf.std('result_mul');
+    console.log(`  std(total_tax) : ${taxStd.toFixed(4)}`);
+    console.log('  [PASS] Multiplication computed.');
+
+    // -----------------------------------------------------------------------
+    // Task 3: GPU Sort — sort by latitude ascending
+    // -----------------------------------------------------------------------
+    sep('Task 3: GPU Sort — sortValues(latitude, ascending=true, gpu=true)');
+    const sortedDf = df.sortValues('latitude', true, true);
+    console.log(`  Sorted rows : ${sortedDf.shape[0].toLocaleString()}`);
+    if (sortedDf.shape[0] !== 50000)
+        throw new Error('Row count changed after sort');
+    console.log('  [PASS] GPU/CPU sort completed.');
+
+    // -----------------------------------------------------------------------
+    // Task 4: Observer — verify heap-allocated JSON (memory patch)
+    // -----------------------------------------------------------------------
+    sep('Task 4: Observer — toJson() heap-allocation memory patch');
+    const jsonStr = sortedDf.toJson();
+    const parsed  = JSON.parse(jsonStr);
+    const first2  = parsed.slice(0, 2);
+    console.log(`  Total records in JSON : ${parsed.length.toLocaleString()}`);
+    console.log(`  First record keys     : ${Object.keys(first2[0]).slice(0, 5).join(', ')}`);
+    console.log(`  First record latitude : ${first2[0].latitude}`);
+    console.log(`  Second record latitude: ${first2[1].latitude}`);
+    if (parsed.length !== 50000)
+        throw new Error(`Expected 50000 records, got ${parsed.length}`);
+    console.log('  [PASS] Observer heap-allocation memory patch working correctly.');
+
+    // -----------------------------------------------------------------------
+    // Task 5: Relational Conqueror — PostgreSQL (append)
+    // -----------------------------------------------------------------------
+    sep('Task 5: Write to PostgreSQL (mode=append)');
+    try {
+        // execute_sql is single-statement; split DROP and CREATE into separate calls
+        executeSql(POSTGRES_CONN, 'DROP TABLE IF EXISTS sales_validation_js');
+        executeSql(POSTGRES_CONN, (
+            'CREATE TABLE sales_validation_js (' +
+            'transaction_id TEXT, timestamp TEXT, date_only TEXT,' +
+            'customer_id BIGINT, state TEXT, latitude DOUBLE PRECISION,' +
+            'longitude DOUBLE PRECISION, category TEXT, price DOUBLE PRECISION,' +
+            'quantity DOUBLE PRECISION, discount DOUBLE PRECISION,' +
+            'tax DOUBLE PRECISION, is_refunded TEXT, notes TEXT)'
+        ));
+        const rowsPg = sortedDf.toSql(POSTGRES_CONN, 'sales_validation_js', 'append');
+        console.log(`  Rows written to Postgres : ${rowsPg.toLocaleString()}`);
+        if (rowsPg !== 50000)
+            throw new Error(`Expected 50000, got ${rowsPg}`);
+        console.log('  [PASS] PostgreSQL write successful.');
+    } catch (e) {
+        console.error(`  [FAIL] PostgreSQL: ${e.message}`);
+        process.exit(1);
+    }
+
+    // -----------------------------------------------------------------------
+    // Summary
+    // -----------------------------------------------------------------------
+    sep('VALIDATION COMPLETE');
+    console.log('  Node.js SDK v0.3.1 — All tasks passed.');
+    console.log('  CSV rows processed : 50,000');
+    console.log('  Databases written  : PostgreSQL');
+}
+
+main().catch(err => {
+    console.error('[FATAL]', err);
+    process.exit(1);
+});
+
+
+[[pardox/package.json]]
+{
+  "name": "@pardox/pardox",
+  "version": "0.3.1",
+  "description": "Universal High-Performance DataFrame Engine for Node.js (powered by Rust)",
+  "main": "src/index.js",
+  "keywords": [
+    "dataframe",
+    "rust",
+    "ffi",
+    "data-analysis",
+    "etl",
+    "performance",
+    "pandas"
+  ],
+  "author": {
+    "name": "Alberto Cárdenas",
+    "email": "conect@albertocardenas.com"
+  },
+  "license": "MIT",
+  "files": [
+    "src",
+    "libs",
+    "README.md"
+  ],
+  "dependencies": {
+    "koffi": "^2.9.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/albertocardenas/pardox"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  }
+}
+
+
+[[pardox/src/index.js]]
+'use strict';
+
+/**
+ * PardoX — Universal High-Performance DataFrame Engine for Node.js
+ *
+ * Usage:
+ *   const { DataFrame, Series, read_csv, read_sql, read_prdx } = require('@pardox/pardox');
+ *
+ *   // Load from CSV
+ *   const df = read_csv('./data.csv');
+ *   df.show();
+ *
+ *   // Column access (Proxy-based subscript)
+ *   const col = df['price'];    // → Series
+ *   df['tax'] = df['price'].mul(df['rate']);  // column assignment
+ *
+ *   // Aggregations
+ *   console.log(df['price'].sum());
+ *   console.log(df['price'].mean());
+ *
+ *   // Filtering
+ *   const mask = df['price'].gt(100);
+ *   const filtered = df.filter(mask);
+ *
+ *   // Write to PostgreSQL
+ *   df.toSql('postgresql://user:pass@localhost:5432/db', 'products', 'upsert', ['id']);
+ */
+
+const { DataFrame } = require('./DataFrame');
+const { Series }    = require('./Series');
+const {
+    read_csv,
+    read_sql,
+    read_prdx,
+    executeSql,
+    read_mysql,
+    execute_mysql,
+    read_sqlserver,
+    execute_sqlserver,
+    read_mongodb,
+    execute_mongodb,
+} = require('./io');
+const { getLib } = require('./ffi');
+
+module.exports = {
+    // Core classes
+    DataFrame,
+    Series,
+
+    // IO helpers (functional API, mirrors Python's pardox.read_csv())
+    read_csv,
+    read_sql,
+    read_prdx,
+    executeSql,
+    read_mysql,
+    execute_mysql,
+    read_sqlserver,
+    execute_sqlserver,
+    read_mongodb,
+    execute_mongodb,
+
+    // Low-level access (for advanced use)
+    getLib,
+};
+
+
+[[pardox/src/DataFrame.js]]
+'use strict';
+
+/**
+ * PardoX DataFrame for Node.js
+ *
+ * Mirrors Python's frame.py and PHP's DataFrame.php.
+ *
+ * Key design notes (from Node.js integration experience):
+ *   - ALL FFI calls are strictly synchronous — no promises/callbacks.
+ *   - Types are explicitly declared in ffi.js to avoid calling-convention issues.
+ *   - A JavaScript Proxy wraps each DataFrame instance to enable df['col'] subscript
+ *     syntax for column selection and column assignment.
+ */
+
+const { getLib } = require('./ffi');
+
+// Default CSV reader configuration (mirrors Python's io.py DEFAULT_CSV_CONFIG)
+const DEFAULT_CSV_CONFIG = JSON.stringify({
+    delimiter:  44,           // comma
+    quote_char: 34,           // double-quote
+    has_header: true,
+    chunk_size: 16 * 1024 * 1024,
+});
+
+// Internal symbol used to access the raw pointer from outside this module
+const PTR_SYMBOL = Symbol('pardox.ptr');
+
+class DataFrame {
+    /**
+     * @param {*|null}  ptr      Opaque koffi pointer to the HyperBlockManager, or null.
+     */
+    constructor(ptr = null) {
+        this[PTR_SYMBOL] = ptr;
+        return createProxy(this);
+    }
+
+    // -------------------------------------------------------------------------
+    // Destructor — Node.js FinalizationRegistry handles GC-based freeing
+    // -------------------------------------------------------------------------
+
+    _free() {
+        if (this[PTR_SYMBOL] !== null) {
+            const lib = getLib();
+            lib.pardox_free_manager(this[PTR_SYMBOL]);
+            this[PTR_SYMBOL] = null;
+        }
+    }
+
+    // -------------------------------------------------------------------------
+    // Properties
+    // -------------------------------------------------------------------------
+
+    get shape() {
+        const lib = getLib();
+        const rows = lib.pardox_get_row_count(this[PTR_SYMBOL]);
+        const cols = this.columns.length;
+        return [rows, cols];
+    }
+
+    get columns() {
+        const schema = this._schema();
+        return (schema.columns || []).map(c => c.name);
+    }
+
+    get dtypes() {
+        const schema = this._schema();
+        const result = {};
+        for (const col of (schema.columns || [])) {
+            result[col.name] = col.type;
+        }
+        return result;
+    }
+
+    // -------------------------------------------------------------------------
+    // Factory Methods
+    // -------------------------------------------------------------------------
+
+    /**
+     * Load a CSV file using the Rust engine.
+     * @param {string}      path    Path to the CSV file.
+     * @param {Object|null} schema  Optional: { colName: 'Int64', ... }
+     * @returns {DataFrame}
+     */
+    static read_csv(path, schema = null) {
+        const lib = getLib();
+        const fs = require('fs');
+
+        if (!fs.existsSync(path)) {
+            throw new Error(`CSV file not found: ${path}`);
+        }
+
+        let schemaJson = '{}';
+        if (schema !== null) {
+            const cols = Object.entries(schema).map(([name, type]) => ({ name, type }));
+            schemaJson = JSON.stringify({ columns: cols });
+        }
+
+        const ptr = lib.pardox_load_manager_csv(path, schemaJson, DEFAULT_CSV_CONFIG);
+
+        if (!ptr) {
+            throw new Error(`Failed to load CSV: ${path}`);
+        }
+
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Run a SQL query via the Rust native driver.
+     * @param {string} connectionString  PostgreSQL connection URL.
+     * @param {string} query             SQL query.
+     * @returns {DataFrame}
+     */
+    static read_sql(connectionString, query) {
+        const lib = getLib();
+
+        const ptr = lib.pardox_scan_sql(connectionString, query);
+
+        if (!ptr) {
+            throw new Error('SQL query failed. Check connection string and query.');
+        }
+
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Run a MySQL query via the Rust native driver.
+     * @param {string} connectionString  MySQL URL (e.g. "mysql://user:pass@host:3306/db").
+     * @param {string} query             SQL query.
+     * @returns {DataFrame}
+     */
+    static read_mysql(connectionString, query) {
+        const lib = getLib();
+        const ptr = lib.pardox_read_mysql(connectionString, query);
+        if (!ptr) {
+            throw new Error('MySQL query failed. Check connection string and query.');
+        }
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Run a SQL Server query via the Rust native driver (tiberius).
+     * @param {string} connectionString  ADO.NET connection string.
+     * @param {string} query             SQL query.
+     * @returns {DataFrame}
+     */
+    static read_sqlserver(connectionString, query) {
+        const lib = getLib();
+        const ptr = lib.pardox_read_sqlserver(connectionString, query);
+        if (!ptr) {
+            throw new Error('SQL Server query failed. Check connection string and query.');
+        }
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Read a MongoDB collection via the Rust native driver.
+     * @param {string} connectionString   MongoDB URI (e.g. "mongodb://user:pass@host:27017").
+     * @param {string} dbDotCollection    Target as "database.collection".
+     * @returns {DataFrame}
+     */
+    static read_mongodb(connectionString, dbDotCollection) {
+        const lib = getLib();
+        const ptr = lib.pardox_read_mongodb(connectionString, dbDotCollection);
+        if (!ptr) {
+            throw new Error('MongoDB read failed. Check connection string and target.');
+        }
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Create a DataFrame from an array of plain objects.
+     * @param {Object[]} data  Array of row objects.
+     * @returns {DataFrame}
+     */
+    static fromArray(data) {
+        if (!Array.isArray(data) || data.length === 0) {
+            throw new Error('fromArray requires a non-empty array of objects.');
+        }
+
+        const lib = getLib();
+        const ndjson = data.map(row => JSON.stringify(row)).join('\n');
+        const buf = Buffer.from(ndjson, 'utf8');
+
+        const ptr = lib.pardox_read_json_bytes(ndjson, buf.byteLength);
+
+        if (!ptr) {
+            throw new Error('Rust engine failed to ingest JSON data.');
+        }
+
+        return new DataFrame(ptr);
+    }
+
+    // -------------------------------------------------------------------------
+    // Inspection & Visualization
+    // -------------------------------------------------------------------------
+
+    /** Return a new DataFrame with the first N rows. */
+    head(n = 5) {
+        return this.slice(0, n);
+    }
+
+    /** Return a new DataFrame with the last N rows. */
+    tail(n = 5) {
+        const lib = getLib();
+        const newPtr = lib.pardox_tail_manager(this[PTR_SYMBOL], n);
+        if (!newPtr) throw new Error('tail() failed (Rust returned null).');
+        return new DataFrame(newPtr);
+    }
+
+    /** Print N rows as an ASCII table to stdout. */
+    show(n = 10) {
+        const lib = getLib();
+        const ascii = lib.pardox_manager_to_ascii(this[PTR_SYMBOL], n);
+        if (ascii) console.log('\n' + ascii);
+    }
+
+    /** Serialize up to `limit` rows as a JSON string. */
+    toJson(limit = 100) {
+        const lib = getLib();
+        return lib.pardox_manager_to_json(this[PTR_SYMBOL], limit) || '[]';
+    }
+
+    /** Return a slice (new DataFrame) by row positions [start, end). */
+    iloc(start, end) {
+        return this.slice(start, end - start);
+    }
+
+    // -------------------------------------------------------------------------
+    // Mutation & Transformation
+    // -------------------------------------------------------------------------
+
+    /** Cast a column to a new type in-place. Returns `this` for chaining. */
+    cast(col, targetType) {
+        const lib = getLib();
+        const res = lib.pardox_cast_column(this[PTR_SYMBOL], col, targetType);
+        if (res !== 1) {
+            throw new Error(`Failed to cast column '${col}' to '${targetType}'.`);
+        }
+        return this;
+    }
+
+    /**
+     * Hash-join with another DataFrame.
+     * @param {DataFrame}   other
+     * @param {string|null} on        Key column (same name on both sides).
+     * @param {string|null} leftOn    Left key column.
+     * @param {string|null} rightOn   Right key column.
+     */
+    join(other, { on = null, leftOn = null, rightOn = null } = {}) {
+        const lCol = on || leftOn;
+        const rCol = on || rightOn;
+
+        if (!lCol || !rCol) {
+            throw new Error("Specify 'on' or both 'leftOn' and 'rightOn'.");
+        }
+
+        const lib = getLib();
+        const resPtr = lib.pardox_hash_join(this[PTR_SYMBOL], other[PTR_SYMBOL], lCol, rCol);
+
+        if (!resPtr) throw new Error('Join failed (Rust returned null).');
+        return new DataFrame(resPtr);
+    }
+
+    /**
+     * Apply a boolean Series as a row filter.
+     * @param {Series} mask  Boolean Series produced by a comparison operation.
+     */
+    filter(mask) {
+        const { Series } = require('./Series');
+
+        if (!(mask instanceof Series)) {
+            throw new TypeError('filter() requires a PardoX Series mask.');
+        }
+
+        const lib = getLib();
+        const resPtr = lib.pardox_apply_filter(
+            this[PTR_SYMBOL],
+            mask._parentPtr(),
+            mask.name
+        );
+
+        if (!resPtr) throw new Error('Filter operation returned null.');
+        return new DataFrame(resPtr);
+    }
+
+    /** Fill null/NaN in all numeric columns. Returns `this` for chaining. */
+    fillna(val) {
+        const lib = getLib();
+        for (const [col, dtype] of Object.entries(this.dtypes)) {
+            if (['Float64', 'Int64'].includes(dtype)) {
+                lib.pardox_fill_na(this[PTR_SYMBOL], col, val);
+            }
+        }
+        return this;
+    }
+
+    /** Round all numeric columns to N decimal places. Returns `this` for chaining. */
+    round(decimals = 0) {
+        const lib = getLib();
+        for (const col of this.columns) {
+            lib.pardox_round(this[PTR_SYMBOL], col, decimals);
+        }
+        return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Writers
+    // -------------------------------------------------------------------------
+
+    /** Export to CSV. */
+    toCsv(path) {
+        const lib = getLib();
+        const res = lib.pardox_to_csv(this[PTR_SYMBOL], path);
+        if (res !== 1) {
+            const errors = {
+                '-1': 'Invalid Manager Pointer',
+                '-2': 'Invalid Path String',
+                '-3': 'Failed to initialize CSV Writer',
+                '-4': 'Failed to write header',
+                '-5': 'Failed to write data block',
+                '-6': 'Failed to flush buffer to disk',
+            };
+            throw new Error(`toCsv failed: ${errors[String(res)] || `Unknown code: ${res}`}`);
+        }
+        return true;
+    }
+
+    /** Export to native PardoX binary format (.prdx). */
+    toPrdx(path) {
+        const lib = getLib();
+        const res = lib.pardox_to_prdx(this[PTR_SYMBOL], path);
+        if (res !== 1) throw new Error(`toPrdx failed with code: ${res}`);
+        return true;
+    }
+
+    /**
+     * Write to a PostgreSQL table.
+     * @param {string}   connectionString  PostgreSQL connection URL.
+     * @param {string}   tableName         Target table name.
+     * @param {string}   mode              'append' (default) or 'upsert'.
+     * @param {string[]} conflictCols      Columns for ON CONFLICT clause.
+     * @returns {number} Rows written.
+     */
+    toSql(connectionString, tableName, mode = 'append', conflictCols = []) {
+        if (!['append', 'upsert'].includes(mode)) {
+            throw new Error("mode must be 'append' or 'upsert'.");
+        }
+
+        const lib = getLib();
+        const colsJson = JSON.stringify(conflictCols);
+
+        const rows = lib.pardox_write_sql(
+            this[PTR_SYMBOL],
+            connectionString,
+            tableName,
+            mode,
+            colsJson
+        );
+
+        if (rows < 0) {
+            const errors = {
+                '-1':   'Invalid Manager Pointer',
+                '-2':   'Invalid connection string',
+                '-3':   'Invalid table name',
+                '-4':   'Invalid mode string',
+                '-5':   'Invalid conflict_cols JSON',
+                '-100': 'Write operation failed (check connection and table schema)',
+            };
+            throw new Error(`toSql failed: ${errors[String(rows)] || `Unknown code: ${rows}`}`);
+        }
+
+        return rows;
+    }
+
+    /**
+     * Write to a MySQL table.
+     * @param {string}   connectionString  MySQL URL (e.g. "mysql://user:pass@host:3306/db").
+     * @param {string}   tableName         Target table name.
+     * @param {string}   mode              'append' (default), 'replace', or 'upsert'.
+     * @param {string[]} conflictCols      Columns for ON DUPLICATE KEY UPDATE clause.
+     * @returns {number} Rows written.
+     */
+    toMysql(connectionString, tableName, mode = 'append', conflictCols = []) {
+        if (!['append', 'replace', 'upsert'].includes(mode)) {
+            throw new Error("mode must be 'append', 'replace', or 'upsert'.");
+        }
+        const lib  = getLib();
+        const rows = lib.pardox_write_mysql(
+            this[PTR_SYMBOL],
+            connectionString,
+            tableName,
+            mode,
+            JSON.stringify(conflictCols)
+        );
+        if (rows < 0) {
+            throw new Error(`toMysql failed with error code: ${rows}`);
+        }
+        return rows;
+    }
+
+    /**
+     * Write to a SQL Server table.
+     * @param {string}   connectionString  ADO.NET connection string.
+     * @param {string}   tableName         Target table name.
+     * @param {string}   mode              'append' (default), 'replace', or 'upsert'.
+     * @param {string[]} conflictCols      Columns for MERGE ON clause.
+     * @returns {number} Rows written.
+     */
+    toSqlserver(connectionString, tableName, mode = 'append', conflictCols = []) {
+        if (!['append', 'replace', 'upsert'].includes(mode)) {
+            throw new Error("mode must be 'append', 'replace', or 'upsert'.");
+        }
+        const lib  = getLib();
+        const rows = lib.pardox_write_sqlserver(
+            this[PTR_SYMBOL],
+            connectionString,
+            tableName,
+            mode,
+            JSON.stringify(conflictCols)
+        );
+        if (rows < 0) {
+            throw new Error(`toSqlserver failed with error code: ${rows}`);
+        }
+        return rows;
+    }
+
+    /**
+     * Write to a MongoDB collection.
+     * @param {string} connectionString   MongoDB URI (e.g. "mongodb://user:pass@host:27017").
+     * @param {string} dbDotCollection    Target as "database.collection".
+     * @param {string} mode               'append' (default) or 'replace'.
+     * @returns {number} Rows written.
+     */
+    toMongodb(connectionString, dbDotCollection, mode = 'append') {
+        if (!['append', 'replace'].includes(mode)) {
+            throw new Error("mode must be 'append' or 'replace'.");
+        }
+        const lib  = getLib();
+        const rows = lib.pardox_write_mongodb(
+            this[PTR_SYMBOL],
+            connectionString,
+            dbDotCollection,
+            mode
+        );
+        if (rows < 0) {
+            throw new Error(`toMongodb failed with error code: ${rows}`);
+        }
+        return rows;
+    }
+
+    // -------------------------------------------------------------------------
+    // Observer v0.3.1 — Native Universal Export & Vectorized Inspection
+    // -------------------------------------------------------------------------
+
+    /**
+     * Returns ALL rows as an array of objects (records format).
+     * Equivalent to Pandas' df.to_dict('records').
+     * @returns {Object[]}
+     */
+    toDict() {
+        const lib  = getLib();
+        const json = lib.pardox_to_json_records(this[PTR_SYMBOL]);
+        if (!json) return [];
+        try { return JSON.parse(json); } catch { return []; }
+    }
+
+    /**
+     * Returns ALL rows as an array of arrays (values format).
+     * Equivalent to Pandas' df.values.tolist().
+     * @returns {Array[]}
+     */
+    toList() {
+        const lib  = getLib();
+        const json = lib.pardox_to_json_arrays(this[PTR_SYMBOL]);
+        if (!json) return [];
+        try { return JSON.parse(json); } catch { return []; }
+    }
+
+    /**
+     * Serializes ALL rows to a JSON string (records format, no row limit).
+     * Unlike the preview toJson(limit), this exports the full DataFrame.
+     * @returns {string}
+     */
+    toJson() {
+        const lib  = getLib();
+        const json = lib.pardox_to_json_records(this[PTR_SYMBOL]);
+        return json || '[]';
+    }
+
+    /**
+     * Returns the frequency of each unique value in the given column.
+     * @param {string} col  Column name.
+     * @returns {Object}  { "value": count, ... } sorted by count descending.
+     */
+    valueCounts(col) {
+        const lib  = getLib();
+        const json = lib.pardox_value_counts(this[PTR_SYMBOL], col);
+        if (!json) return {};
+        try { return JSON.parse(json); } catch { return {}; }
+    }
+
+    /**
+     * Returns the unique values of the given column in insertion order.
+     * @param {string} col  Column name.
+     * @returns {Array}  Flat array of unique values.
+     */
+    unique(col) {
+        const lib  = getLib();
+        const json = lib.pardox_unique(this[PTR_SYMBOL], col);
+        if (!json) return [];
+        try { return JSON.parse(json); } catch { return []; }
+    }
+
+    // -------------------------------------------------------------------------
+    // Native Math Foundation (v0.3.1)
+    // -------------------------------------------------------------------------
+
+    /**
+     * Columnar addition: col_a + col_b → new DataFrame with "result_math_add".
+     * @param {string} colA
+     * @param {string} colB
+     * @returns {DataFrame}
+     */
+    add(colA, colB) {
+        const lib = getLib();
+        const ptr = lib.pardox_math_add(this[PTR_SYMBOL], colA, colB);
+        if (!ptr) throw new Error('pardox_math_add returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Columnar subtraction: col_a - col_b → new DataFrame with "result_math_sub".
+     * @param {string} colA
+     * @param {string} colB
+     * @returns {DataFrame}
+     */
+    sub(colA, colB) {
+        const lib = getLib();
+        const ptr = lib.pardox_math_sub(this[PTR_SYMBOL], colA, colB);
+        if (!ptr) throw new Error('pardox_math_sub returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Columnar multiplication: col_a * col_b → new DataFrame with "result_mul".
+     * @param {string} colA
+     * @param {string} colB
+     * @returns {DataFrame}
+     */
+    mul(colA, colB) {
+        const lib = getLib();
+        const ptr = lib.pardox_series_mul(this[PTR_SYMBOL], colA, this[PTR_SYMBOL], colB);
+        if (!ptr) throw new Error('pardox_series_mul returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Native sample standard deviation of a column.
+     * @param {string} col
+     * @returns {number}
+     */
+    std(col) {
+        const lib = getLib();
+        return lib.pardox_math_stddev(this[PTR_SYMBOL], col);
+    }
+
+    /**
+     * Min-Max Scaler: normalizes column values to [0, 1].
+     * Returns new DataFrame with column "result_minmax".
+     * @param {string} col
+     * @returns {DataFrame}
+     */
+    minMaxScale(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_math_minmax(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('pardox_math_minmax returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Sort rows by the named column.
+     * @param {string}  by        Column name to sort by.
+     * @param {boolean} ascending Sort order (default true).
+     * @param {boolean} gpu       Use GPU Bitonic sort pipeline (falls back to CPU).
+     * @returns {DataFrame}
+     */
+    sortValues(by, ascending = true, gpu = false) {
+        const lib = getLib();
+        let ptr;
+        if (gpu) {
+            ptr = lib.pardox_gpu_sort(this[PTR_SYMBOL], by);
+        } else {
+            const descending = ascending ? 0 : 1;
+            ptr = lib.pardox_sort_values(this[PTR_SYMBOL], by, descending);
+        }
+        if (!ptr) throw new Error('Sort returned null.');
+        return new DataFrame(ptr);
+    }
+
+    // -------------------------------------------------------------------------
+    // Internal helpers
+    // -------------------------------------------------------------------------
+
+    _schema() {
+        if (!this[PTR_SYMBOL]) return {};
+        const lib = getLib();
+        const json = lib.pardox_get_schema_json(this[PTR_SYMBOL]);
+        if (!json) return {};
+        try {
+            return JSON.parse(json);
+        } catch {
+            return {};
+        }
+    }
+
+    slice(start, length) {
+        const lib = getLib();
+        const newPtr = lib.pardox_slice_manager(this[PTR_SYMBOL], start, length);
+        if (!newPtr) throw new Error('Slice operation returned null.');
+        return new DataFrame(newPtr);
+    }
+
+    // Internal: assign a Series result as a column
+    _setColumn(colName, series) {
+        const { Series } = require('./Series');
+        if (!(series instanceof Series)) {
+            throw new TypeError('Column assignment requires a PardoX Series.');
+        }
+
+        const lib = getLib();
+        const res = lib.pardox_add_column(this[PTR_SYMBOL], series._parentPtr(), colName);
+
+        if (res !== 1) {
+            const errors = { '-1': 'Invalid Pointers', '-2': 'Invalid Column Name', '-3': 'Engine Logic Error' };
+            throw new Error(`Column assignment failed: ${errors[String(res)] || `Unknown: ${res}`}`);
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
+// Proxy factory — enables df['col'] and df['col'] = series
+// -------------------------------------------------------------------------
+
+// Properties that belong to the DataFrame class itself (not column names)
+const OWN_PROPS = new Set([
+    'shape', 'columns', 'dtypes',
+    'head', 'tail', 'show', 'toJson', 'iloc',
+    'cast', 'join', 'filter', 'fillna', 'round',
+    'toCsv', 'toPrdx', 'toSql', 'toMysql', 'toSqlserver', 'toMongodb',
+    'toDict', 'toList', 'toJson', 'valueCounts', 'unique',
+    'add', 'sub', 'std', 'minMaxScale', 'sortValues',
+    'read_csv', 'read_sql', 'read_mysql', 'read_sqlserver', 'read_mongodb', 'fromArray',
+    '_free', '_schema', 'slice', '_setColumn',
+    'constructor', 'then',        // 'then' prevents Proxy from being treated as a thenable
+]);
+
+function createProxy(df) {
+    return new Proxy(df, {
+        get(target, prop, receiver) {
+            // Always delegate built-in and class methods/props
+            if (
+                typeof prop === 'symbol' ||
+                OWN_PROPS.has(prop) ||
+                prop in DataFrame.prototype ||
+                prop.startsWith('_')
+            ) {
+                return Reflect.get(target, prop, receiver);
+            }
+
+            // Treat string keys as column access → return Series
+            if (typeof prop === 'string') {
+                const { Series } = require('./Series');
+                return new Series(target, prop);
+            }
+
+            return Reflect.get(target, prop, receiver);
+        },
+
+        set(target, prop, value) {
+            if (typeof prop === 'string' && !prop.startsWith('_') && !OWN_PROPS.has(prop)) {
+                const { Series } = require('./Series');
+                if (value instanceof Series) {
+                    target._setColumn(prop, value);
+                    return true;
+                }
+            }
+            return Reflect.set(target, prop, value);
+        },
+    });
+}
+
+// Export the PTR_SYMBOL so Series can access the raw pointer
+module.exports = { DataFrame, PTR_SYMBOL };
+
+
+[[pardox/src/lib.js]]
+'use strict';
+
+const os   = require('os');
+const path = require('path');
+const fs   = require('fs');
+
+/**
+ * Resolves the absolute path to the PardoX native binary based on the
+ * current operating system and CPU architecture.
+ *
+ * Mirrors Python's wrapper.py and PHP's Core/Lib.php.
+ *
+ * Expected layout (relative to this file):
+ *   ../libs/Linux/pardox-cpu-Linux-x64.so
+ *   ../libs/Win/pardox-cpu-Windows-x64.dll
+ *   ../libs/Mac/pardox-cpu-MacOS-ARM64.dylib
+ *   ../libs/Mac/pardox-cpu-MacOS-Intel.dylib
+ *
+ * @returns {string} Absolute path to the shared library.
+ * @throws  {Error}  If the OS/architecture is unsupported or the file is missing.
+ */
+function getLibraryPath() {
+    const platform = os.platform();  // 'linux', 'win32', 'darwin'
+    const arch     = os.arch();      // 'x64', 'arm64', etc.
+
+    const libsBase = path.join(__dirname, '..', 'libs');
+
+    let libName;
+    let folder;
+
+    if (platform === 'linux') {
+        libName = 'pardox-cpu-Linux-x64.so';
+        folder  = 'Linux';
+    } else if (platform === 'win32') {
+        libName = 'pardox-cpu-Windows-x64.dll';
+        folder  = 'Win';
+    } else if (platform === 'darwin') {
+        folder = 'Mac';
+        if (arch === 'arm64') {
+            libName = 'pardox-cpu-MacOS-ARM64.dylib';
+        } else if (arch === 'x64') {
+            libName = 'pardox-cpu-MacOS-Intel.dylib';
+        } else {
+            throw new Error(`Unsupported macOS architecture: ${arch}`);
+        }
+    } else {
+        throw new Error(`Unsupported operating system: ${platform}`);
+    }
+
+    const libPath = path.join(libsBase, folder, libName);
+
+    if (!fs.existsSync(libPath)) {
+        throw new Error(
+            `PardoX binary not found.\nExpected at: ${libPath}\n` +
+            `Ensure the 'libs/' folder contains the correct binaries for your OS.`
+        );
+    }
+
+    return libPath;
+}
+
+module.exports = { getLibraryPath };
+
+
+[[pardox/src/Series.js]]
+'use strict';
+
+/**
+ * PardoX Series for Node.js
+ *
+ * Represents a single column view into a DataFrame. Arithmetic, comparison,
+ * and aggregation operations delegate to the Rust engine via koffi FFI.
+ *
+ * The Series does NOT own the Rust memory; the parent DataFrame manages
+ * the HyperBlockManager pointer lifecycle.
+ *
+ * Comparison op-codes (mirrors Python series.py):
+ *   0 = Eq, 1 = Neq, 2 = Gt, 3 = Gte, 4 = Lt, 5 = Lte
+ *
+ * Design note:
+ *   All FFI calls are strictly synchronous to avoid calling-convention issues
+ *   between Node.js/koffi and the Rust engine.
+ */
+
+const { getLib } = require('./ffi');
+const { PTR_SYMBOL } = require('./DataFrame');
+
+class Series {
+    /**
+     * @param {import('./DataFrame').DataFrame} df    Parent DataFrame.
+     * @param {string}                          name  Column name.
+     */
+    constructor(df, name) {
+        this._df   = df;
+        this.name  = name;
+    }
+
+    // Series does NOT call pardox_free_manager — memory is owned by parent DataFrame.
+
+    // -------------------------------------------------------------------------
+    // Properties
+    // -------------------------------------------------------------------------
+
+    get dtype() {
+        return this._df.dtypes[this.name] || 'Unknown';
+    }
+
+    toString() {
+        return this.name;
+    }
+
+    // -------------------------------------------------------------------------
+    // Inspection & Visualization
+    // -------------------------------------------------------------------------
+
+    /** Return a new Series containing the first N rows. */
+    head(n = 5) {
+        const sliced = this._df.head(n);
+        return new Series(sliced, this.name);
+    }
+
+    /** Return a new Series containing the last N rows. */
+    tail(n = 5) {
+        const sliced = this._df.tail(n);
+        return new Series(sliced, this.name);
+    }
+
+    /** Print the parent DataFrame's ASCII table. */
+    show(n = 10) {
+        this._df.show(n);
+    }
+
+    // -------------------------------------------------------------------------
+    // Arithmetic Operations
+    // -------------------------------------------------------------------------
+
+    add(other) { return this._arith('pardox_series_add', other); }
+    sub(other) { return this._arith('pardox_series_sub', other); }
+    mul(other) { return this._arith('pardox_series_mul', other); }
+    div(other) { return this._arith('pardox_series_div', other); }
+    mod(other) { return this._arith('pardox_series_mod', other); }
+
+    // -------------------------------------------------------------------------
+    // Comparison Operations (return Boolean Series usable as filter mask)
+    // -------------------------------------------------------------------------
+
+    /** Equal        (op_code = 0) */ eq(other)  { return this._cmp(other, 0); }
+    /** Not equal    (op_code = 1) */ neq(other) { return this._cmp(other, 1); }
+    /** Greater than (op_code = 2) */ gt(other)  { return this._cmp(other, 2); }
+    /** Greater ≥    (op_code = 3) */ gte(other) { return this._cmp(other, 3); }
+    /** Less than    (op_code = 4) */ lt(other)  { return this._cmp(other, 4); }
+    /** Less ≤       (op_code = 5) */ lte(other) { return this._cmp(other, 5); }
+
+    // -------------------------------------------------------------------------
+    // Aggregations
+    // -------------------------------------------------------------------------
+
+    sum()   { return getLib().pardox_agg_sum(this._df[PTR_SYMBOL],   this.name); }
+    mean()  { return getLib().pardox_agg_mean(this._df[PTR_SYMBOL],  this.name); }
+    min()   { return getLib().pardox_agg_min(this._df[PTR_SYMBOL],   this.name); }
+    max()   { return getLib().pardox_agg_max(this._df[PTR_SYMBOL],   this.name); }
+    count() { return Math.round(getLib().pardox_agg_count(this._df[PTR_SYMBOL], this.name)); }
+    std()   { return getLib().pardox_agg_std(this._df[PTR_SYMBOL],   this.name); }
+
+    // -------------------------------------------------------------------------
+    // Cleaning
+    // -------------------------------------------------------------------------
+
+    fillna(val) {
+        const res = getLib().pardox_fill_na(this._df[PTR_SYMBOL], this.name, val);
+        if (res < 0) throw new Error(`fillna failed on column '${this.name}'.`);
+        return this;
+    }
+
+    round(decimals) {
+        const res = getLib().pardox_round(this._df[PTR_SYMBOL], this.name, decimals);
+        if (res < 0) throw new Error(`round failed on column '${this.name}' (must be numeric).`);
+        return this;
+    }
+
+    // -------------------------------------------------------------------------
+    // Internal helpers
+    // -------------------------------------------------------------------------
+
+    /** Expose the raw Rust pointer of the parent DataFrame for FFI calls. */
+    _parentPtr() {
+        return this._df[PTR_SYMBOL];
+    }
+
+    _validateLength(other) {
+        const leftRows  = this._df.shape[0];
+        const rightRows = other._df.shape[0];
+        if (leftRows !== rightRows) {
+            throw new Error(`Length mismatch: left has ${leftRows} rows, right has ${rightRows} rows.`);
+        }
+    }
+
+    _arith(funcName, other) {
+        if (!(other instanceof Series)) {
+            throw new TypeError(`Arithmetic operand must be a PardoX Series. Got: ${typeof other}`);
+        }
+        this._validateLength(other);
+
+        const lib    = getLib();
+        const resPtr = lib[funcName](
+            this._df[PTR_SYMBOL], this.name,
+            other._df[PTR_SYMBOL], other.name
+        );
+
+        return this._wrapResult(resPtr);
+    }
+
+    _cmp(other, opCode) {
+        const lib = getLib();
+
+        if (other instanceof Series) {
+            this._validateLength(other);
+            const resPtr = lib.pardox_filter_compare(
+                this._df[PTR_SYMBOL], this.name,
+                other._df[PTR_SYMBOL], other.name,
+                opCode
+            );
+            return this._wrapResult(resPtr);
+        }
+
+        if (typeof other === 'number') {
+            const isFloat  = Number.isInteger(other) ? 0 : 1;
+            const valF64   = other;
+            const valI64   = Math.trunc(other);
+
+            const resPtr = lib.pardox_filter_compare_scalar(
+                this._df[PTR_SYMBOL], this.name,
+                valF64, BigInt(valI64), isFloat,
+                opCode
+            );
+            return this._wrapResult(resPtr);
+        }
+
+        throw new TypeError(
+            `Comparison operand must be a Series or number. Got: ${typeof other}`
+        );
+    }
+
+    _wrapResult(resPtr) {
+        const { DataFrame } = require('./DataFrame');
+
+        if (!resPtr) {
+            throw new Error('Operation failed (Rust returned null pointer).');
+        }
+
+        const resultDf  = new DataFrame(resPtr);
+        const cols      = resultDf.columns;
+
+        if (cols.length === 0) {
+            throw new Error('Compute engine returned empty result schema.');
+        }
+
+        // Rust generates a name like 'result_add' — take the first column
+        return new Series(resultDf, cols[0]);
+    }
+}
+
+module.exports = { Series };
+
+
+[[pardox/src/io.js]]
+'use strict';
+
+/**
+ * PardoX IO module for Node.js
+ *
+ * Static reader functions that load data into DataFrames.
+ * Mirrors Python's pardox/io.py and PHP's IO.php.
+ */
+
+const fs = require('fs');
+const { getLib } = require('./ffi');
+const { DataFrame } = require('./DataFrame');
+
+/**
+ * Default CSV reader configuration (comma-delimited, double-quoted, with header).
+ */
+const DEFAULT_CSV_CONFIG = JSON.stringify({
+    delimiter:  44,             // ',' ASCII 44
+    quote_char: 34,             // '"' ASCII 34
+    has_header: true,
+    chunk_size: 16 * 1024 * 1024,  // 16 MB
+});
+
+/**
+ * Read a CSV file into a PardoX DataFrame using the native Rust engine.
+ *
+ * @param {string}      path    Path to the CSV file.
+ * @param {Object|null} schema  Optional manual schema: { colName: 'Int64', ... }.
+ *                              Pass null to trigger automatic type inference.
+ * @returns {DataFrame}
+ */
+function read_csv(path, schema = null) {
+    return DataFrame.read_csv(path, schema);
+}
+
+/**
+ * Execute a SQL query via the Rust native driver and return the results.
+ *
+ * Bypasses Node.js completely: Rust connects to the database, executes the
+ * query, and fills memory buffers before handing back a pointer.
+ *
+ * @param {string} connectionString  PostgreSQL connection URL.
+ * @param {string} query             SQL query.
+ * @returns {DataFrame}
+ */
+function read_sql(connectionString, query) {
+    return DataFrame.read_sql(connectionString, query);
+}
+
+/**
+ * Read a native PardoX (.prdx) file and return a preview as a JS array.
+ *
+ * @param {string} path   Path to the .prdx file.
+ * @param {number} limit  Maximum number of rows to read.
+ * @returns {Object[]}    Array of row objects.
+ */
+function read_prdx(path, limit = 100) {
+    if (!fs.existsSync(path)) {
+        throw new Error(`File not found: ${path}`);
+    }
+
+    const lib  = getLib();
+    const json = lib.pardox_read_head_json(path, limit);
+
+    if (json === null) {
+        throw new Error(`Failed to read PRDX file (Rust returned null): ${path}`);
+    }
+
+    try {
+        return JSON.parse(json);
+    } catch (e) {
+        throw new Error(`Failed to decode PRDX data as JSON: ${e.message}`);
+    }
+}
+
+/**
+ * Execute arbitrary DDL or DML directly via the Rust native driver.
+ *
+ * Bypasses Node.js completely: Rust connects to the database and runs the
+ * statement. Useful for CREATE TABLE, DROP TABLE, UPDATE, DELETE, etc.
+ *
+ * @param {string} connectionString  PostgreSQL connection URL.
+ * @param {string} query             SQL statement to execute.
+ * @returns {number}  Number of rows affected (0 for DDL statements).
+ */
+function executeSql(connectionString, query) {
+    const lib  = getLib();
+    const rows = lib.pardox_execute_sql(connectionString, query);
+
+    if (rows < 0) {
+        const errorMap = {
+            '-1':   'Invalid connection string',
+            '-2':   'Invalid query string',
+            '-100': 'Execute operation failed (check connection and SQL syntax)',
+        };
+        const msg = errorMap[String(rows)] ?? `Unknown error code: ${rows}`;
+        throw new Error(`executeSql failed: ${msg}`);
+    }
+
+    return rows;
+}
+
+/**
+ * Read a MySQL table/query into a PardoX DataFrame using the native Rust driver.
+ *
+ * @param {string} connectionString  MySQL URL (e.g. "mysql://user:pass@host:3306/db").
+ * @param {string} query             SQL query to execute.
+ * @returns {DataFrame}
+ */
+function read_mysql(connectionString, query) {
+    return DataFrame.read_mysql(connectionString, query);
+}
+
+/**
+ * Execute arbitrary DDL or DML directly against MySQL via the Rust native driver.
+ *
+ * @param {string} connectionString  MySQL URL.
+ * @param {string} query             SQL statement to execute.
+ * @returns {number}  Number of rows affected.
+ */
+function execute_mysql(connectionString, query) {
+    const lib  = getLib();
+    const rows = lib.pardox_execute_mysql(connectionString, query);
+    if (rows < 0) {
+        throw new Error(`execute_mysql failed with error code: ${rows}`);
+    }
+    return rows;
+}
+
+/**
+ * Read from SQL Server into a PardoX DataFrame using the native Rust driver (tiberius).
+ *
+ * @param {string} connectionString  ADO.NET connection string.
+ * @param {string} query             SQL query to execute.
+ * @returns {DataFrame}
+ */
+function read_sqlserver(connectionString, query) {
+    return DataFrame.read_sqlserver(connectionString, query);
+}
+
+/**
+ * Execute arbitrary DDL or DML directly against SQL Server via the Rust native driver.
+ *
+ * @param {string} connectionString  ADO.NET connection string.
+ * @param {string} query             SQL statement to execute.
+ * @returns {number}  Number of rows affected.
+ */
+function execute_sqlserver(connectionString, query) {
+    const lib  = getLib();
+    const rows = lib.pardox_execute_sqlserver(connectionString, query);
+    if (rows < 0) {
+        throw new Error(`execute_sqlserver failed with error code: ${rows}`);
+    }
+    return rows;
+}
+
+/**
+ * Read a MongoDB collection into a PardoX DataFrame using the native Rust driver.
+ *
+ * @param {string} connectionString   MongoDB URI (e.g. "mongodb://user:pass@host:27017").
+ * @param {string} dbDotCollection    Target as "database.collection" (e.g. "mydb.orders").
+ * @returns {DataFrame}
+ */
+function read_mongodb(connectionString, dbDotCollection) {
+    return DataFrame.read_mongodb(connectionString, dbDotCollection);
+}
+
+/**
+ * Execute a MongoDB command via the Rust native driver.
+ *
+ * @param {string} connectionString  MongoDB URI.
+ * @param {string} database          Target database name.
+ * @param {string} commandJson       JSON string of the MongoDB command document.
+ *                                   e.g. '{"drop":"my_collection"}'
+ * @returns {number}  Value of the 'n' or 'ok' field from the result.
+ */
+function execute_mongodb(connectionString, database, commandJson) {
+    const lib    = getLib();
+    const result = lib.pardox_execute_mongodb(connectionString, database, commandJson);
+    if (result < 0) {
+        throw new Error(`execute_mongodb failed with error code: ${result}`);
+    }
+    return result;
+}
+
+module.exports = {
+    read_csv,
+    read_sql,
+    read_prdx,
+    executeSql,
+    read_mysql,
+    execute_mysql,
+    read_sqlserver,
+    execute_sqlserver,
+    read_mongodb,
+    execute_mongodb,
+    DEFAULT_CSV_CONFIG,
+};
+
+
+[[pardox/src/ffi.js]]
+'use strict';
+
+/**
+ * PardoX FFI Singleton (Node.js)
+ *
+ * Loads the Rust shared library via koffi and registers all exported C-ABI
+ * functions. Returns the same koffi library instance on every call (singleton).
+ *
+ * Mirrors Python's wrapper.py and PHP's Core/FFI.php.
+ *
+ * String memory management pattern:
+ *   Functions that return heap-allocated char* are declared as returning
+ *   'void *' (opaque pointer). The caller reads the string with
+ *   koffi.decode(ptr, 'string') and then frees with pardox_free_string(ptr).
+ *
+ * 64-bit integer return values (long long / size_t):
+ *   koffi returns these as BigInt. Helper functions convert to Number where safe.
+ */
+
+const koffi = require('koffi');
+const { getLibraryPath } = require('./lib');
+
+/** @type {Object|null} */
+let _lib = null;
+
+/**
+ * Returns the koffi library instance, loading it on first call.
+ * @returns {Object} koffi lib with all function bindings.
+ */
+function getLib() {
+    if (_lib !== null) return _lib;
+
+    const libPath = getLibraryPath();
+
+    let raw;
+    try {
+        raw = koffi.load(libPath);
+    } catch (err) {
+        throw new Error(`Fatal Error loading PardoX: ${err.message}`);
+    }
+
+    // -------------------------------------------------------------------------
+    // Engine Initialization
+    // -------------------------------------------------------------------------
+    const pardox_init_engine = raw.func('void pardox_init_engine()');
+
+    // -------------------------------------------------------------------------
+    // Memory Management
+    // -------------------------------------------------------------------------
+    const pardox_free_manager = raw.func('void pardox_free_manager(void * mgr)');
+    const pardox_free_string  = raw.func('void pardox_free_string(void * ptr)');
+
+    // -------------------------------------------------------------------------
+    // Ingestion
+    // -------------------------------------------------------------------------
+    const pardox_read_json_bytes    = raw.func('void * pardox_read_json_bytes(const char * bytes, size_t len)');
+    const pardox_load_manager_csv   = raw.func('void * pardox_load_manager_csv(const char * path, const char * schema, const char * config)');
+
+    // -------------------------------------------------------------------------
+    // Native SQL Read
+    // -------------------------------------------------------------------------
+    const pardox_scan_sql = raw.func('void * pardox_scan_sql(const char * conn_str, const char * query)');
+
+    // -------------------------------------------------------------------------
+    // Joins
+    // -------------------------------------------------------------------------
+    const pardox_hash_join = raw.func('void * pardox_hash_join(void * left, void * right, const char * left_key, const char * right_key)');
+
+    // -------------------------------------------------------------------------
+    // Slicing & Navigation
+    // -------------------------------------------------------------------------
+    const pardox_slice_manager = raw.func('void * pardox_slice_manager(void * mgr, size_t start, size_t len)');
+    const pardox_tail_manager  = raw.func('void * pardox_tail_manager(void * mgr, size_t n)');
+
+    // -------------------------------------------------------------------------
+    // Inspection
+    // Note: functions using set_global_buffer() return thread-local pointers
+    //       declared as 'const char *' so koffi auto-decodes without freeing.
+    //       Functions using CString::into_raw() are declared as 'void *'
+    //       so we can manually decode and free the heap allocation.
+    // -------------------------------------------------------------------------
+    const pardox_get_row_count       = raw.func('int64_t pardox_get_row_count(void * mgr)');
+    // Thread-local buffer (set_global_buffer) — koffi auto-decodes 'const char *'
+    const pardox_get_schema_json     = raw.func('const char * pardox_get_schema_json(void * mgr)');
+    const pardox_manager_to_json     = raw.func('const char * pardox_manager_to_json(void * mgr, size_t limit)');
+    const pardox_manager_to_ascii    = raw.func('const char * pardox_manager_to_ascii(void * mgr, size_t limit)');
+    const pardox_manager_to_json_range = raw.func('const char * pardox_manager_to_json_range(void * mgr, size_t start, size_t limit)');
+
+    // -------------------------------------------------------------------------
+    // Casting & Column Mutation
+    // -------------------------------------------------------------------------
+    const pardox_cast_column = raw.func('int pardox_cast_column(void * mgr, const char * col_name, const char * target_type)');
+    const pardox_add_column  = raw.func('int64_t pardox_add_column(void * target, void * source, const char * col_name)');
+
+    // -------------------------------------------------------------------------
+    // Cleaning
+    // -------------------------------------------------------------------------
+    const pardox_fill_na = raw.func('int64_t pardox_fill_na(void * mgr, const char * col, double val)');
+    const pardox_round   = raw.func('int64_t pardox_round(void * mgr, const char * col, int decimals)');
+
+    // -------------------------------------------------------------------------
+    // Writers
+    // -------------------------------------------------------------------------
+    const pardox_to_csv    = raw.func('int64_t pardox_to_csv(void * mgr, const char * path)');
+    const pardox_to_prdx   = raw.func('int64_t pardox_to_prdx(void * mgr, const char * path)');
+    const pardox_write_sql = raw.func('int64_t pardox_write_sql(void * mgr, const char * conn_str, const char * table, const char * mode, const char * conflict_cols_json)');
+    const pardox_execute_sql = raw.func('int64_t pardox_execute_sql(const char * conn_str, const char * query)');
+
+    // -------------------------------------------------------------------------
+    // Arithmetic (Series)
+    // -------------------------------------------------------------------------
+    const pardox_series_add = raw.func('void * pardox_series_add(void * left, const char * left_col, void * right, const char * right_col)');
+    const pardox_series_sub = raw.func('void * pardox_series_sub(void * left, const char * left_col, void * right, const char * right_col)');
+    const pardox_series_mul = raw.func('void * pardox_series_mul(void * left, const char * left_col, void * right, const char * right_col)');
+    const pardox_series_div = raw.func('void * pardox_series_div(void * left, const char * left_col, void * right, const char * right_col)');
+    const pardox_series_mod = raw.func('void * pardox_series_mod(void * left, const char * left_col, void * right, const char * right_col)');
+
+    // -------------------------------------------------------------------------
+    // Filter Predicates
+    // -------------------------------------------------------------------------
+    const pardox_filter_compare = raw.func(
+        'void * pardox_filter_compare(void * left, const char * left_col, void * right, const char * right_col, int op_code)'
+    );
+    const pardox_filter_compare_scalar = raw.func(
+        'void * pardox_filter_compare_scalar(void * mgr, const char * col, double val_f64, int64_t val_i64, int is_float, int op_code)'
+    );
+    const pardox_apply_filter = raw.func('void * pardox_apply_filter(void * data, void * mask, const char * mask_col)');
+
+    // -------------------------------------------------------------------------
+    // Aggregations
+    // -------------------------------------------------------------------------
+    const pardox_agg_sum   = raw.func('double pardox_agg_sum(void * mgr, const char * col)');
+    const pardox_agg_mean  = raw.func('double pardox_agg_mean(void * mgr, const char * col)');
+    const pardox_agg_min   = raw.func('double pardox_agg_min(void * mgr, const char * col)');
+    const pardox_agg_max   = raw.func('double pardox_agg_max(void * mgr, const char * col)');
+    const pardox_agg_count = raw.func('double pardox_agg_count(void * mgr, const char * col)');
+    const pardox_agg_std   = raw.func('double pardox_agg_std(void * mgr, const char * col)');
+
+    // -------------------------------------------------------------------------
+    // MySQL
+    // -------------------------------------------------------------------------
+    const pardox_read_mysql    = raw.func('void * pardox_read_mysql(const char * conn_str, const char * query)');
+    const pardox_write_mysql   = raw.func('int64_t pardox_write_mysql(void * mgr, const char * conn_str, const char * table, const char * mode, const char * conflict_cols_json)');
+    const pardox_execute_mysql = raw.func('int64_t pardox_execute_mysql(const char * conn_str, const char * query)');
+
+    // -------------------------------------------------------------------------
+    // SQL Server
+    // -------------------------------------------------------------------------
+    const pardox_read_sqlserver    = raw.func('void * pardox_read_sqlserver(const char * conn_str, const char * query)');
+    const pardox_write_sqlserver   = raw.func('int64_t pardox_write_sqlserver(void * mgr, const char * conn_str, const char * table, const char * mode, const char * conflict_cols_json)');
+    const pardox_execute_sqlserver = raw.func('int64_t pardox_execute_sqlserver(const char * conn_str, const char * query)');
+
+    // -------------------------------------------------------------------------
+    // MongoDB
+    // -------------------------------------------------------------------------
+    const pardox_read_mongodb    = raw.func('void * pardox_read_mongodb(const char * conn_str, const char * db_dot_collection)');
+    const pardox_write_mongodb   = raw.func('int64_t pardox_write_mongodb(void * mgr, const char * conn_str, const char * db_dot_collection, const char * mode)');
+    const pardox_execute_mongodb = raw.func('int64_t pardox_execute_mongodb(const char * conn_str, const char * database, const char * command_json)');
+
+    // -------------------------------------------------------------------------
+    // Native Math Foundation v0.3.1
+    // -------------------------------------------------------------------------
+    const pardox_math_add    = raw.func('void * pardox_math_add(void * mgr, const char * col_a, const char * col_b)');
+    const pardox_math_sub    = raw.func('void * pardox_math_sub(void * mgr, const char * col_a, const char * col_b)');
+    const pardox_math_stddev = raw.func('double pardox_math_stddev(void * mgr, const char * col_name)');
+    const pardox_math_minmax = raw.func('void * pardox_math_minmax(void * mgr, const char * col_name)');
+    const pardox_sort_values = raw.func('void * pardox_sort_values(void * mgr, const char * col_name, int descending)');
+    const pardox_gpu_sort    = raw.func('void * pardox_gpu_sort(void * mgr, const char * col_name)');
+
+    // -------------------------------------------------------------------------
+    // Observer v0.3.1 — Native Universal Export & Vectorized Inspection
+    // These functions return heap-allocated strings via CString::into_raw().
+    // Declared as 'void *' so koffi returns an opaque pointer; we then read
+    // the string with koffi.decode() and immediately free with pardox_free_string.
+    // -------------------------------------------------------------------------
+    const pardox_to_json_records = raw.func('void * pardox_to_json_records(void * mgr)');
+    const pardox_to_json_arrays  = raw.func('void * pardox_to_json_arrays(void * mgr)');
+    const pardox_value_counts    = raw.func('void * pardox_value_counts(void * mgr, const char * col_name)');
+    const pardox_unique          = raw.func('void * pardox_unique(void * mgr, const char * col_name)');
+
+    // -------------------------------------------------------------------------
+    // Native Readers
+    // -------------------------------------------------------------------------
+    // Thread-local buffer (set_global_buffer) — koffi auto-decodes 'const char *'
+    const pardox_read_head_json = raw.func('const char * pardox_read_head_json(const char * path, size_t limit)');
+    const pardox_column_sum     = raw.func('double pardox_column_sum(const char * path, const char * col)');
+
+    // -------------------------------------------------------------------------
+    // Warmup handshake
+    // -------------------------------------------------------------------------
+    try {
+        pardox_init_engine();
+    } catch (_) {
+        // Non-fatal: older builds may not export this symbol
+    }
+
+    // -------------------------------------------------------------------------
+    // Wrap char*-returning functions with automatic decode + free
+    // -------------------------------------------------------------------------
+
+    /**
+     * Read a null-terminated C string from an opaque pointer and free it.
+     * Use ONLY for functions that return heap-allocated strings via CString::into_raw().
+     * Functions: pardox_to_json_records, pardox_to_json_arrays, pardox_value_counts, pardox_unique.
+     * @param {*}        ptr      koffi opaque pointer (void *)
+     * @param {Function} freeFn   The pardox_free_string function
+     * @returns {string|null}
+     */
+    function _readAndFreeStr(ptr, freeFn) {
+        if (!ptr) return null;
+        const str = koffi.decode(ptr, 'string');
+        freeFn(ptr);
+        return str;
+    }
+
+    /**
+     * Read a null-terminated C string from a thread-local buffer pointer.
+     * Use for functions that return via set_global_buffer() — DO NOT free these.
+     * Functions: pardox_get_schema_json, pardox_manager_to_json, pardox_manager_to_ascii,
+     *            pardox_manager_to_json_range, pardox_read_head_json.
+     * @param {*} ptr  koffi opaque pointer (void *)
+     * @returns {string|null}
+     */
+    function _readStr(ptr) {
+        if (!ptr) return null;
+        return koffi.decode(ptr, 'string');
+        // DO NOT free — pointer is owned by Rust thread-local storage (set_global_buffer)
+    }
+
+    _lib = {
+        // Memory
+        pardox_free_manager,
+
+        // Ingestion
+        pardox_read_json_bytes,
+        pardox_load_manager_csv,
+        pardox_scan_sql,
+
+        // Joins
+        pardox_hash_join,
+
+        // Slicing
+        pardox_slice_manager,
+        pardox_tail_manager,
+
+        // Inspection — wrapped versions that return JS strings directly
+        pardox_get_row_count: (mgr) => Number(pardox_get_row_count(mgr)),
+
+        // Thread-local buffer — koffi auto-decodes 'const char *', no free needed
+        pardox_get_schema_json:      (mgr)              => pardox_get_schema_json(mgr) || null,
+        pardox_manager_to_json:      (mgr, limit)       => pardox_manager_to_json(mgr, limit) || null,
+        pardox_manager_to_ascii:     (mgr, limit)       => pardox_manager_to_ascii(mgr, limit) || null,
+        pardox_manager_to_json_range:(mgr, start, limit)=> pardox_manager_to_json_range(mgr, start, limit) || null,
+        pardox_read_head_json:       (path, limit)      => pardox_read_head_json(path, limit) || null,
+
+        // Casting & Mutation
+        pardox_cast_column,
+        pardox_add_column: (target, source, col) => Number(pardox_add_column(target, source, col)),
+
+        // Cleaning
+        pardox_fill_na: (mgr, col, val) => Number(pardox_fill_na(mgr, col, val)),
+        pardox_round:   (mgr, col, dec) => Number(pardox_round(mgr, col, dec)),
+
+        // Writers
+        pardox_to_csv:    (mgr, path)  => Number(pardox_to_csv(mgr, path)),
+        pardox_to_prdx:   (mgr, path)  => Number(pardox_to_prdx(mgr, path)),
+        pardox_write_sql: (mgr, conn, table, mode, cols) =>
+            Number(pardox_write_sql(mgr, conn, table, mode, cols)),
+        pardox_execute_sql: (conn, query) => Number(pardox_execute_sql(conn, query)),
+
+        // MySQL
+        pardox_read_mysql,
+        pardox_write_mysql:   (mgr, conn, table, mode, cols) => Number(pardox_write_mysql(mgr, conn, table, mode, cols)),
+        pardox_execute_mysql: (conn, query) => Number(pardox_execute_mysql(conn, query)),
+
+        // SQL Server
+        pardox_read_sqlserver,
+        pardox_write_sqlserver:   (mgr, conn, table, mode, cols) => Number(pardox_write_sqlserver(mgr, conn, table, mode, cols)),
+        pardox_execute_sqlserver: (conn, query) => Number(pardox_execute_sqlserver(conn, query)),
+
+        // MongoDB
+        pardox_read_mongodb,
+        pardox_write_mongodb:   (mgr, conn, dbColl, mode) => Number(pardox_write_mongodb(mgr, conn, dbColl, mode)),
+        pardox_execute_mongodb: (conn, db, cmdJson) => Number(pardox_execute_mongodb(conn, db, cmdJson)),
+
+        // Arithmetic
+        pardox_series_add,
+        pardox_series_sub,
+        pardox_series_mul,
+        pardox_series_div,
+        pardox_series_mod,
+
+        // Filters
+        pardox_filter_compare,
+        pardox_filter_compare_scalar,
+        pardox_apply_filter,
+
+        // Aggregations
+        pardox_agg_sum,
+        pardox_agg_mean,
+        pardox_agg_min,
+        pardox_agg_max,
+        pardox_agg_count,
+        pardox_agg_std,
+
+        // Native readers
+        pardox_column_sum,
+
+        // Observer v0.3.1 — heap-allocated strings: decode + free via _readAndFreeStr
+        pardox_to_json_records: (mgr)      => _readAndFreeStr(pardox_to_json_records(mgr), pardox_free_string),
+        pardox_to_json_arrays:  (mgr)      => _readAndFreeStr(pardox_to_json_arrays(mgr),  pardox_free_string),
+        pardox_value_counts:    (mgr, col) => _readAndFreeStr(pardox_value_counts(mgr, col), pardox_free_string),
+        pardox_unique:          (mgr, col) => _readAndFreeStr(pardox_unique(mgr, col), pardox_free_string),
+
+        // Native Math Foundation v0.3.1
+        pardox_math_add,
+        pardox_math_sub,
+        pardox_math_stddev,
+        pardox_math_minmax,
+        pardox_sort_values: (mgr, col, descending) => pardox_sort_values(mgr, col, descending),
+        pardox_gpu_sort,
+    };
+
+    return _lib;
+}
+
+module.exports = { getLib };
+
+

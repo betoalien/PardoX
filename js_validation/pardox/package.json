@@ -1,0 +1,38 @@
+{
+  "name": "@pardox/pardox",
+  "version": "0.3.1",
+  "description": "Universal High-Performance DataFrame Engine for Node.js (powered by Rust)",
+  "main": "src/index.js",
+  "keywords": [
+    "dataframe",
+    "rust",
+    "ffi",
+    "data-analysis",
+    "etl",
+    "performance",
+    "pandas"
+  ],
+  "author": {
+    "name": "Alberto Cárdenas",
+    "email": "conect@albertocardenas.com"
+  },
+  "license": "MIT",
+  "files": [
+    "src",
+    "libs",
+    "README.md"
+  ],
+  "dependencies": {
+    "koffi": "^2.9.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/albertocardenas/pardox.git"
+  },
+  "exports": {
+    ".": "./src/index.js"
+  }
+}
