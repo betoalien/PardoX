@@ -454,3 +454,4 @@ if hasattr(lib, 'pardox_gpu_sort'):
 if hasattr(lib, 'pardox_get_f64_buffer'):
     lib.pardox_get_f64_buffer.argtypes = [c_void_p, c_char_p, ctypes.POINTER(c_size_t)]
     lib.pardox_get_f64_buffer.restype = c_void_p
+

@@ -60,4 +60,8 @@ composer require betoalien/pardox-php
 
 ## 📄 License
 
+<<<<<<< HEAD
 MIT
+=======
+MIT
+>>>>>>> a1d87e1 (Pardox 0.3.2 changes commit)

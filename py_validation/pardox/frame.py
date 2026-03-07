@@ -775,10 +775,11 @@ class DataFrame:
         for col_name in current_columns:
             # We call Rust blindly; the Kernel checks types internally for safety
             lib.pardox_round(
-                self._ptr, 
-                col_name.encode('utf-8'), 
+                self._ptr,
+                col_name.encode('utf-8'),
                 c_decimals
             )
-        
+
         return self # Enable method chaining
+
     
