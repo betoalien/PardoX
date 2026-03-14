@@ -1,3 +1,10 @@
+---
+layout: default
+title: "Data Mutation & Arithmetic"
+parent: "User Guide"
+nav_order: 3
+---
+
 # Data Mutation & Arithmetic
 
 PardoX performs all arithmetic and transformations directly on Rust memory buffers using SIMD (Single Instruction, Multiple Data) instructions. No Python objects are created during computation.

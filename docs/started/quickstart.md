@@ -1,3 +1,10 @@
+---
+layout: default
+title: "Quick Start"
+parent: "Getting Started"
+nav_order: 2
+---
+
 # Quick Start
 
 This guide walks through a complete v0.3.1 data pipeline: loading a CSV, running vectorized math, inspecting results, and writing to a relational database — all in native Rust speed.

@@ -1,3 +1,10 @@
+---
+layout: default
+title: "Installation"
+parent: "Getting Started"
+nav_order: 1
+---
+
 # Installation
 
 PardoX ships as a pre-compiled native library. No Rust compiler or C toolchain is required on the end-user machine. The Rust core (`libpardox.so` / `.dylib` / `.dll`) is bundled inside the package for each supported platform.

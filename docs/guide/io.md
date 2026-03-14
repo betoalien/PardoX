@@ -1,3 +1,10 @@
+---
+layout: default
+title: "Input / Output Operations"
+parent: "User Guide"
+nav_order: 1
+---
+
 # Input / Output Operations
 
 The bottleneck in most data pipelines is not computation, but **IO**. PardoX moves all data ingestion and persistence entirely into the Rust core, bypassing Python's file handling and object creation overhead.

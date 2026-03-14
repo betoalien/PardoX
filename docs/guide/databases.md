@@ -1,3 +1,10 @@
+---
+layout: default
+title: "Database Integration"
+parent: "User Guide"
+nav_order: 2
+---
+
 # Database Integration
 
 PardoX v0.3.1 introduces native database connectivity via Rust drivers — no Python, PHP, or Node.js database libraries required. The same Rust core powers identical APIs across all three SDKs.

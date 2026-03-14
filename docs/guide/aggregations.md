@@ -1,3 +1,10 @@
+---
+layout: default
+title: "Aggregations, Analytics & The Observer"
+parent: "User Guide"
+nav_order: 4
+---
+
 # Aggregations, Analytics & The Observer
 
 PardoX provides two layers of data insight:

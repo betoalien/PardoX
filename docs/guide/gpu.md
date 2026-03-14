@@ -1,3 +1,10 @@
+---
+layout: default
+title: "GPU Acceleration"
+parent: "User Guide"
+nav_order: 5
+---
+
 # GPU Acceleration
 
 PardoX v0.3.1 introduces a **GPU Bitonic Sort** pipeline powered by WebGPU compute shaders via the `wgpu` crate. The GPU engine is loaded dynamically from a separate library (`libpardox_gpu.so`), keeping it completely optional.

@@ -1,3 +1,10 @@
+---
+layout: default
+title: "Roadmap"
+parent: "Getting Started"
+nav_order: 3
+---
+
 # Roadmap
 
 This page tracks features planned for upcoming releases and the reasoning behind them.

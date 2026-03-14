@@ -1,3 +1,9 @@
+---
+layout: default
+title: "API Reference"
+nav_order: 4
+---
+
 # API Reference
 
 Complete documentation of all classes, functions, and methods in the PardoX Python SDK v0.3.1.
