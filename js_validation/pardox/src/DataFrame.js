@@ -22,6 +22,14 @@ const DEFAULT_CSV_CONFIG = JSON.stringify({
     chunk_size: 16 * 1024 * 1024,
 });
 
+// Pipe delimiter CSV config for JSON columns (no quote char to avoid conflicts)
+const PIPE_CSV_CONFIG = JSON.stringify({
+    delimiter:  124,          // pipe
+    quote_char: 0,            // no quote char
+    has_header: true,
+    chunk_size: 16 * 1024 * 1024,
+});
+
 // Internal symbol used to access the raw pointer from outside this module
 const PTR_SYMBOL = Symbol('pardox.ptr');
 
@@ -44,6 +52,22 @@ class DataFrame {
             lib.pardox_free_manager(this[PTR_SYMBOL]);
             this[PTR_SYMBOL] = null;
         }
+    }
+
+    /**
+     * Public method to free the underlying Rust manager.
+     * Call this explicitly when done with a DataFrame to avoid memory leaks.
+     */
+    free() {
+        this._free();
+    }
+
+    /**
+     * Public method to free the underlying Rust memory.
+     * Call this when done with a DataFrame to avoid memory leaks.
+     */
+    free() {
+        this._free();
     }
 
     // -------------------------------------------------------------------------
@@ -79,9 +103,10 @@ class DataFrame {
      * Load a CSV file using the Rust engine.
      * @param {string}      path    Path to the CSV file.
      * @param {Object|null} schema  Optional: { colName: 'Int64', ... }
+     * @param {boolean}     usePipe Optional: Use pipe delimiter (for JSON columns). Default: false
      * @returns {DataFrame}
      */
-    static read_csv(path, schema = null) {
+    static read_csv(path, schema = null, usePipe = false) {
         const lib = getLib();
         const fs = require('fs');
 
@@ -91,11 +116,16 @@ class DataFrame {
 
         let schemaJson = '{}';
         if (schema !== null) {
-            const cols = Object.entries(schema).map(([name, type]) => ({ name, type }));
-            schemaJson = JSON.stringify({ columns: cols });
+            // Convert { colName: 'Int64', ... } to { column_names: [...], column_types: [...] }
+            // This is the format expected by the Rust core
+            const entries = Object.entries(schema);
+            const column_names = entries.map(([name, _]) => name);
+            const column_types = entries.map(([_, type]) => type);
+            schemaJson = JSON.stringify({ column_names, column_types });
         }
 
-        const ptr = lib.pardox_load_manager_csv(path, schemaJson, DEFAULT_CSV_CONFIG);
+        const config = usePipe ? PIPE_CSV_CONFIG : DEFAULT_CSV_CONFIG;
+        const ptr = lib.pardox_load_manager_csv(path, schemaJson, config);
 
         if (!ptr) {
             throw new Error(`Failed to load CSV: ${path}`);
@@ -515,6 +545,29 @@ class DataFrame {
     // Native Math Foundation (v0.3.1)
     // -------------------------------------------------------------------------
 
+    // -------------------------------------------------------------------------
+    // Gap 1: GroupBy Aggregation
+    // -------------------------------------------------------------------------
+
+    /**
+     * GroupBy aggregation.
+     * @param {string|string[]} cols  Column name(s) to group by.
+     * @param {Object} agg            Aggregation dict: { colName: 'sum'|'mean'|'count'|'min'|'max'|'std' }
+     * @returns {DataFrame}
+     */
+    groupBy(cols, agg) {
+        const lib = getLib();
+        const colsJson = JSON.stringify(Array.isArray(cols) ? cols : [cols]);
+        const aggJson = JSON.stringify(agg);
+        const ptr = lib.pardox_groupby_agg(this[PTR_SYMBOL], colsJson, aggJson);
+        if (!ptr) throw new Error(`groupBy failed: cols=${cols} agg=${JSON.stringify(agg)}`);
+        return new DataFrame(ptr);
+    }
+
+    // -------------------------------------------------------------------------
+    // Native Math Foundation (v0.3.1)
+    // -------------------------------------------------------------------------
+
     /**
      * Columnar addition: col_a + col_b → new DataFrame with "result_math_add".
      * @param {string} colA
@@ -598,6 +651,362 @@ class DataFrame {
     }
 
     // -------------------------------------------------------------------------
+    // Gap 7: GPU Compute
+    // -------------------------------------------------------------------------
+
+    /**
+     * GPU-accelerated column addition: col_a + col_b → "gpu_add".
+     * @param {string} colA
+     * @param {string} colB
+     * @returns {DataFrame}
+     */
+    gpuAdd(colA, colB) {
+        const lib = getLib();
+        const ptr = lib.pardox_gpu_add(this[PTR_SYMBOL], colA, colB);
+        if (!ptr) throw new Error('pardox_gpu_add returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * GPU-accelerated column subtraction: col_a - col_b → "gpu_sub".
+     * @param {string} colA
+     * @param {string} colB
+     * @returns {DataFrame}
+     */
+    gpuSub(colA, colB) {
+        const lib = getLib();
+        const ptr = lib.pardox_gpu_sub(this[PTR_SYMBOL], colA, colB);
+        if (!ptr) throw new Error('pardox_gpu_sub returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * GPU-accelerated column multiplication: col_a * col_b → "gpu_mul".
+     * @param {string} colA
+     * @param {string} colB
+     * @returns {DataFrame}
+     */
+    gpuMul(colA, colB) {
+        const lib = getLib();
+        const ptr = lib.pardox_gpu_mul(this[PTR_SYMBOL], colA, colB);
+        if (!ptr) throw new Error('pardox_gpu_mul returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * GPU-accelerated column division: col_a / col_b → "gpu_div".
+     * @param {string} colA
+     * @param {string} colB
+     * @returns {DataFrame}
+     */
+    gpuDiv(colA, colB) {
+        const lib = getLib();
+        const ptr = lib.pardox_gpu_div(this[PTR_SYMBOL], colA, colB);
+        if (!ptr) throw new Error('pardox_gpu_div returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * GPU-accelerated square root: sqrt(col) → "gpu_sqrt".
+     * @param {string} col
+     * @returns {DataFrame}
+     */
+    gpuSqrt(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_gpu_sqrt(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('pardox_gpu_sqrt returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * GPU-accelerated exponential: exp(col) → "gpu_exp".
+     * @param {string} col
+     * @returns {DataFrame}
+     */
+    gpuExp(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_gpu_exp(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('pardox_gpu_exp returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * GPU-accelerated natural logarithm: log(col) → "gpu_log".
+     * @param {string} col
+     * @returns {DataFrame}
+     */
+    gpuLog(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_gpu_log(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('pardox_gpu_log returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * GPU-accelerated absolute value: abs(col) → "gpu_abs".
+     * @param {string} col
+     * @returns {DataFrame}
+     */
+    gpuAbs(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_gpu_abs(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('pardox_gpu_abs returned null.');
+        return new DataFrame(ptr);
+    }
+
+    // -------------------------------------------------------------------------
+    // Gap 8: Pivot & Melt
+    // -------------------------------------------------------------------------
+
+    /**
+     * Pivot table transformation.
+     * @param {string} index     Column to use as index.
+     * @param {string} columns   Column to pivot (unique values become new columns).
+     * @param {string} values    Column with values to fill the pivot table.
+     * @param {string} aggFunc   Aggregation function: 'sum', 'mean', 'count', 'min', 'max'.
+     * @returns {DataFrame}
+     */
+    pivotTable(index, columns, values, aggFunc = 'sum') {
+        const lib = getLib();
+        const ptr = lib.pardox_pivot_table(this[PTR_SYMBOL], index, columns, values, aggFunc);
+        if (!ptr) throw new Error('pardox_pivot_table returned null. Check column names and agg_func.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Melt (unpivot) transformation.
+     * @param {string[]} idVars     Columns to keep as identifiers.
+     * @param {string[]} valueVars  Columns to unpivot into rows.
+     * @param {string}   varName    Name for the 'variable' column (default: 'variable').
+     * @param {string}   valueName  Name for the 'value' column (default: 'value').
+     * @returns {DataFrame}
+     */
+    melt(idVars, valueVars, varName = 'variable', valueName = 'value') {
+        const lib = getLib();
+        const idVarsJson = JSON.stringify(Array.isArray(idVars) ? idVars : [idVars]);
+        const valueVarsJson = JSON.stringify(Array.isArray(valueVars) ? valueVars : [valueVars]);
+        const ptr = lib.pardox_melt(this[PTR_SYMBOL], idVarsJson, valueVarsJson, varName, valueName);
+        if (!ptr) throw new Error('pardox_melt returned null. Check column names.');
+        return new DataFrame(ptr);
+    }
+
+    // -------------------------------------------------------------------------
+    // Gap 9: Time Series Fill
+    // -------------------------------------------------------------------------
+
+    /**
+     * Forward fill null values in a column.
+     * @param {string} col  Column name.
+     * @returns {DataFrame} New DataFrame with forward-filled column.
+     */
+    ffill(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_ffill(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('pardox_ffill returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Backward fill null values in a column.
+     * @param {string} col  Column name.
+     * @returns {DataFrame} New DataFrame with backward-filled column.
+     */
+    bfill(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_bfill(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('pardox_bfill returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Linear interpolation of null values in a column.
+     * @param {string} col  Column name.
+     * @returns {DataFrame} New DataFrame with interpolated column.
+     */
+    interpolate(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_interpolate(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('pardox_interpolate returned null.');
+        return new DataFrame(ptr);
+    }
+
+    // -------------------------------------------------------------------------
+    // Gap 10: Nested Data
+    // -------------------------------------------------------------------------
+
+    /**
+     * Extract a value from a JSON column by key.
+     * @param {string} col  JSON column name.
+     * @param {string} key  JSON key to extract.
+     * @returns {DataFrame} New DataFrame with extracted values.
+     */
+    jsonExtract(col, key) {
+        const lib = getLib();
+        const ptr = lib.pardox_json_extract(this[PTR_SYMBOL], col, key);
+        if (!ptr) throw new Error('pardox_json_extract returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Explode a list-like column, creating one row per element.
+     * @param {string} col  Column to explode.
+     * @returns {DataFrame} New DataFrame with exploded rows.
+     */
+    explode(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_explode(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('pardox_explode returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Unnest a struct column, expanding its fields into separate columns.
+     * @param {string} col  Struct column to unnest.
+     * @returns {DataFrame} New DataFrame with unnested columns.
+     */
+    unnest(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_unnest(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('pardox_unnest returned null.');
+        return new DataFrame(ptr);
+    }
+
+    // -------------------------------------------------------------------------
+    // Gap 11: Spill to Disk
+    // -------------------------------------------------------------------------
+
+    /**
+     * Spill DataFrame to disk in .prdx format.
+     * @param {string} path  File path to write.
+     * @returns {number} 1 on success, throws on error.
+     */
+    spillToDisk(path) {
+        const lib = getLib();
+        const result = lib.pardox_spill_to_disk(this[PTR_SYMBOL], path);
+        // pardox_spill_to_disk returns bytes written (>0) on success, negative on error
+        if (result <= 0) {
+            throw new Error(`pardox_spill_to_disk failed with error code: ${result}`);
+        }
+        return 1;  // Return 1 to indicate success (matches Python/PHP SDK behavior)
+    }
+
+    /**
+     * Load a spilled DataFrame from disk.
+     * @param {string} path  File path to read.
+     * @returns {DataFrame}
+     */
+    static spillFromDisk(path) {
+        const lib = getLib();
+        const ptr = lib.pardox_spill_from_disk(path);
+        if (!ptr) throw new Error('pardox_spill_from_disk returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Streaming GroupBy with chunked processing for large datasets.
+     * @param {string} groupCol   Column to group by.
+     * @param {Object} aggSpecs   Aggregation specs: { col: 'sum'|'mean'|'count'|'min'|'max' }.
+     * @param {number} chunkSize  Number of rows per chunk (default: 100000).
+     * @returns {DataFrame}
+     */
+    chunkedGroupby(groupCol, aggSpecs, chunkSize = 100000) {
+        const lib = getLib();
+        const aggJson = JSON.stringify(aggSpecs);
+        const ptr = lib.pardox_chunked_groupby(this[PTR_SYMBOL], groupCol, aggJson, chunkSize);
+        if (!ptr) throw new Error('pardox_chunked_groupby returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * External sort for large datasets that don't fit in memory.
+     * @param {string} by         Column to sort by.
+     * @param {boolean} ascending Sort order (default true).
+     * @param {number} chunkSize  Number of rows per chunk (default: 100000).
+     * @returns {DataFrame}
+     */
+    externalSort(by, ascending = true, chunkSize = 100000) {
+        const lib = getLib();
+        const ascendingInt = ascending ? 1 : 0;
+        const ptr = lib.pardox_external_sort(this[PTR_SYMBOL], by, ascendingInt, chunkSize);
+        if (!ptr) throw new Error('pardox_external_sort returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Get memory usage of this DataFrame in bytes.
+     * @returns {number} Memory usage in bytes.
+     */
+    memoryUsage() {
+        const lib = getLib();
+        return lib.pardox_memory_usage(this[PTR_SYMBOL]);
+    }
+
+    /**
+     * Get current process memory usage in bytes (static).
+     * @returns {number} Memory usage in bytes.
+     */
+    static memoryUsage() {
+        const lib = getLib();
+        return lib.pardox_memory_usage(null);
+    }
+
+    // -------------------------------------------------------------------------
+    // Gap 14: SQL Query over in-memory DataFrame
+    // -------------------------------------------------------------------------
+
+    /**
+     * Execute a SQL SELECT query on this DataFrame.
+     *
+     * Supported SQL subset:
+     *   SELECT * | col [AS alias] | AGG(col) [AS alias]
+     *   FROM table_name (ignored — queries the current DataFrame)
+     *   WHERE col OP value (AND / OR / NOT / BETWEEN / LIKE / IN)
+     *   GROUP BY col [, col ...]
+     *   HAVING agg_cond
+     *   ORDER BY col [ASC | DESC]
+     *   LIMIT n
+     *
+     * Aggregates: SUM, COUNT, AVG/MEAN, MIN, MAX, STD
+     *
+     * @param {string} sql The SQL query to execute.
+     * @returns {DataFrame|null} New DataFrame with query results, or null on error.
+     */
+    sql(sqlQuery) {
+        const lib = getLib();
+        const ptr = lib.pardox_sql_query(this[PTR_SYMBOL], sqlQuery);
+        if (!ptr) return null;
+        return new DataFrame(ptr);
+    }
+
+    // -------------------------------------------------------------------------
+    // Gap 14: SQL Query over in-memory DataFrame
+    // -------------------------------------------------------------------------
+
+    /**
+     * Execute a SQL SELECT query on this DataFrame.
+     *
+     * Supported SQL subset:
+     *   SELECT * | col [AS alias] | AGG(col) [AS alias]
+     *   FROM table_name (ignored — queries the current DataFrame)
+     *   WHERE col OP value (AND / OR / NOT / BETWEEN / LIKE / IN)
+     *   GROUP BY col [, col ...]
+     *   HAVING agg_cond
+     *   ORDER BY col [ASC | DESC]
+     *   LIMIT n
+     *
+     * Aggregates: SUM, COUNT, AVG/MEAN, MIN, MAX, STD
+     *
+     * @param {string} sql The SQL query to execute.
+     * @returns {DataFrame|null} New DataFrame with results, or null on error.
+     */
+    sql(sqlQuery) {
+        const lib = getLib();
+        const ptr = lib.pardox_sql_query(this[PTR_SYMBOL], sqlQuery);
+        if (!ptr) return null;
+        return new DataFrame(ptr);
+    }
+
+    // -------------------------------------------------------------------------
     // Internal helpers
     // -------------------------------------------------------------------------
 
@@ -618,6 +1027,143 @@ class DataFrame {
         const newPtr = lib.pardox_slice_manager(this[PTR_SYMBOL], start, length);
         if (!newPtr) throw new Error('Slice operation returned null.');
         return new DataFrame(newPtr);
+    }
+
+    // =========================================================================
+    // GAP 19: DATA CONTRACTS
+    // =========================================================================
+
+    /**
+     * Validate the DataFrame against a data contract.
+     * @param {Object} rules - Validation rules, e.g. { amount: 'not_null' }
+     * @returns {number} Number of violations (0 = all passed)
+     */
+    validateContract(rules) {
+        const lib = getLib();
+        return lib.pardox_validate_contract(this[PTR_SYMBOL], JSON.stringify(rules));
+    }
+
+    /**
+     * Return the number of violations from the last validateContract() call.
+     * @returns {number}
+     */
+    static contractViolationCount() {
+        const lib = getLib();
+        return lib.pardox_contract_violation_count();
+    }
+
+    // =========================================================================
+    // GAP 20: TIME TRAVEL
+    // =========================================================================
+
+    /**
+     * Write a versioned snapshot of this DataFrame to disk.
+     * @param {string} path      Base directory path.
+     * @param {string} label     Version label.
+     * @param {number} timestamp Optional Unix timestamp (0 = current time).
+     * @returns {number} Rows written.
+     */
+    versionWrite(path, label, timestamp = 0) {
+        const lib = getLib();
+        const result = lib.pardox_version_write(this[PTR_SYMBOL], path, label, timestamp);
+        if (result < 0) throw new Error(`versionWrite failed with code: ${result}`);
+        return result;
+    }
+
+    // =========================================================================
+    // GAP 28: LINEAR ALGEBRA
+    // =========================================================================
+
+    /**
+     * L2-normalize a numeric column (unit vector).
+     * @param {string} col Column name.
+     * @returns {DataFrame} New DataFrame.
+     */
+    linalgL2Normalize(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_l2_normalize(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('linalgL2Normalize returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * L1-normalize a numeric column (sum-to-one).
+     * @param {string} col Column name.
+     * @returns {DataFrame} New DataFrame.
+     */
+    linalgL1Normalize(col) {
+        const lib = getLib();
+        const ptr = lib.pardox_l1_normalize(this[PTR_SYMBOL], col);
+        if (!ptr) throw new Error('linalgL1Normalize returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Cosine similarity between two columns across two DataFrames.
+     * @param {string}    colA   Column in this DataFrame.
+     * @param {DataFrame} other  The other DataFrame.
+     * @param {string}    colB   Column in other.
+     * @returns {number} Cosine similarity score.
+     */
+    linalgCosineSim(colA, other, colB) {
+        const lib = getLib();
+        return lib.pardox_cosine_sim(this[PTR_SYMBOL], colA, other[PTR_SYMBOL], colB);
+    }
+
+    /**
+     * PCA — reduce a column to N principal components.
+     * @param {string} col         Column name.
+     * @param {number} nComponents Number of components.
+     * @returns {DataFrame} New DataFrame.
+     */
+    linalgPca(col, nComponents) {
+        const lib = getLib();
+        const ptr = lib.pardox_pca(this[PTR_SYMBOL], col, nComponents);
+        if (!ptr) throw new Error('linalgPca returned null.');
+        return new DataFrame(ptr);
+    }
+
+    /**
+     * Matrix multiplication between columns of two DataFrames.
+     * @param {string}    colA  Column in this DataFrame.
+     * @param {DataFrame} other Other DataFrame.
+     * @param {string}    colB  Column in other.
+     * @returns {DataFrame} New DataFrame with matmul result.
+     */
+    linalgMatmul(colA, other, colB) {
+        const lib = getLib();
+        const ptr = lib.pardox_matmul(this[PTR_SYMBOL], colA, other[PTR_SYMBOL], colB);
+        if (!ptr) throw new Error('linalgMatmul returned null.');
+        return new DataFrame(ptr);
+    }
+
+    // =========================================================================
+    // PARQUET SUPPORT
+    // =========================================================================
+
+    /**
+     * Write the DataFrame to a Parquet file.
+     * @param {string} path Destination file path.
+     * @returns {number} Rows written.
+     */
+    toParquet(path) {
+        const lib = getLib();
+        const result = lib.pardox_to_parquet(this[PTR_SYMBOL], path);
+        if (result < 0) throw new Error(`toParquet failed with code: ${result}`);
+        return result;
+    }
+
+    /**
+     * Write the DataFrame to multiple sharded Parquet files.
+     * @param {string} directory       Output directory path.
+     * @param {number} maxRowsPerShard Max rows per shard (default 1,000,000).
+     * @returns {number} Rows written.
+     */
+    writeShardedParquet(directory, maxRowsPerShard = 1_000_000) {
+        const lib = getLib();
+        const result = lib.pardox_write_sharded_parquet(this[PTR_SYMBOL], directory, maxRowsPerShard);
+        if (result < 0) throw new Error(`writeShardedParquet failed with code: ${result}`);
+        return result;
     }
 
     // Internal: assign a Series result as a column
@@ -650,8 +1196,26 @@ const OWN_PROPS = new Set([
     'toDict', 'toList', 'toJson', 'valueCounts', 'unique',
     'add', 'sub', 'std', 'minMaxScale', 'sortValues',
     'read_csv', 'read_sql', 'read_mysql', 'read_sqlserver', 'read_mongodb', 'fromArray',
-    '_free', '_schema', 'slice', '_setColumn',
+    '_free', 'free', '_schema', 'slice', '_setColumn',
     'constructor', 'then',        // 'then' prevents Proxy from being treated as a thenable
+    // Gap 7: GPU Compute
+    'gpuAdd', 'gpuSub', 'gpuMul', 'gpuDiv', 'gpuSqrt', 'gpuExp', 'gpuLog', 'gpuAbs',
+    // Gap 8: Pivot & Melt
+    'pivotTable', 'melt',
+    // Gap 9: Time Series Fill
+    'ffill', 'bfill', 'interpolate',
+    // Gap 10: Nested Data
+    'jsonExtract', 'explode', 'unnest',
+    // Gap 11: Spill to Disk
+    'spillToDisk', 'spillFromDisk', 'chunkedGroupby', 'externalSort', 'memoryUsage',
+    // Gap 19: Data Contracts
+    'validateContract', 'contractViolationCount',
+    // Gap 20: Time Travel
+    'versionWrite',
+    // Gap 28: Linear Algebra
+    'linalgL2Normalize', 'linalgL1Normalize', 'linalgCosineSim', 'linalgPca', 'linalgMatmul',
+    // Parquet
+    'toParquet', 'writeShardedParquet',
 ]);
 
 function createProxy(df) {

@@ -6,7 +6,7 @@ nav_order: 4
 
 # API Reference
 
-Complete documentation of all classes, functions, and methods in the PardoX Python SDK v0.3.1.
+Complete documentation of all classes, functions, and methods in the PardoX Python SDK v0.3.2.
 
 ---
 
@@ -434,6 +434,41 @@ rows = df.to_sql(CONN, "orders", mode="upsert", conflict_cols=["id"])
 
 **Returns:** `int` — rows written. **Raises:** `RuntimeError` on failure.
 
+---
+
+### `write_sql_prdx` — PRDX Streaming to PostgreSQL
+
+*Added in v0.3.2*
+
+Stream a `.prdx` file directly to PostgreSQL via `COPY FROM STDIN` — **O(block) RAM** regardless of file size. The schema is read from the PRDX footer; data is never fully loaded into memory.
+
+```python
+from pardox import write_sql_prdx
+
+rows = write_sql_prdx(
+    prdx_path,        # str — path to .prdx file
+    connection_string, # str — PostgreSQL connection string
+    table_name,        # str — target table (must already exist)
+    mode="append",     # str — only "append" supported
+    conflict_cols=[],  # list[str] — reserved for future upsert support
+    batch_rows=1000000 # int — rows per COPY batch
+)
+print(f"Streamed {rows:,} rows")
+```
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `prdx_path` | `str` | Path to the `.prdx` file |
+| `connection_string` | `str` | PostgreSQL connection string (`postgresql://user:pass@host:port/db`) |
+| `table_name` | `str` | Target table name (must exist with matching schema) |
+| `mode` | `str` | Write mode — only `"append"` supported in v0.3.2 |
+| `conflict_cols` | `list[str]` | Reserved — pass `[]` |
+| `batch_rows` | `int` | Rows per COPY batch (default: 1,000,000) |
+
+**Returns:** `int` — total rows written. **Raises:** `RuntimeError` on failure.
+
+**Validated:** 150M rows / 3.8 GB PRDX → PostgreSQL in ~490s at ~300,000 rows/s.
+
 #### `to_mysql(connection_string, table_name, mode="append", conflict_cols=[]) → int`
 
 Writes to MySQL.
@@ -597,9 +632,9 @@ All database functions raise `RuntimeError` with a descriptive message on failur
 | `-3` | Invalid table / query string |
 | `-4` | Invalid mode string |
 | `-5` | Invalid conflict columns JSON |
+| `-10` | File not found (`write_sql_prdx` only) |
+| `-20` | Empty connection string (`write_sql_prdx` only) |
 | `-100` | Operation failed — check stderr for Rust error details |
 
 !!! tip "Stderr logging"
     When `-100` is returned, the Rust core logs the actual database error to stderr before returning. Run with stderr visible to diagnose connection or schema issues.
-
-A hierarchical error code system (connection errors, SQL syntax errors, constraint violations, etc.) is planned for v0.3.2.

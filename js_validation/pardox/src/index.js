@@ -32,6 +32,7 @@ const {
     read_csv,
     read_sql,
     read_prdx,
+    write_sql_prdx,
     executeSql,
     read_mysql,
     execute_mysql,
@@ -39,8 +40,64 @@ const {
     execute_sqlserver,
     read_mongodb,
     execute_mongodb,
+    // Parquet
+    readParquet,
+    // PRDX metadata
+    readPrdxSchema,
+    inspectPrdx,
+    // Bulk CSV to PRDX
+    hyperCopy,
+    // Mainframe
+    readDat,
+    // Engine utilities
+    reset,
+    ping,
+    engineVersion,
+    systemReport,
+    getQuarantineLogs,
+    clearQuarantine,
+    sqlserverConfigOk,
+    // Gap 20: Time Travel
+    versionRead,
+    versionList,
+    versionDelete,
+    // Gap 21: Arrow Flight
+    flightStart,
+    flightRegister,
+    flightRead,
+    flightStop,
+    // Gap 22: Cluster
+    clusterConnect,
+    clusterPing,
+    clusterPingAll,
+    clusterCheckpoint,
+    clusterFree,
+    clusterWorkerStart,
+    clusterWorkerStop,
+    clusterWorkerRegister,
+    clusterScatter,
+    clusterScatterResilient,
+    clusterSql,
+    clusterSqlResilient,
+    // Gap 27: Lazy Pipeline
+    scanPrdx,
+    lazyOptimize,
+    lazyStats,
+    // Gap 29: REST Connector
+    readRest,
 } = require('./io');
 const { getLib } = require('./ffi');
+
+// Gap 17: WebAssembly module
+let PardoxWasm = null;
+try {
+    const path = require('path');
+    const fs   = require('fs');
+    const wasmPath = path.join(__dirname, '..', 'libs', 'Linux', 'pardox_wasm.js');
+    if (fs.existsSync(wasmPath)) {
+        PardoxWasm = require(wasmPath).PardoxWasm;
+    }
+} catch (_) {}
 
 module.exports = {
     // Core classes
@@ -51,6 +108,7 @@ module.exports = {
     read_csv,
     read_sql,
     read_prdx,
+    write_sql_prdx,
     executeSql,
     read_mysql,
     execute_mysql,
@@ -59,6 +117,64 @@ module.exports = {
     read_mongodb,
     execute_mongodb,
 
+    // Parquet
+    readParquet,
+
+    // PRDX metadata
+    readPrdxSchema,
+    inspectPrdx,
+
+    // Bulk CSV to PRDX
+    hyperCopy,
+
+    // Mainframe
+    readDat,
+
+    // Engine utilities
+    reset,
+    ping,
+    engineVersion,
+    systemReport,
+    getQuarantineLogs,
+    clearQuarantine,
+    sqlserverConfigOk,
+
+    // Gap 20: Time Travel
+    versionRead,
+    versionList,
+    versionDelete,
+
+    // Gap 21: Arrow Flight
+    flightStart,
+    flightRegister,
+    flightRead,
+    flightStop,
+
+    // Gap 22: Cluster
+    clusterConnect,
+    clusterPing,
+    clusterPingAll,
+    clusterCheckpoint,
+    clusterFree,
+    clusterWorkerStart,
+    clusterWorkerStop,
+    clusterWorkerRegister,
+    clusterScatter,
+    clusterScatterResilient,
+    clusterSql,
+    clusterSqlResilient,
+
+    // Gap 27: Lazy Pipeline
+    scanPrdx,
+    lazyOptimize,
+    lazyStats,
+
+    // Gap 29: REST Connector
+    readRest,
+
     // Low-level access (for advanced use)
     getLib,
+
+    // Gap 17: WebAssembly module
+    PardoxWasm,
 };

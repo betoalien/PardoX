@@ -7,7 +7,7 @@ nav_order: 2
 
 # Database Integration
 
-PardoX v0.3.1 introduces native database connectivity via Rust drivers — no Python, PHP, or Node.js database libraries required. The same Rust core powers identical APIs across all three SDKs.
+PardoX v0.3.2 provides native database connectivity via Rust drivers — no Python, PHP, or Node.js database libraries required. The same Rust core powers identical APIs across all three SDKs.
 
 ---
 
@@ -324,9 +324,80 @@ $rows = $df->to_mongodb($CONN, 'mydb.orders_archive', 'append');
 
 ---
 
-## Validated Results (v0.3.1)
+## PRDX Streaming to PostgreSQL (v0.3.2)
 
-All validations used a 50,000-row real-world dataset (`hardcore_sales_50k.csv`).
+*New in v0.3.2:* Stream any `.prdx` file directly to PostgreSQL — **without loading the file into RAM**. Uses `COPY FROM STDIN` with block-by-block decompression.
+
+### Python
+
+```python
+from pardox import write_sql_prdx
+
+CONN = "postgresql://user:pass@localhost:5434/mydb"
+
+rows = write_sql_prdx(
+    "/data/ventas_150m.prdx",
+    CONN,
+    "ventas",          # table must exist with matching schema
+    mode="append",
+    conflict_cols=[],
+    batch_rows=1_000_000
+)
+print(f"Streamed {rows:,} rows")
+```
+
+### JavaScript
+
+```js
+const { write_sql_prdx } = require('./pardox/src/io');
+
+const rows = write_sql_prdx(
+    '/data/ventas_150m.prdx',
+    'postgresql://user:pass@localhost:5434/mydb',
+    'ventas',
+    'append',
+    [],
+    1000000
+);
+console.log(`Streamed ${rows.toLocaleString()} rows`);
+```
+
+### PHP
+
+```php
+use PardoX\IO;
+
+$rows = IO::write_sql_prdx(
+    '/data/ventas_150m.prdx',
+    'postgresql://user:pass@localhost:5434/mydb',
+    'ventas',
+    'append',
+    [],
+    1000000
+);
+echo "Streamed $rows rows\n";
+```
+
+### Memory characteristics
+
+| Approach | RAM used |
+|----------|----------|
+| `df = read_prdx(path)` then `df.to_sql(...)` | Entire file loaded (3.8 GB for 150M rows) |
+| `write_sql_prdx(path, ...)` | O(one block × columns) — typically < 200 MB |
+
+---
+
+## Validated Results (v0.3.2)
+
+### PRDX → PostgreSQL — 150M rows (3.8 GB)
+
+| SDK | Rows | Time | Throughput | Protocol |
+|-----|------|------|------------|----------|
+| Python | 150,000,000 | ~490s | ~306,000 rows/s | COPY FROM STDIN |
+| JavaScript | 150,000,000 | ~514s | ~291,000 rows/s | COPY FROM STDIN |
+| PHP | 150,000,000 | ~1,032s | ~145,000 rows/s | batch INSERT |
+
+### CSV / DataFrame → PostgreSQL
 
 | Database | SDK | Result |
 |----------|-----|--------|
@@ -334,5 +405,5 @@ All validations used a 50,000-row real-world dataset (`hardcore_sales_50k.csv`).
 | PostgreSQL | Node.js | ✅ 50,000 rows — COPY FROM STDIN |
 | MySQL | Python | ✅ 50,000 rows — chunked batch (LOAD DATA disabled server-side) |
 | MySQL | PHP | ✅ 50,000 rows — chunked batch |
-| SQL Server | all | ⚠️ Authentication fails with `!` in password — fix in v0.3.2 |
+| SQL Server | all | ⚠️ Authentication fails with `!` in password |
 | MongoDB | — | Implemented; bulk benchmarks planned |

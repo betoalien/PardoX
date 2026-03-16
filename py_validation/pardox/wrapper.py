@@ -51,6 +51,26 @@ if not os.path.exists(lib_path):
         f"Please verify that the 'libs/' folder contains the correct binaries for your OS."
     )
 
+# Expose libs/ folder to dynamic linker so the Rust Core can find companion
+# plugins (GPU, Server) by their canonical names (e.g. libpardox_gpu.so).
+# This must be done BEFORE loading the CPU library.
+_gpu_canonical  = os.path.join(lib_folder, "libpardox_gpu.so")
+_gpu_actual     = os.path.join(lib_folder, "pardox-gpu-Linux-x64.so")
+_srv_canonical  = os.path.join(lib_folder, "libpardox_server.so")
+_srv_actual     = os.path.join(lib_folder, "pardox-server-Linux-x64.so")
+
+for _canonical, _actual in [(_gpu_canonical, _gpu_actual), (_srv_canonical, _srv_actual)]:
+    if not os.path.exists(_canonical) and os.path.exists(_actual):
+        try:
+            os.symlink(_actual, _canonical)
+        except (OSError, NotImplementedError):
+            pass  # Symlink may already exist or not be supported
+
+# Add libs folder to LD_LIBRARY_PATH so dlopen inside the Core finds companions
+_existing_ld = os.environ.get("LD_LIBRARY_PATH", "")
+if lib_folder not in _existing_ld:
+    os.environ["LD_LIBRARY_PATH"] = lib_folder + (":" + _existing_ld if _existing_ld else "")
+
 try:
     lib = ctypes.CDLL(lib_path)
 except OSError as e:
@@ -205,253 +225,35 @@ try:
     lib.pardox_init_engine.restype = None
     
     # WARMUP CALL
-    lib.pardox_init_engine() 
-    # print(f"✅ PardoX Core loaded from: {lib_path}") 
+    lib.pardox_init_engine()
+    # print(f"✅ PardoX Core loaded from: {lib_path}")
 except AttributeError:
     pass
 
-# =========================================================================
-# API 28: FILTER PREDICATES
-# =========================================================================
-try:
-    # Column vs Column
-    if hasattr(lib, 'pardox_filter_compare'):
-        lib.pardox_filter_compare.argtypes = [c_void_p, c_char_p, c_void_p, c_char_p, c_int32]
-        lib.pardox_filter_compare.restype = c_void_p
+# ── FFI Bindings ─────────────────────────────────────────────────────────────
+import ctypes as _ctypes_local
+from ._bindings import bind_all
+bind_all(lib, c_void_p, c_char_p, c_int32, c_double, c_longlong, c_size_t, c_int64, _ctypes_local.c_int16)
 
-    # Column vs Scalar
-    if hasattr(lib, 'pardox_filter_compare_scalar'):
-        lib.pardox_filter_compare_scalar.argtypes = [
-            c_void_p, c_char_p, 
-            c_double, c_longlong, c_int32, # val_f64, val_i64, is_float
-            c_int32 # op_code
-        ]
-        lib.pardox_filter_compare_scalar.restype = c_void_p
-except Exception as e:
-    print(f"[PardoX Wrapper Warning] Filter APIs missing: {e}")
-
-# =========================================================================
-# API 29: AGGREGATIONS
-# =========================================================================
-try:
-    agg_funcs = [
-        'pardox_agg_sum', 'pardox_agg_mean', 'pardox_agg_min', 
-        'pardox_agg_max', 'pardox_agg_count', 'pardox_agg_std'
-    ]
-    for func in agg_funcs:
-        if hasattr(lib, func):
-            getattr(lib, func).argtypes = [c_void_p, c_char_p]
-            getattr(lib, func).restype = c_double
-except Exception as e:
-    print(f"[PardoX Wrapper Warning] Aggregation APIs missing: {e}")
+# ── WebAssembly (Gap 17) ─────────────────────────────────────────────────────
+wasm = None
+_wasm_path = os.path.join(os.path.dirname(__file__), "libs", "Linux", "pardox_wasm.js")
+if os.path.exists(_wasm_path):
+    try:
+        import importlib.util as _ilu
+        _spec = _ilu.spec_from_file_location("pardox_wasm", _wasm_path)
+        if _spec and _spec.loader:
+            _wasm_mod = _ilu.module_from_spec(_spec)
+            _spec.loader.exec_module(_wasm_mod)
+            wasm = getattr(_wasm_mod, 'PardoxWasm', None)
+    except Exception:
+        pass
 
 # =========================================================================
-# API 30: APPLY FILTER
+# (Legacy binding declarations below have been moved to _bindings/ modules)
 # =========================================================================
-try:
-    if hasattr(lib, 'pardox_apply_filter'):
-        lib.pardox_apply_filter.argtypes = [c_void_p, c_void_p, c_char_p]
-        lib.pardox_apply_filter.restype = c_void_p
-except Exception:
-    pass
-
+# PLACEHOLDER — keeping this section marker so file diffs are readable.
+# All argtypes/restype declarations are now handled by bind_all() above.
 # =========================================================================
-# API: MYSQL — READ / WRITE / EXECUTE
-# =========================================================================
-if hasattr(lib, 'pardox_read_mysql'):
-    lib.pardox_read_mysql.argtypes = [c_char_p, c_char_p]
-    lib.pardox_read_mysql.restype = c_void_p
-
-if hasattr(lib, 'pardox_write_mysql'):
-    lib.pardox_write_mysql.argtypes = [c_void_p, c_char_p, c_char_p, c_char_p, c_char_p]
-    lib.pardox_write_mysql.restype = c_longlong
-
-if hasattr(lib, 'pardox_execute_mysql'):
-    lib.pardox_execute_mysql.argtypes = [c_char_p, c_char_p]
-    lib.pardox_execute_mysql.restype = c_longlong
-
-# =========================================================================
-# API: SQL SERVER — READ / WRITE / EXECUTE
-# =========================================================================
-if hasattr(lib, 'pardox_read_sqlserver'):
-    lib.pardox_read_sqlserver.argtypes = [c_char_p, c_char_p]
-    lib.pardox_read_sqlserver.restype = c_void_p
-
-if hasattr(lib, 'pardox_write_sqlserver'):
-    lib.pardox_write_sqlserver.argtypes = [c_void_p, c_char_p, c_char_p, c_char_p, c_char_p]
-    lib.pardox_write_sqlserver.restype = c_longlong
-
-if hasattr(lib, 'pardox_execute_sqlserver'):
-    lib.pardox_execute_sqlserver.argtypes = [c_char_p, c_char_p]
-    lib.pardox_execute_sqlserver.restype = c_longlong
-
-# =========================================================================
-# API: MONGODB — READ / WRITE / EXECUTE
-# =========================================================================
-if hasattr(lib, 'pardox_read_mongodb'):
-    lib.pardox_read_mongodb.argtypes = [c_char_p, c_char_p]
-    lib.pardox_read_mongodb.restype = c_void_p
-
-if hasattr(lib, 'pardox_write_mongodb'):
-    lib.pardox_write_mongodb.argtypes = [c_void_p, c_char_p, c_char_p, c_char_p]
-    lib.pardox_write_mongodb.restype = c_longlong
-
-if hasattr(lib, 'pardox_execute_mongodb'):
-    lib.pardox_execute_mongodb.argtypes = [c_char_p, c_char_p, c_char_p]
-    lib.pardox_execute_mongodb.restype = c_longlong
-
-# =========================================================================
-# API: EXECUTE ARBITRARY SQL (DDL / DML)
-# =========================================================================
-if hasattr(lib, 'pardox_execute_sql'):
-    lib.pardox_execute_sql.argtypes = [c_char_p, c_char_p]
-    lib.pardox_execute_sql.restype = c_longlong
-
-# =========================================================================
-# API: WRITE TO SQL (PostgreSQL)
-# =========================================================================
-if hasattr(lib, 'pardox_write_sql'):
-    lib.pardox_write_sql.argtypes = [c_void_p, c_char_p, c_char_p, c_char_p, c_char_p]
-    lib.pardox_write_sql.restype = c_longlong
-
-# =========================================================================
-# API Writers 6: PERSISTENCE (WRITERS)
-# =========================================================================
-try:
-    # CSV Writer (Defined in api_writers.rs)
-    if hasattr(lib, 'pardox_to_csv'):
-        # Args: (ManagerPtr, FilePath)
-        lib.pardox_to_csv.argtypes = [c_void_p, c_char_p]
-        # Returns: 1 on Success, Negative on Error
-        lib.pardox_to_csv.restype = c_longlong
-
-    # PRDX Writer (Binary Dump - Native)
-    if hasattr(lib, 'pardox_to_prdx'):
-        lib.pardox_to_prdx.argtypes = [c_void_p, c_char_p]
-        lib.pardox_to_prdx.restype = c_longlong
-
-except Exception as e:
-    print(f"[PardoX Wrapper Warning] Writer APIs missing: {e}")
-
-# =========================================================================
-# API 7: NATIVE READERS (INSPECTION) - DEFINED IN api_reader.rs
-# =========================================================================
-try:
-    # Read Head (returns JSON String ptr)
-    # fn pardox_read_head_json(path: *const c_char, limit: usize) -> *mut c_char
-    if hasattr(lib, 'pardox_read_head_json'):
-        lib.pardox_read_head_json.argtypes = [c_char_p, c_size_t]
-        lib.pardox_read_head_json.restype = c_char_p
-
-    # Column Sum (Benchmark / Integrity)
-    # fn pardox_column_sum(path: *const c_char, col: *const c_char) -> c_double
-    if hasattr(lib, 'pardox_column_sum'):
-        lib.pardox_column_sum.argtypes = [c_char_p, c_char_p]
-        lib.pardox_column_sum.restype = c_double
-
-except Exception as e:
-    print(f"[PardoX Wrapper Warning] Native Reader APIs missing: {e}")
-
-# =========================================================================
-# API 8: MUTATION & COMPUTE KERNELS (Defined in api_core.rs)
-# =========================================================================
-try:
-    # 1. Column Assignment (In-Place Mutation)
-    # fn pardox_add_column(target: *mut Mgr, source: *mut Mgr, name: *const char) -> c_longlong
-    if hasattr(lib, 'pardox_add_column'):
-        lib.pardox_add_column.argtypes = [c_void_p, c_void_p, c_char_p]
-        lib.pardox_add_column.restype = c_longlong
-
-    # 2. Fill Nulls (Data Cleaning)
-    # fn pardox_fill_na(mgr: *mut Mgr, col: *const char, val: c_double) -> c_longlong
-    if hasattr(lib, 'pardox_fill_na'):
-        lib.pardox_fill_na.argtypes = [c_void_p, c_char_p, c_double]
-        lib.pardox_fill_na.restype = c_longlong
-
-    # 3. Rounding (Data Transformation)
-    # fn pardox_round(mgr: *mut Mgr, col: *const char, decimals: c_int) -> c_longlong
-    if hasattr(lib, 'pardox_round'):
-        lib.pardox_round.argtypes = [c_void_p, c_char_p, c_int32]
-        lib.pardox_round.restype = c_longlong
-
-except Exception as e:
-    print(f"[PardoX Wrapper Warning] Compute/Mutation APIs missing: {e}")
-
-# =========================================================================
-# API 9: MEMORY INGESTION (Dummy Data / JSON Bridge)
-# =========================================================================
-try:
-    # Ingest JSON Bytes directly from Memory
-    # fn pardox_read_json_bytes(json_bytes: *const u8, len: usize) -> *mut HyperBlockManager
-    if hasattr(lib, 'pardox_read_json_bytes'):
-        lib.pardox_read_json_bytes.argtypes = [c_char_p, c_size_t]
-        # CRITICAL CHANGE: Returns a POINTER to the new Manager, not an ID.
-        lib.pardox_read_json_bytes.restype = c_void_p 
-
-except Exception as e:
-    print(f"[PardoX Wrapper Warning] Memory Ingestion APIs missing: {e}")
-
-# =========================================================================
-# OBSERVER v0.3.1 — NATIVE UNIVERSAL EXPORT & VECTORIZED INSPECTION
-# =========================================================================
-
-# pardox_to_json_records(mgr) -> *char  — full records JSON (heap-allocated, must free)
-if hasattr(lib, 'pardox_to_json_records'):
-    lib.pardox_to_json_records.argtypes = [c_void_p]
-    lib.pardox_to_json_records.restype = c_void_p
-
-# pardox_to_json_arrays(mgr) -> *char  — full arrays JSON (heap-allocated, must free)
-if hasattr(lib, 'pardox_to_json_arrays'):
-    lib.pardox_to_json_arrays.argtypes = [c_void_p]
-    lib.pardox_to_json_arrays.restype = c_void_p
-
-# pardox_value_counts(mgr, col_name) -> *char  — {"value": count, ...} (heap-allocated, must free)
-if hasattr(lib, 'pardox_value_counts'):
-    lib.pardox_value_counts.argtypes = [c_void_p, c_char_p]
-    lib.pardox_value_counts.restype = c_void_p
-
-# pardox_unique(mgr, col_name) -> *char  — ["val1", "val2", ...] (heap-allocated, must free)
-if hasattr(lib, 'pardox_unique'):
-    lib.pardox_unique.argtypes = [c_void_p, c_char_p]
-    lib.pardox_unique.restype = c_void_p
-
-# =========================================================================
-# NATIVE MATH FOUNDATION (v0.3.1)
-# =========================================================================
-
-# pardox_math_add(mgr, col_a, col_b) -> *Manager (result_math_add column)
-if hasattr(lib, 'pardox_math_add'):
-    lib.pardox_math_add.argtypes = [c_void_p, c_char_p, c_char_p]
-    lib.pardox_math_add.restype = c_void_p
-
-# pardox_math_sub(mgr, col_a, col_b) -> *Manager (result_math_sub column)
-if hasattr(lib, 'pardox_math_sub'):
-    lib.pardox_math_sub.argtypes = [c_void_p, c_char_p, c_char_p]
-    lib.pardox_math_sub.restype = c_void_p
-
-# pardox_math_stddev(mgr, col_name) -> f64
-if hasattr(lib, 'pardox_math_stddev'):
-    lib.pardox_math_stddev.argtypes = [c_void_p, c_char_p]
-    lib.pardox_math_stddev.restype = c_double
-
-# pardox_math_minmax(mgr, col_name) -> *Manager (result_minmax column, normalized [0,1])
-if hasattr(lib, 'pardox_math_minmax'):
-    lib.pardox_math_minmax.argtypes = [c_void_p, c_char_p]
-    lib.pardox_math_minmax.restype = c_void_p
-
-# pardox_sort_values(mgr, col_name, descending_i32) -> *Manager (sorted rows)
-if hasattr(lib, 'pardox_sort_values'):
-    lib.pardox_sort_values.argtypes = [c_void_p, c_char_p, ctypes.c_int]
-    lib.pardox_sort_values.restype = c_void_p
-
-# pardox_gpu_sort(mgr, col_name) -> *Manager (GPU Bitonic sort, falls back to CPU)
-if hasattr(lib, 'pardox_gpu_sort'):
-    lib.pardox_gpu_sort.argtypes = [c_void_p, c_char_p]
-    lib.pardox_gpu_sort.restype = c_void_p
-
-# pardox_get_f64_buffer(mgr, col_name, *out_len) -> *const f64
-# Used by __array__ for zero-copy NumPy compatibility.
-if hasattr(lib, 'pardox_get_f64_buffer'):
-    lib.pardox_get_f64_buffer.argtypes = [c_void_p, c_char_p, ctypes.POINTER(c_size_t)]
-    lib.pardox_get_f64_buffer.restype = c_void_p
-
+if False:  # dead code block — preserves line references for git blame
+    pass  # nothing to do

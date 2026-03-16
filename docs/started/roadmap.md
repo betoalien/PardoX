@@ -38,13 +38,52 @@ All items below were delivered in this release.
 
 ---
 
-## v0.3.2 — Planned
+## v0.3.2 — Released (2026-03-15)
+
+All items below were delivered in this release.
+
+| Feature | Status |
+|---------|--------|
+| `write_sql_prdx()` — PRDX streaming to PostgreSQL via COPY FROM STDIN, O(block) RAM | ✅ Done |
+| GroupBy aggregation (Gap 1) | ✅ Done — Python, JS, PHP |
+| String & Date operations (Gap 2) | ✅ Done — Python, JS, PHP |
+| Decimal type (Gap 3) | ✅ Done — Python, JS, PHP |
+| Window functions (Gap 4) | ✅ Done — Python, JS, PHP |
+| Lazy pipeline (Gap 5) | ✅ Done — Python, JS, PHP |
+| GPU compute (Gap 7) | ✅ Done — Python, PHP |
+| Pivot & Melt (Gap 8) | ✅ Done — Python, PHP |
+| Time Series Fill (Gap 9) | ✅ Done — Python, PHP |
+| Nested Data / JSON (Gap 10) | ✅ Done — Python, PHP |
+| Spill to Disk (Gap 11) | ✅ Done — Python, PHP |
+| Universal Loader PRDX (Gap 12) | ✅ Done — Python, PHP |
+| Streaming GroupBy (Gap 13) | ✅ Done — PHP |
+| SQL over DataFrames (Gap 14) | ✅ Done — Python, JS, PHP |
+| Cloud Storage (Gap 15) | ✅ Done — Python |
+| Live Query (Gap 16) | ✅ Done — Python |
+| WebAssembly (Gap 17) | ✅ Done — JS |
+| Encryption (Gap 18) | ✅ Done — Python |
+| Data Contracts (Gap 19) | ✅ Done — Python |
+| Time Travel (Gap 20) | ✅ Done — Python |
+| Arrow Flight (Gap 21) | ✅ Done — Python |
+| Distributed Cluster (Gap 22) | ✅ Done — Python |
+| SQL Server Fix (Gap 23) | ✅ Done — Python |
+| Fault Tolerance (Gap 26) | ✅ Done — Python |
+| Query Planner (Gap 27) | ✅ Done — Python |
+| Linear Algebra (Gap 28) | ✅ Done — Python |
+| REST Connector (Gap 29) | ✅ Done — Python |
+| FFI Reference documentation (181 exports) | ✅ Done |
+| VAP31 CSV→PostgreSQL — 3 SDKs | ✅ Done |
+| VAP32 PRDX→PostgreSQL — 3 SDKs | ✅ Done — 150M rows validated |
+
+---
+
+## v0.4.0 — Planned
 
 ### SQL Server — Password Special Character Fix
 
-**Problem:** The tiberius Rust driver (v0.12) fails to authenticate when the SQL Server password contains `!` or certain other special characters. The connection succeeds from the local machine (loopback), but fails from an external host. Root cause is in the `unicode_password()` XOR encoding function inside the TDS `LOGIN7` packet.
+**Problem:** The tiberius Rust driver (v0.12) fails to authenticate when the SQL Server password contains `!` or certain other special characters.
 
-**Planned fix:** Audit `tiberius` v0.12.x `login.rs` — specifically the `unicode_password()` function — and patch or upgrade to a version where the encoding is correct for all printable ASCII characters.
+**Planned fix:** Audit `tiberius` v0.12.x `login.rs` and patch or upgrade to a version where the encoding is correct for all printable ASCII characters.
 
 **Workaround until fixed:** Use a SQL Server password that contains only `[A-Za-z0-9_\-@#$]`.
 
@@ -68,8 +107,6 @@ All items below were delivered in this release.
 
 ### Additional Native Data Sources
 
-The following connectors are planned for native Rust implementation (no Python driver dependency):
-
 | Source | Format / Protocol | Notes |
 |--------|------------------|-------|
 | Apache Parquet | Binary columnar | Direct read into HyperBlock via `parquet2` crate |
@@ -81,36 +118,9 @@ The following connectors are planned for native Rust implementation (no Python d
 
 ---
 
-### Fake PostgreSQL Server (Validation Tool)
+### Gaps 7–14 — JavaScript SDK
 
-**Purpose:** Enable SDK validation tests to run without a real PostgreSQL instance. A lightweight Rust server implementing a subset of the PostgreSQL wire protocol will respond to `SELECT`, `INSERT`, `COPY`, and DDL statements, returning predictable results.
-
-**Use cases:**
-- CI/CD pipeline tests that cannot provision real databases
-- SDK integration tests against a controlled server
-- Protocol-level regression testing for the `pardox_write_sql` COPY path
-
----
-
-### GroupBy / Split-Apply-Combine
-
-Vectorized `groupby` with Rust hash-aggregation engine.
-
-```python
-# Coming in v0.3.2
-summary = df.groupby("region").agg({"revenue": "sum", "quantity": "mean"})
-```
-
----
-
-### DataFrame Filtering DSL
-
-A fluent filter API backed by Rust predicate evaluation.
-
-```python
-# Coming in v0.3.2
-df_filtered = df.filter(df["price"] > 100).filter(df["state"] == "TX")
-```
+JavaScript SDK currently segfaults on Gaps 7–11 due to a known Core issue. Fix and re-validate planned.
 
 ---
 
@@ -119,4 +129,4 @@ df_filtered = df.filter(df["price"] > 100).filter(df["state"] == "TX")
 - **Distributed execution:** Partition HyperBlocks across nodes via a Rust-native scheduler.
 - **Streaming DataFrames:** Ingest from Kafka / Kinesis as append-only HyperBlock partitions.
 - **GPU-accelerated aggregations:** Extend GPU support from sort to sum, mean, and groupby using compute shaders.
-- **WASM SDK:** PardoX in the browser via WebAssembly.
+- **WASM SDK:** Full PardoX in the browser via WebAssembly.
