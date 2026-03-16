@@ -1,0 +1,2 @@
+vendor/         export-ignore
+check_ffi.php   export-ignore

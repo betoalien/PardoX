@@ -1,0 +1,39 @@
+{
+    "name": "pardox/pardox",
+    "description": "Universal High-Performance DataFrame Engine for PHP (powered by Rust)",
+    "keywords": [
+        "dataframe",
+        "rust",
+        "ffi",
+        "data-analysis",
+        "etl",
+        "performance",
+        "pandas"
+    ],
+    "type": "library",
+    "license": "MIT",
+    "version": "0.3.1",
+    "authors": [
+        {
+            "name": "Alberto Cárdenas",
+            "email": "conect@albertocardenas.com",
+            "role": "Lead Developer"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-ffi": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "PardoX\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "support": {
+        "issues": "https://github.com/albertocardenas/pardox/issues",
+        "source": "https://github.com/albertocardenas/pardox"
+    }
+}

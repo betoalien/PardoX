@@ -9,5 +9,4 @@ module.exports = function bindInspection(_lib) {
     _lib.pardox_slice_manager             = _lib.raw.func('void * pardox_slice_manager(void * mgr, size_t start, size_t len)');
     _lib.pardox_tail_manager              = _lib.raw.func('void * pardox_tail_manager(void * mgr, size_t n)');
     _lib._raw_pardox_get_f64_buffer       = _lib.raw.func('void * pardox_get_f64_buffer(void * mgr, const char * col, size_t * out_len)');
-    _lib._raw_pardox_get_string_buffer    = _lib.raw.func('void * pardox_get_string_buffer(void * mgr, const char * col, size_t * out_len)');
 };
