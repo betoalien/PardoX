@@ -48,7 +48,18 @@ PardoX is a high-performance DataFrame engine designed for modern data engineeri
 - [**FFI Exports Reference**](ffi-reference.md) — All 181 C-ABI functions exported by the Rust core across 5 crates. Use this to build custom bindings or validate SDK integrations.
 
 ### 📂 Base Knowledge
-- [**Base Knowledge**](base_knowledge/) — Validation files, integration notes, and supporting documentation.
+- [**Base Knowledge**](base_knowledge/) — Validation scripts for all 29 feature gaps across Python, Node.js, and PHP SDKs.
+  - [Python validation scripts](base_knowledge/python_code/) — 28 files (`validate_gap1_sdk.py` → `validate_gap29_sdk.py`)
+  - [Node.js validation scripts](base_knowledge/js_code/) — 18 files (`validate_gap1_sdk.js` → `validate_gap18_sdk.js`)
+  - [PHP validation scripts](base_knowledge/php_code/) — 28 files (`validate_gap1_sdk.php` → `validate_gap29_sdk.php`)
+
+### 📘 SDK Documentation
+- [**SDK Documentation**](documentation_sdk/) — In-depth guides for each SDK.
+  - [Python SDK](documentation_sdk/python_sdk.md) — API reference and v0.3.2 features
+  - [Node.js SDK](documentation_sdk/javascript_sdk.md) — API reference and v0.3.2 features
+  - [PHP SDK](documentation_sdk/php_sdk.md) — API reference and v0.3.2 features
+  - [Database Integration](documentation_sdk/db_integration.md) — PostgreSQL, MySQL, SQL Server, MongoDB across all SDKs
+  - [Universality](documentation_sdk/universalidad.md) — Cross-SDK design philosophy
 
 ### 📓 Examples & Notebooks
 - [**Jupyter Notebooks**](https://github.com/betoalien/PardoX/tree/master/notebooks) — Interactive examples and real-world ETL scenarios.

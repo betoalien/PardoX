@@ -342,7 +342,7 @@ arr = np.array(df["price"])   # zero-copy Float64 array
 
 ## 📘 Documentation
 
-[**Full Documentation →**](https://betoalien.github.io/PardoX/)
+[**Full Documentation →**](https://www.pardox.io)
 
 ---
 
@@ -8217,7 +8217,7 @@ arr = np.array(df["price"])   # zero-copy Float64 array
 
 ## 📘 Documentation
 
-[**Full Documentation →**](https://betoalien.github.io/PardoX/)
+[**Full Documentation →**](https://www.pardox.io)
 
 ---
 

@@ -4,19 +4,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pardox"
-version = "0.3.1"
+version = "0.3.2"
 description = "High-Performance DataFrame Engine powered by Rust (The PardoX Project)"
 readme = "README.md"
+
 authors = [
   { name = "Alberto Cardenas", email = "iam@albertocardenas.com" },
 ]
-license = { text = "MIT" }
+
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Rust",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Information Analysis",
 ]
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
 keywords = ["dataframe", "rust", "etl", "big-data", "simd"]
 requires-python = ">=3.8"
 
@@ -27,5 +30,8 @@ dependencies = []
 "Source" = "https://github.com/betoalien/pardox"
 
 [tool.setuptools]
-packages = ["pardox"]
+packages = { find = { namespaces = true } }
 include-package-data = true
+
+[tool.setuptools.package-data]
+"pardox" = ["libs/*/*"]

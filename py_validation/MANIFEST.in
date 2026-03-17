@@ -1,5 +1,3 @@
 include README.md
-include pardox/libs/Win/*.dll
-include pardox/libs/Linux/*.so
-include pardox/libs/Mac/*.dylib
+include LICENSE
 recursive-include pardox/libs *

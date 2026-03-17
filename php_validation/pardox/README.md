@@ -325,7 +325,7 @@ IO::executeMongodb($mgConn, 'mydb', '{"drop": "col"}');
 
 ## 📘 Documentation
 
-[**Full Documentation →**](https://betoalien.github.io/PardoX/)
+[**Full Documentation →**](https://www.pardox.io)
 
 ---
 

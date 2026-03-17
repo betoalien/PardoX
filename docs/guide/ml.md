@@ -7,7 +7,7 @@ nav_order: 6
 
 # ML Integration — Zero-Copy NumPy Bridge
 
-PardoX v0.3.1 implements the **NumPy `__array__` protocol**, allowing direct zero-copy access from PardoX Series to NumPy arrays. No data is copied — the NumPy array points directly into the Rust HyperBlock buffer.
+PardoX v0.3.2 implements the **NumPy `__array__` protocol**, allowing direct zero-copy access from PardoX Series to NumPy arrays. No data is copied — the NumPy array points directly into the Rust HyperBlock buffer.
 
 ---
 

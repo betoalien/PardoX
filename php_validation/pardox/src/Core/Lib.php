@@ -49,8 +49,8 @@ class Lib
         }
 
         // 2. Resolve Path
-        // Assumes 'libs' is at the project root (2 levels up from src/Core)
-        $baseDir = dirname(__DIR__, 2);
+        // libs/ is one level up from src/Core (inside src/)
+        $baseDir = dirname(__DIR__);
         $libPath = $baseDir . DIRECTORY_SEPARATOR . 'libs' . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $libName;
 
         if (!file_exists($libPath)) {

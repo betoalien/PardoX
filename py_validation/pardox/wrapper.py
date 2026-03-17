@@ -51,21 +51,6 @@ if not os.path.exists(lib_path):
         f"Please verify that the 'libs/' folder contains the correct binaries for your OS."
     )
 
-# Expose libs/ folder to dynamic linker so the Rust Core can find companion
-# plugins (GPU, Server) by their canonical names (e.g. libpardox_gpu.so).
-# This must be done BEFORE loading the CPU library.
-_gpu_canonical  = os.path.join(lib_folder, "libpardox_gpu.so")
-_gpu_actual     = os.path.join(lib_folder, "pardox-gpu-Linux-x64.so")
-_srv_canonical  = os.path.join(lib_folder, "libpardox_server.so")
-_srv_actual     = os.path.join(lib_folder, "pardox-server-Linux-x64.so")
-
-for _canonical, _actual in [(_gpu_canonical, _gpu_actual), (_srv_canonical, _srv_actual)]:
-    if not os.path.exists(_canonical) and os.path.exists(_actual):
-        try:
-            os.symlink(_actual, _canonical)
-        except (OSError, NotImplementedError):
-            pass  # Symlink may already exist or not be supported
-
 # Add libs folder to LD_LIBRARY_PATH so dlopen inside the Core finds companions
 _existing_ld = os.environ.get("LD_LIBRARY_PATH", "")
 if lib_folder not in _existing_ld:

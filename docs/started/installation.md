@@ -29,7 +29,7 @@ pip install pardox
 | macOS | x86_64 (Intel) | ✅ Stable |
 
 !!! note "Python version"
-    Python **3.10 or higher** is required. No Rust compiler is needed — binaries are pre-packaged for all platforms.
+    Python **3.8 or higher** is required. No Rust compiler is needed — binaries are pre-packaged for all platforms.
 
 !!! note "No database drivers needed"
     PardoX connects to PostgreSQL, MySQL, SQL Server, and MongoDB entirely through the Rust core. You do **not** need to install `psycopg2`, `pymysql`, `pyodbc`, or `pymongo`.
@@ -38,7 +38,7 @@ pip install pardox
 
 ```python
 import pardox as px
-print(px.__version__)    # e.g. "0.3.1"
+print(px.__version__)    # e.g. "0.3.2"
 
 df = px.read_csv("my_data.csv")
 print(df.shape)
@@ -51,15 +51,13 @@ print(df.shape)
 The Node.js SDK uses [koffi](https://koffi.dev/) for FFI bindings and ships the same pre-compiled `.so` / `.dylib` / `.dll`.
 
 ```bash
-npm install pardox
-# or
-yarn add pardox
+npm i @pardox/pardox
 ```
 
 ### Usage
 
 ```js
-const px = require('pardox');
+const { DataFrame, read_csv } = require('@pardox/pardox');
 
 const df = px.read_csv('my_data.csv');
 console.log(df.shape);
@@ -78,14 +76,14 @@ console.log(df.shape);
 The PHP SDK uses the built-in `FFI` extension (PHP 7.4+).
 
 ```bash
-composer require pardox/pardox-php
+composer require betoalien/pardox-php
 ```
 
 ### Requirements
 
 | Runtime | Minimum version |
 |---------|----------------|
-| PHP | 7.4 or higher |
+| PHP | 8.1 or higher |
 | FFI extension | Must be enabled in `php.ini` |
 
 Enable the FFI extension:

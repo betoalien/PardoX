@@ -7,9 +7,9 @@
 
 **The Speed of Rust. The Simplicity of JavaScript.**
 
-PardoX is a high-performance DataFrame engine for Node.js. A single **Rust core** handles all computation — CSV parsing, arithmetic, database I/O, and sorting — exposed to JavaScript through [koffi](https://koffi.dev/) FFI. No Python. No native Node addons to compile. No database drivers.
+PardoX is a high-performance DataFrame engine for Node.js. A single **Rust core** handles all computation — CSV parsing, arithmetic, database I/O, sorting, GroupBy, Window functions, and more — exposed to JavaScript through [koffi](https://koffi.dev/) FFI. No Python. No native Node addons to compile. No database drivers.
 
-> **v0.3.1 is now available.** Native database connectivity for PostgreSQL, MySQL, SQL Server, and MongoDB. Full Observer export. GPU sort. All from Node.js.
+> **v0.3.2 is now available.** PRDX streaming to PostgreSQL (150M rows validated), GroupBy, String & Date ops, Window functions, Lazy pipeline, SQL over DataFrames, WebAssembly, Encryption, Data Contracts, Time Travel, Arrow Flight, Linear Algebra, REST Connector — all from Node.js.
 
 ---
 
@@ -20,8 +20,11 @@ PardoX is a high-performance DataFrame engine for Node.js. A single **Rust core*
 | **Zero-copy ingestion** | Multi-threaded Rust CSV parser — no JS string processing |
 | **SIMD arithmetic** | AVX2 / NEON — 5x–20x faster than JS loops |
 | **Native database I/O** | Rust drivers for PostgreSQL, MySQL, SQL Server, MongoDB — no `pg`, no `mysql2`, no Mongoose |
+| **PRDX Streaming** | Stream 150M-row files to PostgreSQL at ~291k rows/s with O(block) RAM |
 | **GPU sort** | WebGPU Bitonic sort with transparent CPU fallback |
-| **Proxy-based subscript** | `df['col']` returns a Series; `df['col'] = series` assigns a column — native JS syntax |
+| **GroupBy + Window** | Aggregations, rolling, rank, lag/lead — pure Rust |
+| **WebAssembly** | Run PardoX in the browser via WASM target |
+| **Proxy-based subscript** | `df['col']` returns a Series; `df['col'] = series` assigns a column |
 | **Cross-platform** | Linux x64 · Windows x64 · macOS Intel · macOS Apple Silicon |
 
 ---
@@ -34,7 +37,7 @@ npm install @pardox/pardox
 
 **Requirements:**
 - Node.js 18 or higher
-- No native compilation needed — prebuilt Rust binaries included
+- No native compilation needed — prebuilt Rust binaries included for all platforms
 
 ---
 
@@ -43,22 +46,19 @@ npm install @pardox/pardox
 ```js
 const { DataFrame, read_csv, executeSql } = require('@pardox/pardox');
 
-// Load 50,000 rows — parallel Rust CSV parser
+// Load 100,000 rows — parallel Rust CSV parser
 const df = read_csv('./sales_data.csv');
 console.log(`Loaded ${df.shape[0].toLocaleString()} rows × ${df.shape[1]} columns`);
 
-// Cast and compute revenue (SIMD-accelerated)
-df.cast('quantity', 'Float64');
+// SIMD-accelerated arithmetic
 const revenueDf = df.mul('price', 'quantity');   // result column: 'result_mul'
 
-// Statistics — pure Rust, no math libraries needed
+// Statistics — pure Rust
 console.log(`Total revenue : $${df['price'].sum().toFixed(2)}`);
 console.log(`Avg ticket    : $${df['price'].mean().toFixed(2)}`);
-console.log(`Std deviation : ${df.std('price').toFixed(2)}`);
 
-// Value frequency table
-const stateCounts = df.valueCounts('state');
-console.log(stateCounts);   // { TX: 6345, CA: 6301, ... }
+// GroupBy aggregation
+const grouped = df.groupBy('state', { revenue: 'sum', quantity: 'mean' });
 
 // Write to PostgreSQL — COPY FROM STDIN auto-activated for > 10k rows
 const PG = 'postgresql://user:password@localhost:5432/mydb';
@@ -72,61 +72,161 @@ df.toPrdx('./sales_processed.prdx');
 
 ---
 
-## 🗄️ What's New in v0.3.1
+## 🗄️ What's New in v0.3.2
 
-### 1. Relational Conqueror — Native Database I/O
+### PRDX Streaming to PostgreSQL
 
-Connect to **PostgreSQL, MySQL, SQL Server, and MongoDB** entirely through the Rust core. No `pg`, no `mysql2`, no MongoDB Node driver installed or imported.
+Stream a `.prdx` file directly to PostgreSQL — **without loading the file into RAM**. O(block) memory regardless of file size.
+
+```js
+const { write_sql_prdx } = require('@pardox/pardox');
+
+const rows = write_sql_prdx(
+    '/data/ventas_150m.prdx',
+    'postgresql://user:pass@localhost:5434/mydb',
+    'ventas',       // table must already exist
+    'append',
+    [],
+    1000000         // rows per COPY batch
+);
+console.log(`Streamed ${rows.toLocaleString()} rows`);
+// Validated: 150,000,000 rows / 3.8 GB in ~514s at ~291k rows/s
+```
+
+| Approach | RAM used |
+|----------|----------|
+| `read_prdx()` then `toSql()` | Entire file (3.8 GB for 150M rows) |
+| `write_sql_prdx()` | O(one block) — typically < 200 MB |
+
+---
+
+### GroupBy Aggregation
+
+```js
+// Single aggregation
+const grouped = df.groupBy('category', { revenue: 'sum' });
+
+// Multiple aggregations
+const grouped = df.groupBy('state', {
+    revenue:  'sum',
+    price:    'mean',
+    quantity: 'count',
+});
+```
+
+---
+
+### String & Date Operations
+
+```js
+// String ops
+df.strUpper('name');
+df.strLower('email');
+df.strTrim('description');
+df.strContains('tag', 'node');
+df.strReplace('status', 'old', 'new');
+
+// Date ops
+df.dateExtract('created_at', 'year');    // → 'result_year'
+df.dateFormat('created_at', '%Y-%m');
+df.dateDiff('end_date', 'start_date');
+df.dateAdd('created_at', 30, 'day');
+```
+
+---
+
+### Window Functions
+
+```js
+df.rowNumber('price');
+df.rank('revenue', 'dense');
+df.lag('price', 1);
+df.lead('price', 1);
+df.rollingMean('price', 7);   // 7-period moving average
+```
+
+---
+
+### Lazy Pipeline
+
+```js
+const { lazy_scan_csv } = require('@pardox/pardox');
+
+// Scan without loading — filter and collect on demand
+const result = lazy_scan_csv('./large_file.csv')
+    .select(['id', 'price', 'state'])
+    .filter('price', '>', 100.0)
+    .limit(10000)
+    .collect();
+
+console.log(`${result.shape[0]} rows`);
+```
+
+---
+
+### SQL over DataFrames
+
+```js
+// Run SQL directly on a DataFrame
+const result = df.sql('SELECT state, SUM(revenue) as total FROM df GROUP BY state');
+```
+
+---
+
+### Cloud Storage
+
+```js
+const { cloud_read_csv } = require('@pardox/pardox');
+
+// Read CSV from S3, GCS, Azure, or local file://
+const df = cloud_read_csv(
+    's3://my-bucket/data.csv',
+    '{}',               // schema (empty = auto-detect)
+    '{}',               // config
+    JSON.stringify({ access_key_id: '...', secret_access_key: '...' })
+);
+```
+
+---
+
+## 🗄️ Database I/O
 
 ```js
 const {
     read_csv,
-    read_sql, executeSql,                    // PostgreSQL
-    read_mysql, execute_mysql,               // MySQL
-    read_sqlserver, execute_sqlserver,       // SQL Server
-    read_mongodb, execute_mongodb,           // MongoDB
+    read_sql,    executeSql,
+    read_mysql,  execute_mysql,
+    read_sqlserver, execute_sqlserver,
+    read_mongodb,   execute_mongodb,
 } = require('@pardox/pardox');
 
-// ── PostgreSQL ──────────────────────────────────────────────────────
+// ── PostgreSQL ───────────────────────────────────────────────
 const PG = 'postgresql://user:pass@localhost:5432/db';
 
 const df = read_sql(PG, "SELECT * FROM orders WHERE status = 'active'");
-executeSql(PG, 'DROP TABLE IF EXISTS orders_archive');
 executeSql(PG, 'CREATE TABLE orders_archive (id BIGINT, amount FLOAT, region TEXT)');
+df.toSql(PG, 'orders_archive', 'append');          // COPY FROM STDIN for > 10k rows
+df.toSql(PG, 'orders_archive', 'upsert', ['id']); // ON CONFLICT DO UPDATE
 
-// COPY FROM STDIN auto-activated for > 10,000 rows
-const rowsPg = df.toSql(PG, 'orders_archive', 'append');
-
-// Upsert — INSERT … ON CONFLICT DO UPDATE
-const rowsUp = df.toSql(PG, 'orders_archive', 'upsert', ['id']);
-
-// ── MySQL ───────────────────────────────────────────────────────────
+// ── MySQL ────────────────────────────────────────────────────
 const MY = 'mysql://user:pass@localhost:3306/db';
 
 const dfMy = read_mysql(MY, 'SELECT * FROM products WHERE active = 1');
 execute_mysql(MY, 'CREATE TABLE IF NOT EXISTS products_bak (id BIGINT, price DOUBLE)');
+dfMy.toMysql(MY, 'products_bak', 'append');
+dfMy.toMysql(MY, 'products_bak', 'upsert', ['id']);
 
-dfMy.toMysql(MY, 'products_bak', 'append');           // chunked INSERT 1k/stmt
-dfMy.toMysql(MY, 'products_bak', 'replace');          // REPLACE INTO
-dfMy.toMysql(MY, 'products_bak', 'upsert', ['id']);   // ON DUPLICATE KEY UPDATE
-
-// ── SQL Server ──────────────────────────────────────────────────────
+// ── SQL Server ───────────────────────────────────────────────
 const MS = 'Server=localhost,1433;Database=mydb;UID=sa;PWD=MyPwd;TrustServerCertificate=Yes';
 
 const dfMs = read_sqlserver(MS, 'SELECT TOP 5000 * FROM dbo.transactions');
-execute_sqlserver(MS, 'DROP TABLE IF EXISTS dbo.transactions_bak');
-
-dfMs.toSqlserver(MS, 'dbo.transactions_bak', 'append');          // 500 rows/stmt batch INSERT
 dfMs.toSqlserver(MS, 'dbo.transactions_bak', 'upsert', ['id']); // MERGE INTO
 
-// ── MongoDB ─────────────────────────────────────────────────────────
+// ── MongoDB ──────────────────────────────────────────────────
 const MG = 'mongodb://admin:pass@localhost:27017';
 
 const dfMg = read_mongodb(MG, 'mydb.orders');
-execute_mongodb(MG, 'mydb', '{"drop": "orders_archive"}');
-
-dfMg.toMongodb(MG, 'mydb.orders_archive', 'append');   // 10k docs/batch, ordered:false
-dfMg.toMongodb(MG, 'mydb.orders_archive', 'replace');  // drop + insert_many
+dfMg.toMongodb(MG, 'mydb.orders_archive', 'append');   // 10k docs/batch
 ```
 
 **Write modes:**
@@ -138,81 +238,7 @@ dfMg.toMongodb(MG, 'mydb.orders_archive', 'replace');  // drop + insert_many
 | SQL Server | INSERT 500/stmt | INSERT 500/stmt | MERGE INTO |
 | MongoDB | insert_many 10k/batch | drop + insert_many | — |
 
-> **Note on SQL Server passwords:** Avoid using `!` in SQL Server passwords. A known issue in the tiberius v0.12 Rust driver causes authentication failure when `!` is present when connecting via TCP. Use only `[A-Za-z0-9_\-@#$]`. Fix planned for v0.3.2.
-
----
-
-### 2. The Observer — Full DataFrame Export & EDA
-
-```js
-// Value frequency table
-const stateCounts = df.valueCounts('state');
-// { TX: 6345, CA: 6301, CO: 6304, ... }
-
-// Unique values (insertion order)
-const categories = df.unique('category');
-// ['Electronics', 'Books', 'Clothing', ...]
-
-// Full export to JavaScript
-const records = df.toDict();    // Array of objects — all rows
-const matrix  = df.toList();    // Array of arrays — values only
-const jsonStr = df.toJson();    // JSON string "[{...}, ...]"
-```
-
----
-
-### 3. Native Math Foundation
-
-Pure Rust arithmetic — no numeric libraries needed.
-
-```js
-// DataFrame arithmetic methods — return new DataFrame
-const revenueDf = df.mul('price', 'quantity');   // result column: 'result_mul'
-const profitDf  = df.sub('revenue', 'cost');     // result column: 'result_math_sub'
-const totalDf   = df.add('amount', 'tax');       // result column: 'result_math_add'
-
-// Standard deviation (scalar)
-const stdVal = revenueDf.std('result_mul');
-console.log(`Revenue std dev: ${stdVal.toFixed(2)}`);
-
-// Min-Max normalization to [0, 1]
-const normedDf = df.minMaxScale('price');        // result column: 'result_minmax'
-
-// Sort
-const sortedDf = df.sortValues('price', false);  // descending, CPU sort
-```
-
----
-
-### 4. GPU Sort — Bitonic Sort via WebGPU
-
-```js
-// GPU Bitonic sort — falls back to CPU silently if GPU unavailable
-const sortedDf = df.sortValues('revenue', true, true);  // (by, ascending, gpu)
-```
-
-If a compatible GPU (Vulkan / Metal / DX12) is not available, PardoX automatically uses the parallel CPU sort. The result is identical either way.
-
----
-
-### 5. Proxy-Based Column Syntax
-
-PardoX wraps every DataFrame in a JavaScript `Proxy` so that column access and assignment feel native:
-
-```js
-// Column access → Series
-const prices = df['price'];
-
-// Arithmetic between Series → new Series
-const revenue = df['price'].mul(df['quantity']);
-
-// Column assignment from Series
-df['revenue'] = df['price'].mul(df['quantity']);
-
-// Filter using a boolean Series mask
-const mask     = df['price'].gt(100.0);
-const filtered = df.filter(mask);
-```
+> **Note on SQL Server passwords:** Avoid using `!` in SQL Server passwords. A known issue in the tiberius v0.12 Rust driver causes authentication failure when `!` is present. Use only `[A-Za-z0-9_\-@#$]`. Fix planned for v0.4.0.
 
 ---
 
@@ -222,26 +248,16 @@ const filtered = df.filter(mask);
 
 ```js
 const {
-    DataFrame,
-    Series,
-    read_csv,
+    DataFrame, Series,
+    read_csv, read_prdx,
     read_sql,    executeSql,
     read_mysql,  execute_mysql,
     read_sqlserver, execute_sqlserver,
     read_mongodb,   execute_mongodb,
-    read_prdx,
+    write_sql_prdx,
+    lazy_scan_csv,
+    cloud_read_csv,
 } = require('@pardox/pardox');
-
-const df = read_csv('./file.csv', { price: 'Float64' });  // optional schema
-const df = read_sql(pgConn, 'SELECT * FROM orders');
-const df = read_mysql(myConn, 'SELECT * FROM products');
-const df = read_sqlserver(msConn, 'SELECT TOP 100 * FROM dbo.t');
-const df = read_mongodb(mgConn, 'mydb.collection');
-
-const rows = read_prdx('./file.prdx', 100);  // Array of objects (preview)
-
-// Factory from in-memory JS array of objects
-const df = DataFrame.fromArray([{ id: 1, val: 2.5 }, { id: 2, val: 3.1 }]);
 ```
 
 ### DataFrame — Properties
@@ -259,15 +275,14 @@ df.show(10);              // ASCII table (stdout)
 df.head(5);               // → DataFrame
 df.tail(5);               // → DataFrame
 df.iloc(0, 100);          // → DataFrame (rows 0–99)
-df.toJson(50);            // JSON string, first 50 rows (preview)
 ```
 
 ### DataFrame — Arithmetic & Transform
 
 ```js
 df.cast('quantity', 'Float64');
-df.fillna(0.0);                        // returns this (chainable)
-df.round(2);                           // returns this (chainable)
+df.fillna(0.0);
+df.round(2);
 df.mul('price', 'quantity');           // → DataFrame with 'result_mul'
 df.sub('revenue', 'cost');             // → DataFrame with 'result_math_sub'
 df.add('amount', 'tax');               // → DataFrame with 'result_math_add'
@@ -277,21 +292,48 @@ df.sortValues('col', true);            // → DataFrame (ascending)
 df.sortValues('col', false, true);     // → DataFrame (descending, GPU)
 ```
 
+### DataFrame — GroupBy & Aggregation
+
+```js
+df.groupBy('category', { revenue: 'sum', price: 'mean' });
+df.groupBy('state', { quantity: 'count', revenue: 'max' });
+```
+
+### DataFrame — Window Functions
+
+```js
+df.rowNumber('price');
+df.rank('revenue', 'dense');
+df.lag('price', 1);
+df.lead('price', 1);
+df.rollingMean('price', 7);
+```
+
+### DataFrame — String Operations
+
+```js
+df.strUpper('col');
+df.strLower('col');
+df.strTrim('col');
+df.strLen('col');
+df.strContains('col', 'pattern');
+df.strReplace('col', 'old', 'new');
+```
+
 ### DataFrame — Join & Filter
 
 ```js
-df.join(other, { on: 'id' });                          // hash join, same key name
-df.join(other, { leftOn: 'order_id', rightOn: 'id' }); // different key names
-df.filter(mask);                                        // → DataFrame
+df.join(other, { on: 'id' });
+df.join(other, { leftOn: 'order_id', rightOn: 'id' });
+df.filter(mask);   // → DataFrame
 ```
 
 ### Series — Column Access & Arithmetic
 
 ```js
-const col  = df['price'];              // → Series
-const rev  = df['price'].mul(df['quantity']);  // → Series
-
-df['revenue'] = df['price'].mul(df['quantity']); // column assignment
+const col = df['price'];                          // → Series
+const rev = df['price'].mul(df['quantity']);       // → Series
+df['revenue'] = df['price'].mul(df['quantity']);   // column assignment
 ```
 
 ### Series — Aggregations
@@ -308,12 +350,9 @@ df['col'].count();  // int
 ### Series — Comparisons (filter masks)
 
 ```js
-df['price'].eq(100);      // ===
-df['price'].neq(100);     // !==
-df['price'].gt(100);      // >
-df['price'].gte(100);     // >=
-df['price'].lt(100);      // <
-df['price'].lte(100);     // <=
+df['price'].eq(100);   df['price'].neq(100);
+df['price'].gt(100);   df['price'].gte(100);
+df['price'].lt(100);   df['price'].lte(100);
 ```
 
 ### Observer
@@ -321,9 +360,9 @@ df['price'].lte(100);     // <=
 ```js
 df.valueCounts('col');   // { 'value': count, ... }
 df.unique('col');        // ['val1', 'val2', ...]
-df.toDict();             // [{ col: val, ... }, ...]  — all rows
-df.toList();             // [[val, val, ...], ...]    — values only
-df.toJson();             // JSON string — all rows
+df.toDict();             // [{ col: val, ... }, ...]
+df.toList();             // [[val, val, ...], ...]
+df.toJson();             // JSON string
 ```
 
 ### Write
@@ -335,27 +374,20 @@ df.toSql(pgConn, 'table', 'append', ['id']);
 df.toMysql(myConn, 'table', 'upsert', ['id']);
 df.toSqlserver(msConn, 'dbo.table', 'append');
 df.toMongodb(mgConn, 'db.collection', 'append');
-```
-
-### IO — Standalone execute helpers
-
-```js
-executeSql(pgConn,       'CREATE TABLE ...');
-execute_mysql(myConn,    'DROP TABLE IF EXISTS ...');
-execute_sqlserver(msConn,'TRUNCATE TABLE dbo.staging');
-execute_mongodb(mgConn,  'mydb', '{"drop": "col"}');
+write_sql_prdx('file.prdx', pgConn, 'table', 'append', [], 1000000);
 ```
 
 ---
 
 ## 📊 Benchmarks
 
-| Operation | Node.js (js-native) | PardoX v0.3.1 | Speedup |
+| Operation | Node.js (js-native) | PardoX v0.3.2 | Speedup |
 |-----------|---------------------|---------------|---------|
 | Read CSV (1 GB) | ~10s | ~0.8s | **~12x** |
 | Column multiply (1M rows) | ~0.6s | ~0.02s | **~30x** |
 | PostgreSQL write 50k rows | ~20s (pg execute) | ~0.6s (COPY) | **~33x** |
 | MySQL write 50k rows | ~25s (mysql2) | ~3s (batch INSERT) | **~8x** |
+| PRDX → PostgreSQL 150M rows | N/A | ~514s | 291k rows/s |
 
 ---
 
@@ -365,7 +397,8 @@ execute_mongodb(mgConn,  'mydb', '{"drop": "col"}');
 |---------|--------|------------|
 | v0.1 | ✅ Released | CSV, arithmetic, aggregations, .prdx format |
 | v0.3.1 | ✅ Released | Databases (PG/MySQL/MSSQL/MongoDB), Observer, Math, GPU sort |
-| v0.3.2 | 🔜 Planned | SQL Server `!` password fix, error hierarchy, GroupBy, Parquet reader |
+| v0.3.2 | ✅ Released | PRDX Streaming, GroupBy, Window, String/Date, Lazy, WebAssembly, Encryption, Data Contracts, Time Travel, Arrow Flight, Linear Algebra, REST Connector — 29 features |
+| v0.4.0 | 🔜 Planned | SQL Server `!` password fix, structured error codes, Apache Parquet, Kafka, S3, Gaps 7–11 JS fix |
 
 ---
 
@@ -377,12 +410,13 @@ execute_mongodb(mgConn,  'mydb', '{"drop": "col"}');
 | Windows | x86_64 | ✅ Stable |
 | macOS | ARM64 (M1/M2/M3) | ✅ Stable |
 | macOS | x86_64 (Intel) | ✅ Stable |
+| WebAssembly | Browser / Edge | ✅ Stable |
 
 ---
 
 ## 📘 Documentation
 
-[**Full Documentation →**](https://betoalien.github.io/PardoX/)
+[**Full Documentation →**](https://www.pardox.io)
 
 ---
 
