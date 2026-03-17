@@ -1,0 +1,3119 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The Hyper-Fast Data Engine powered by Rust.">
+      
+      
+      
+        <link rel="canonical" href="https://www.pardox.io/reference/">
+      
+      
+        <link rel="prev" href="../guide/aggregations/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.5">
+    
+    
+      
+        <title>API Reference - PardoX Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="PardoX Documentation" class="md-header__button md-logo" aria-label="PardoX Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            PardoX Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/betoalien/PardoX" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    betoalien/pardox
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="PardoX Documentation" class="md-nav__button md-logo" aria-label="PardoX Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    PardoX Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/betoalien/PardoX" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    betoalien/pardox
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IO Operations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/mutation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Mutation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/aggregations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aggregations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#top-level-functions-import-pardox-as-px" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top-Level Functions (import pardox as px)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Top-Level Functions (import pardox as px)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_csv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_csv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#read_prdx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_prdx
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from_arrow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_arrow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pardoxio-database-io" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pardox.io — Database I/O
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="pardox.io — Database I/O">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PostgreSQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_sqlconnection_string-query-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_sql(connection_string, query) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execute_sqlconnection_string-query-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        execute_sql(connection_string, query) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MySQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_mysqlconnection_string-query-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_mysql(connection_string, query) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execute_mysqlconnection_string-query-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        execute_mysql(connection_string, query) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sql-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQL Server
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SQL Server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_sqlserverconnection_string-query-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_sqlserver(connection_string, query) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execute_sqlserverconnection_string-query-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        execute_sqlserver(connection_string, query) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mongodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MongoDB
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MongoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_mongodbconnection_string-db_dot_collection-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_mongodb(connection_string, db_dot_collection) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execute_mongodbconnection_string-database-command_json-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        execute_mongodb(connection_string, database, command_json) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#class-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class: DataFrame
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Class: DataFrame">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#construction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Construction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Properties
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Properties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shape-tupleint-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        shape → tuple[int, int]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#columns-liststr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        columns → list[str]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dtypes-dictstr-str" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dtypes → dict[str, str]
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inspection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Inspection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shown10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        show(n=10)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#headn5-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        head(n=5) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tailn5-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tail(n=5) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilocstart-end-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iloc(start, end) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Operations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Type Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#castcol-target_type-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cast(col, target_type) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arithmetic-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arithmetic Methods
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Arithmetic Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mulcol_a-col_b-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mul(col_a, col_b) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addcol_a-col_b-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        add(col_a, col_b) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subcol_a-col_b-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sub(col_a, col_b) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stdcol-float" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        std(col) → float
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#min_max_scalecol-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        min_max_scale(col) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sorting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sorting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sorting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sort_valuesby-ascendingtrue-gpufalse-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sort_values(by, ascending=True, gpu=False) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filtering
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filtering">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filtermask-series-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter(mask: Series) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-cleaning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Cleaning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Cleaning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fillnavalue-float-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fillna(value: float) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rounddecimals-int-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        round(decimals: int) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observer-export-inspection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observer — Export &amp; Inspection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Observer — Export &amp; Inspection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to_dict-listdict" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_dict() → list[dict]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_json-str" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_json() → str
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#value_countscol-dictstr-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        value_counts(col) → dict[str, int]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uniquecol-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        unique(col) → list
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#joins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Joins
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Joins">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#joinother-onnone-left_onnone-right_onnone-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        join(other, on=None, left_on=None, right_on=None) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Writers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to_prdxpath-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_prdx(path) → bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_csvpath-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_csv(path) → bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_sqlconnection_string-table_name-modeappend-conflict_cols-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_sql(connection_string, table_name, mode="append", conflict_cols=[]) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#write_sql_prdx-prdx-streaming-to-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        write_sql_prdx — PRDX Streaming to PostgreSQL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="write_sql_prdx — PRDX Streaming to PostgreSQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to_mysqlconnection_string-table_name-modeappend-conflict_cols-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_mysql(connection_string, table_name, mode="append", conflict_cols=[]) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_sqlserverconnection_string-table_name-modeappend-conflict_cols-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_sqlserver(connection_string, table_name, mode="append", conflict_cols=[]) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_mongodbconnection_string-db_dot_collection-modeappend-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_mongodb(connection_string, db_dot_collection, mode="append") → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#class-series" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class: Series
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Class: Series">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#properties_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Properties
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Properties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name-str" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name → str
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dtype-str" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dtype → str
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arithmetic-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arithmetic Operators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comparison-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison Operators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transformations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transformations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fillnavalue-series" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fillna(value) → Series
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rounddecimals-series" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        round(decimals) → Series
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#numpy-zero-copy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NumPy Zero-Copy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Codes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#top-level-functions-import-pardox-as-px" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top-Level Functions (import pardox as px)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Top-Level Functions (import pardox as px)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_csv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_csv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#read_prdx" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_prdx
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#from_arrow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_arrow
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pardoxio-database-io" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pardox.io — Database I/O
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="pardox.io — Database I/O">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PostgreSQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_sqlconnection_string-query-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_sql(connection_string, query) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execute_sqlconnection_string-query-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        execute_sql(connection_string, query) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MySQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_mysqlconnection_string-query-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_mysql(connection_string, query) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execute_mysqlconnection_string-query-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        execute_mysql(connection_string, query) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sql-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQL Server
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SQL Server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_sqlserverconnection_string-query-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_sqlserver(connection_string, query) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execute_sqlserverconnection_string-query-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        execute_sqlserver(connection_string, query) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mongodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MongoDB
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MongoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#read_mongodbconnection_string-db_dot_collection-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        read_mongodb(connection_string, db_dot_collection) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#execute_mongodbconnection_string-database-command_json-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        execute_mongodb(connection_string, database, command_json) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#class-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class: DataFrame
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Class: DataFrame">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#construction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Construction
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#properties" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Properties
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Properties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shape-tupleint-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        shape → tuple[int, int]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#columns-liststr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        columns → list[str]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dtypes-dictstr-str" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dtypes → dict[str, str]
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inspection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Inspection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#shown10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        show(n=10)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#headn5-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        head(n=5) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tailn5-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        tail(n=5) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ilocstart-end-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iloc(start, end) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Operations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Type Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#castcol-target_type-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cast(col, target_type) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arithmetic-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arithmetic Methods
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Arithmetic Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mulcol_a-col_b-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        mul(col_a, col_b) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#addcol_a-col_b-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        add(col_a, col_b) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subcol_a-col_b-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sub(col_a, col_b) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#stdcol-float" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        std(col) → float
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#min_max_scalecol-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        min_max_scale(col) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sorting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sorting
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sorting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sort_valuesby-ascendingtrue-gpufalse-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        sort_values(by, ascending=True, gpu=False) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filtering
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Filtering">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#filtermask-series-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter(mask: Series) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-cleaning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Cleaning
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Cleaning">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fillnavalue-float-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fillna(value: float) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rounddecimals-int-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        round(decimals: int) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#observer-export-inspection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observer — Export &amp; Inspection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Observer — Export &amp; Inspection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to_dict-listdict" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_dict() → list[dict]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_json-str" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_json() → str
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#value_countscol-dictstr-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        value_counts(col) → dict[str, int]
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uniquecol-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        unique(col) → list
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#joins" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Joins
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Joins">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#joinother-onnone-left_onnone-right_onnone-dataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        join(other, on=None, left_on=None, right_on=None) → DataFrame
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#writers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Writers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Writers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to_prdxpath-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_prdx(path) → bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_csvpath-bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_csv(path) → bool
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_sqlconnection_string-table_name-modeappend-conflict_cols-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_sql(connection_string, table_name, mode="append", conflict_cols=[]) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#write_sql_prdx-prdx-streaming-to-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        write_sql_prdx — PRDX Streaming to PostgreSQL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="write_sql_prdx — PRDX Streaming to PostgreSQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#to_mysqlconnection_string-table_name-modeappend-conflict_cols-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_mysql(connection_string, table_name, mode="append", conflict_cols=[]) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_sqlserverconnection_string-table_name-modeappend-conflict_cols-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_sqlserver(connection_string, table_name, mode="append", conflict_cols=[]) → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#to_mongodbconnection_string-db_dot_collection-modeappend-int" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_mongodb(connection_string, db_dot_collection, mode="append") → int
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#class-series" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Class: Series
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Class: Series">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#properties_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Properties
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Properties">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#name-str" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        name → str
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dtype-str" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        dtype → str
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#arithmetic-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arithmetic Operators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#comparison-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Comparison Operators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transformations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transformations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fillnavalue-series" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        fillna(value) → Series
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rounddecimals-series" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        round(decimals) → Series
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#numpy-zero-copy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        NumPy Zero-Copy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#error-codes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Codes
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="api-reference">API Reference</h1>
+<p>Complete documentation of all classes, functions, and methods in the PardoX Python SDK v0.3.2.</p>
+<hr />
+<h2 id="top-level-functions-import-pardox-as-px">Top-Level Functions (<code>import pardox as px</code>)</h2>
+<h3 id="read_csv"><code>read_csv</code></h3>
+<p>Reads a CSV file into a DataFrame using the multi-threaded Rust parser.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>path</code></td>
+<td><code>str</code></td>
+<td>Path to the <code>.csv</code> file.</td>
+</tr>
+<tr>
+<td><code>schema</code></td>
+<td><code>dict</code> or <code>None</code></td>
+<td>Optional column type overrides: <code>{"col": "Float64", ...}</code>. Supported types: <code>Int64</code>, <code>Float64</code>, <code>Utf8</code>.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>DataFrame</code></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">df</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;sales.csv&quot;</span><span class="p">)</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">df</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;sales.csv&quot;</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;price&quot;</span><span class="p">:</span> <span class="s2">&quot;Float64&quot;</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;Int64&quot;</span><span class="p">})</span>
+</code></pre></div>
+<hr />
+<h3 id="read_prdx"><code>read_prdx</code></h3>
+<p>Loads a native PardoX binary file (<code>.prdx</code>).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">read_prdx</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>path</code></td>
+<td><code>str</code></td>
+<td>Path to the <code>.prdx</code> file.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>list[dict]</code> (preview rows)</p>
+<hr />
+<h3 id="from_arrow"><code>from_arrow</code></h3>
+<p>Zero-copy conversion from a PyArrow Table or RecordBatch.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">from_arrow</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">Table</span> <span class="o">|</span> <span class="n">pyarrow</span><span class="o">.</span><span class="n">RecordBatch</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataFrame</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pyarrow</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pa</span><span class="o">,</span><span class="w"> </span><span class="nn">pardox</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">px</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="n">arrow_table</span> <span class="o">=</span> <span class="n">pa</span><span class="o">.</span><span class="n">Table</span><span class="o">.</span><span class="n">from_pydict</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">]})</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="n">df</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">from_arrow</span><span class="p">(</span><span class="n">arrow_table</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="pardoxio-database-io"><code>pardox.io</code> — Database I/O</h2>
+<p>All database functions bypass the Python runtime — connection and data transfer happen entirely in the Rust core.</p>
+<h3 id="postgresql">PostgreSQL</h3>
+<h4 id="read_sqlconnection_string-query-dataframe"><code>read_sql(connection_string, query) → DataFrame</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_sql</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_sql</span><span class="p">(</span><span class="s2">&quot;postgresql://user:pass@localhost:5432/db&quot;</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM orders&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="execute_sqlconnection_string-query-int"><code>execute_sql(connection_string, query) → int</code></h4>
+<p>Executes DDL or DML. Returns rows affected (0 for DDL).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">execute_sql</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="n">execute_sql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;DROP TABLE IF EXISTS orders&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="n">execute_sql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;CREATE TABLE orders (id BIGINT, amount FLOAT)&quot;</span><span class="p">)</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="n">n</span> <span class="o">=</span> <span class="n">execute_sql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;DELETE FROM orders WHERE status = &#39;cancelled&#39;&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Raises:</strong> <code>RuntimeError</code> on connection or SQL failure.</p>
+<hr />
+<h3 id="mysql">MySQL</h3>
+<h4 id="read_mysqlconnection_string-query-dataframe"><code>read_mysql(connection_string, query) → DataFrame</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_mysql</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_mysql</span><span class="p">(</span><span class="s2">&quot;mysql://user:pass@localhost:3306/db&quot;</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM products&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="execute_mysqlconnection_string-query-int"><code>execute_mysql(connection_string, query) → int</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">execute_mysql</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="n">execute_mysql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;CREATE TABLE IF NOT EXISTS products (id BIGINT, price DOUBLE)&quot;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h3 id="sql-server">SQL Server</h3>
+<h4 id="read_sqlserverconnection_string-query-dataframe"><code>read_sqlserver(connection_string, query) → DataFrame</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_sqlserver</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="n">CONN</span> <span class="o">=</span> <span class="s2">&quot;Server=localhost,1433;Database=mydb;UID=sa;PWD=MyPwd;TrustServerCertificate=Yes&quot;</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_sqlserver</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;SELECT TOP 1000 * FROM dbo.orders&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="execute_sqlserverconnection_string-query-int"><code>execute_sqlserver(connection_string, query) → int</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">execute_sqlserver</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">execute_sqlserver</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;DROP TABLE IF EXISTS dbo.orders_bak&quot;</span><span class="p">)</span>
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Password special characters</p>
+<p>Avoid <code>!</code> in SQL Server passwords. Known tiberius v0.12 bug — fix planned for v0.3.2.</p>
+</div>
+<hr />
+<h3 id="mongodb">MongoDB</h3>
+<h4 id="read_mongodbconnection_string-db_dot_collection-dataframe"><code>read_mongodb(connection_string, db_dot_collection) → DataFrame</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_mongodb</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_mongodb</span><span class="p">(</span><span class="s2">&quot;mongodb://admin:pass@localhost:27017&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb.orders&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="execute_mongodbconnection_string-database-command_json-int"><code>execute_mongodb(connection_string, database, command_json) → int</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">execute_mongodb</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="n">execute_mongodb</span><span class="p">(</span><span class="s2">&quot;mongodb://...&quot;</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">,</span> <span class="s1">&#39;{&quot;drop&quot;: &quot;orders_archive&quot;}&#39;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="class-dataframe">Class: <code>DataFrame</code></h2>
+<p>The main data structure. Holds an opaque pointer to a Rust <code>HyperBlockManager</code>.</p>
+<h3 id="construction">Construction</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="c1"># From CSV</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="n">df</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;file.csv&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="c1"># From SQL</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_sql</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;SELECT …&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="c1"># From MySQL / SQL Server / MongoDB</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_mysql</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_sqlserver</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_mongodb</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="s2">&quot;db.collection&quot;</span><span class="p">)</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a><span class="c1"># From Arrow</span>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="n">df</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">from_arrow</span><span class="p">(</span><span class="n">arrow_table</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="properties">Properties</h3>
+<h4 id="shape-tupleint-int"><code>shape → tuple[int, int]</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">shape</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rows</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> rows × </span><span class="si">{</span><span class="n">cols</span><span class="si">}</span><span class="s2"> columns&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="columns-liststr"><code>columns → list[str]</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>   <span class="c1"># [&#39;id&#39;, &#39;price&#39;, &#39;quantity&#39;, ...]</span>
+</code></pre></div>
+<h4 id="dtypes-dictstr-str"><code>dtypes → dict[str, str]</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dtypes</span><span class="p">)</span>    <span class="c1"># {&#39;id&#39;: &#39;Utf8&#39;, &#39;price&#39;: &#39;Float64&#39;, &#39;quantity&#39;: &#39;Int64&#39;}</span>
+</code></pre></div>
+<hr />
+<h3 id="inspection">Inspection</h3>
+<h4 id="shown10"><code>show(n=10)</code></h4>
+<p>Prints the first <code>n</code> rows as an ASCII table to stdout.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="n">df</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="headn5-dataframe"><code>head(n=5) → DataFrame</code></h4>
+<p>Returns a new DataFrame with the first <code>n</code> rows.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="n">top5</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="tailn5-dataframe"><code>tail(n=5) → DataFrame</code></h4>
+<p>Returns a new DataFrame with the last <code>n</code> rows.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="n">last5</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="ilocstart-end-dataframe"><code>iloc(start, end) → DataFrame</code></h4>
+<p>Returns rows in the range <code>[start, end)</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="n">subset</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">)</span>   <span class="c1"># rows 100–199</span>
+</code></pre></div>
+<hr />
+<h3 id="type-operations">Type Operations</h3>
+<h4 id="castcol-target_type-dataframe"><code>cast(col, target_type) → DataFrame</code></h4>
+<p>Converts a column to a new type in-place. Returns <code>self</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="n">df</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;quantity&quot;</span><span class="p">,</span> <span class="s2">&quot;Float64&quot;</span><span class="p">)</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="n">df</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span>       <span class="s2">&quot;Utf8&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><strong>Supported types:</strong> <code>Int64</code>, <code>Float64</code>, <code>Utf8</code></p>
+<hr />
+<h3 id="arithmetic-methods">Arithmetic Methods</h3>
+<p>All arithmetic methods return a <strong>new DataFrame</strong> with the result stored in a named column.</p>
+<h4 id="mulcol_a-col_b-dataframe"><code>mul(col_a, col_b) → DataFrame</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">revenue_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="s2">&quot;price&quot;</span><span class="p">,</span> <span class="s2">&quot;quantity&quot;</span><span class="p">)</span>   <span class="c1"># result column: &#39;result_mul&#39;</span>
+</code></pre></div>
+<h4 id="addcol_a-col_b-dataframe"><code>add(col_a, col_b) → DataFrame</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">total_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s2">&quot;price&quot;</span><span class="p">,</span> <span class="s2">&quot;tax&quot;</span><span class="p">)</span>          <span class="c1"># result column: &#39;result_add&#39;</span>
+</code></pre></div>
+<h4 id="subcol_a-col_b-dataframe"><code>sub(col_a, col_b) → DataFrame</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">profit_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;revenue&quot;</span><span class="p">,</span> <span class="s2">&quot;cost&quot;</span><span class="p">)</span>      <span class="c1"># result column: &#39;result_sub&#39;</span>
+</code></pre></div>
+<h4 id="stdcol-float"><code>std(col) → float</code></h4>
+<p>Sample standard deviation of a column. Pure Rust, no NumPy.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">std_val</span> <span class="o">=</span> <span class="n">revenue_df</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="s2">&quot;result_mul&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="min_max_scalecol-dataframe"><code>min_max_scale(col) → DataFrame</code></h4>
+<p>Normalizes column values to <code>[0, 1]</code>. Returns new DataFrame with <code>result_minmax</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">normed_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">min_max_scale</span><span class="p">(</span><span class="s2">&quot;price&quot;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h3 id="sorting">Sorting</h3>
+<h4 id="sort_valuesby-ascendingtrue-gpufalse-dataframe"><code>sort_values(by, ascending=True, gpu=False) → DataFrame</code></h4>
+<p>Sorts the DataFrame by a <code>Float64</code> column. Returns a <strong>new sorted DataFrame</strong>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">sorted_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;price&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="n">sorted_df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;price&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">gpu</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>by</code></td>
+<td><code>str</code></td>
+<td>Column name to sort by. Must be <code>Float64</code>.</td>
+</tr>
+<tr>
+<td><code>ascending</code></td>
+<td><code>bool</code></td>
+<td><code>True</code> = ascending (default).</td>
+</tr>
+<tr>
+<td><code>gpu</code></td>
+<td><code>bool</code></td>
+<td>Use GPU Bitonic sort. Falls back to CPU if GPU unavailable.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="filtering">Filtering</h3>
+<h4 id="filtermask-series-dataframe"><code>filter(mask: Series) → DataFrame</code></h4>
+<p>Applies a boolean Series as a row filter. Returns a new DataFrame.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">mask</span>   <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">100.0</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="n">result</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h3 id="data-cleaning">Data Cleaning</h3>
+<h4 id="fillnavalue-float-dataframe"><code>fillna(value: float) → DataFrame</code></h4>
+<p>Fills <code>NaN</code> / null values in all numeric columns in-place.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="rounddecimals-int-dataframe"><code>round(decimals: int) → DataFrame</code></h4>
+<p>Rounds all numeric columns in-place.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">df</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h3 id="observer-export-inspection">Observer — Export &amp; Inspection</h3>
+<h4 id="to_dict-listdict"><code>to_dict() → list[dict]</code></h4>
+<p>Returns all rows as a list of dictionaries (records format).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="n">records</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="c1"># [{&#39;price&#39;: 19.99, &#39;state&#39;: &#39;TX&#39;, ...}, ...]</span>
+</code></pre></div>
+<p><strong>Returns:</strong> <code>list[dict]</code></p>
+<h4 id="to_json-str"><code>to_json() → str</code></h4>
+<p>Returns all rows as a JSON string <code>"[{...}, ...]"</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="n">json_str</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Returns:</strong> <code>str</code></p>
+<h4 id="value_countscol-dictstr-int"><code>value_counts(col) → dict[str, int]</code></h4>
+<p>Frequency of each unique value in a column, sorted by count descending.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="n">state_dist</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="s2">&quot;state&quot;</span><span class="p">)</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="c1"># {&#39;TX&#39;: 6345, &#39;CA&#39;: 6301, ...}</span>
+</code></pre></div>
+<p><strong>Returns:</strong> <code>dict[str, int]</code></p>
+<h4 id="uniquecol-list"><code>unique(col) → list</code></h4>
+<p>Unique values in a column in insertion order.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="n">cats</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="c1"># [&#39;Electronics&#39;, &#39;Books&#39;, ...]</span>
+</code></pre></div>
+<p><strong>Returns:</strong> <code>list</code></p>
+<hr />
+<h3 id="joins">Joins</h3>
+<h4 id="joinother-onnone-left_onnone-right_onnone-dataframe"><code>join(other, on=None, left_on=None, right_on=None) → DataFrame</code></h4>
+<p>Hash-join two DataFrames on a key column.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="n">result</span> <span class="o">=</span> <span class="n">orders</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">customers</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s2">&quot;customer_id&quot;</span><span class="p">)</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="n">result</span> <span class="o">=</span> <span class="n">orders</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">customers</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s2">&quot;cust_id&quot;</span><span class="p">,</span> <span class="n">right_on</span><span class="o">=</span><span class="s2">&quot;id&quot;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h3 id="writers">Writers</h3>
+<h4 id="to_prdxpath-bool"><code>to_prdx(path) → bool</code></h4>
+<p>Saves DataFrame to native binary format.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a><span class="n">df</span><span class="o">.</span><span class="n">to_prdx</span><span class="p">(</span><span class="s2">&quot;output.prdx&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="to_csvpath-bool"><code>to_csv(path) → bool</code></h4>
+<p>Exports DataFrame to a CSV file.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a><span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s2">&quot;output.csv&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="to_sqlconnection_string-table_name-modeappend-conflict_cols-int"><code>to_sql(connection_string, table_name, mode="append", conflict_cols=[]) → int</code></h4>
+<p>Writes to PostgreSQL.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;upsert&quot;</span><span class="p">,</span> <span class="n">conflict_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mode</code></td>
+<td><code>str</code></td>
+<td><code>"append"</code>, <code>"upsert"</code></td>
+</tr>
+<tr>
+<td><code>conflict_cols</code></td>
+<td><code>list[str]</code></td>
+<td>Columns for <code>ON CONFLICT</code> clause (upsert only)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>int</code> — rows written. <strong>Raises:</strong> <code>RuntimeError</code> on failure.</p>
+<hr />
+<h3 id="write_sql_prdx-prdx-streaming-to-postgresql"><code>write_sql_prdx</code> — PRDX Streaming to PostgreSQL</h3>
+<p><em>Added in v0.3.2</em></p>
+<p>Stream a <code>.prdx</code> file directly to PostgreSQL via <code>COPY FROM STDIN</code> — <strong>O(block) RAM</strong> regardless of file size. The schema is read from the PRDX footer; data is never fully loaded into memory.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox</span><span class="w"> </span><span class="kn">import</span> <span class="n">write_sql_prdx</span>
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>
+<a id="__codelineno-39-3" name="__codelineno-39-3" href="#__codelineno-39-3"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">write_sql_prdx</span><span class="p">(</span>
+<a id="__codelineno-39-4" name="__codelineno-39-4" href="#__codelineno-39-4"></a>    <span class="n">prdx_path</span><span class="p">,</span>        <span class="c1"># str — path to .prdx file</span>
+<a id="__codelineno-39-5" name="__codelineno-39-5" href="#__codelineno-39-5"></a>    <span class="n">connection_string</span><span class="p">,</span> <span class="c1"># str — PostgreSQL connection string</span>
+<a id="__codelineno-39-6" name="__codelineno-39-6" href="#__codelineno-39-6"></a>    <span class="n">table_name</span><span class="p">,</span>        <span class="c1"># str — target table (must already exist)</span>
+<a id="__codelineno-39-7" name="__codelineno-39-7" href="#__codelineno-39-7"></a>    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span>     <span class="c1"># str — only &quot;append&quot; supported</span>
+<a id="__codelineno-39-8" name="__codelineno-39-8" href="#__codelineno-39-8"></a>    <span class="n">conflict_cols</span><span class="o">=</span><span class="p">[],</span>  <span class="c1"># list[str] — reserved for future upsert support</span>
+<a id="__codelineno-39-9" name="__codelineno-39-9" href="#__codelineno-39-9"></a>    <span class="n">batch_rows</span><span class="o">=</span><span class="mi">1000000</span> <span class="c1"># int — rows per COPY batch</span>
+<a id="__codelineno-39-10" name="__codelineno-39-10" href="#__codelineno-39-10"></a><span class="p">)</span>
+<a id="__codelineno-39-11" name="__codelineno-39-11" href="#__codelineno-39-11"></a><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Streamed </span><span class="si">{</span><span class="n">rows</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> rows&quot;</span><span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>prdx_path</code></td>
+<td><code>str</code></td>
+<td>Path to the <code>.prdx</code> file</td>
+</tr>
+<tr>
+<td><code>connection_string</code></td>
+<td><code>str</code></td>
+<td>PostgreSQL connection string (<code>postgresql://user:pass@host:port/db</code>)</td>
+</tr>
+<tr>
+<td><code>table_name</code></td>
+<td><code>str</code></td>
+<td>Target table name (must exist with matching schema)</td>
+</tr>
+<tr>
+<td><code>mode</code></td>
+<td><code>str</code></td>
+<td>Write mode — only <code>"append"</code> supported in v0.3.2</td>
+</tr>
+<tr>
+<td><code>conflict_cols</code></td>
+<td><code>list[str]</code></td>
+<td>Reserved — pass <code>[]</code></td>
+</tr>
+<tr>
+<td><code>batch_rows</code></td>
+<td><code>int</code></td>
+<td>Rows per COPY batch (default: 1,000,000)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Returns:</strong> <code>int</code> — total rows written. <strong>Raises:</strong> <code>RuntimeError</code> on failure.</p>
+<p><strong>Validated:</strong> 150M rows / 3.8 GB PRDX → PostgreSQL in ~490s at ~300,000 rows/s.</p>
+<h4 id="to_mysqlconnection_string-table_name-modeappend-conflict_cols-int"><code>to_mysql(connection_string, table_name, mode="append", conflict_cols=[]) → int</code></h4>
+<p>Writes to MySQL.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_mysql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;products&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_mysql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;products&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_mysql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;products&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;upsert&quot;</span><span class="p">,</span> <span class="n">conflict_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mode</code></td>
+<td><code>str</code></td>
+<td><code>"append"</code>, <code>"replace"</code>, <code>"upsert"</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="to_sqlserverconnection_string-table_name-modeappend-conflict_cols-int"><code>to_sqlserver(connection_string, table_name, mode="append", conflict_cols=[]) → int</code></h4>
+<p>Writes to SQL Server (batch INSERT 500 rows/stmt).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_sqlserver</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;dbo.orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_sqlserver</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;dbo.orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;upsert&quot;</span><span class="p">,</span> <span class="n">conflict_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mode</code></td>
+<td><code>str</code></td>
+<td><code>"append"</code>, <code>"replace"</code>, <code>"upsert"</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="to_mongodbconnection_string-db_dot_collection-modeappend-int"><code>to_mongodb(connection_string, db_dot_collection, mode="append") → int</code></h4>
+<p>Writes to MongoDB (10,000 docs/batch, <code>ordered: false</code>).</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_mongodb</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;mydb.orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_mongodb</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;mydb.orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>mode</code></td>
+<td><code>str</code></td>
+<td><code>"append"</code>, <code>"replace"</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="class-series">Class: <code>Series</code></h2>
+<p>A single column view into a DataFrame. Returned by <code>df['col_name']</code>. Does <strong>not</strong> own the underlying memory — the parent DataFrame does.</p>
+<h3 id="properties_1">Properties</h3>
+<h4 id="name-str"><code>name → str</code></h4>
+<p>Column name.</p>
+<h4 id="dtype-str"><code>dtype → str</code></h4>
+<p>Column type (<code>"Int64"</code>, <code>"Float64"</code>, <code>"Utf8"</code>).</p>
+<hr />
+<h3 id="arithmetic-operators">Arithmetic Operators</h3>
+<p>Operations dispatch to SIMD-accelerated Rust kernels. All return a new <code>Series</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a><span class="n">total</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;quantity&#39;</span><span class="p">]</span>
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a><span class="n">net</span>   <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;discount&#39;</span><span class="p">]</span>
+<a id="__codelineno-43-3" name="__codelineno-43-3" href="#__codelineno-43-3"></a><span class="n">tax</span>   <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;total&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;tax_amount&#39;</span><span class="p">]</span>
+<a id="__codelineno-43-4" name="__codelineno-43-4" href="#__codelineno-43-4"></a><span class="n">unit</span>  <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;revenue&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;quantity&#39;</span><span class="p">]</span>
+</code></pre></div>
+<hr />
+<h3 id="comparison-operators">Comparison Operators</h3>
+<p>Return a boolean <code>Series</code> usable as a filter mask.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>s.eq(val)</code></td>
+<td><code>==</code></td>
+</tr>
+<tr>
+<td><code>s.neq(val)</code></td>
+<td><code>!=</code></td>
+</tr>
+<tr>
+<td><code>s.gt(val)</code></td>
+<td><code>&gt;</code></td>
+</tr>
+<tr>
+<td><code>s.gte(val)</code></td>
+<td><code>&gt;=</code></td>
+</tr>
+<tr>
+<td><code>s.lt(val)</code></td>
+<td><code>&lt;</code></td>
+</tr>
+<tr>
+<td><code>s.lte(val)</code></td>
+<td><code>&lt;=</code></td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a><span class="n">mask</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">gt</span><span class="p">(</span><span class="mf">100.0</span><span class="p">)</span>
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a><span class="n">df_filtered</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>
+<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a><span class="n">mask2</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="s2">&quot;TX&quot;</span><span class="p">)</span>
+<a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a><span class="n">df_tx</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">mask2</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h3 id="aggregations">Aggregations</h3>
+<p>All aggregation methods return a Python scalar.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>sum()</code></td>
+<td><code>float</code></td>
+<td>Sum of all non-null values</td>
+</tr>
+<tr>
+<td><code>mean()</code></td>
+<td><code>float</code></td>
+<td>Arithmetic mean</td>
+</tr>
+<tr>
+<td><code>min()</code></td>
+<td><code>float</code></td>
+<td>Minimum value</td>
+</tr>
+<tr>
+<td><code>max()</code></td>
+<td><code>float</code></td>
+<td>Maximum value</td>
+</tr>
+<tr>
+<td><code>std()</code></td>
+<td><code>float</code></td>
+<td>Sample standard deviation</td>
+</tr>
+<tr>
+<td><code>count()</code></td>
+<td><code>int</code></td>
+<td>Count of non-null values</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a><span class="n">total</span>   <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;revenue&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a><span class="n">average</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;revenue&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+<a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a><span class="n">high</span>    <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;revenue&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+<a id="__codelineno-45-4" name="__codelineno-45-4" href="#__codelineno-45-4"></a><span class="n">low</span>     <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;revenue&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+<a id="__codelineno-45-5" name="__codelineno-45-5" href="#__codelineno-45-5"></a><span class="n">spread</span>  <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;revenue&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+<a id="__codelineno-45-6" name="__codelineno-45-6" href="#__codelineno-45-6"></a><span class="n">valid</span>   <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+</code></pre></div>
+<hr />
+<h3 id="transformations">Transformations</h3>
+<h4 id="fillnavalue-series"><code>fillna(value) → Series</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a><span class="n">df</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="rounddecimals-series"><code>round(decimals) → Series</code></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a><span class="n">df</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h3 id="numpy-zero-copy">NumPy Zero-Copy</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a>
+<a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a><span class="c1"># Direct pointer into Rust buffer — no allocation</span>
+<a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;price&#39;</span><span class="p">])</span>   <span class="c1"># dtype: float64</span>
+</code></pre></div>
+<p>Works on <code>Float64</code> columns. Cast <code>Int64</code> columns first:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a><span class="n">df</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="s2">&quot;quantity&quot;</span><span class="p">,</span> <span class="s2">&quot;Float64&quot;</span><span class="p">)</span>
+<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a><span class="n">arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;quantity&quot;</span><span class="p">])</span>
+</code></pre></div>
+<hr />
+<h2 id="error-codes">Error Codes</h2>
+<p>All database functions raise <code>RuntimeError</code> with a descriptive message on failure. The underlying Rust function returns integer error codes:</p>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-1</code></td>
+<td>Invalid manager pointer (null)</td>
+</tr>
+<tr>
+<td><code>-2</code></td>
+<td>Invalid connection string</td>
+</tr>
+<tr>
+<td><code>-3</code></td>
+<td>Invalid table / query string</td>
+</tr>
+<tr>
+<td><code>-4</code></td>
+<td>Invalid mode string</td>
+</tr>
+<tr>
+<td><code>-5</code></td>
+<td>Invalid conflict columns JSON</td>
+</tr>
+<tr>
+<td><code>-10</code></td>
+<td>File not found (<code>write_sql_prdx</code> only)</td>
+</tr>
+<tr>
+<td><code>-20</code></td>
+<td>Empty connection string (<code>write_sql_prdx</code> only)</td>
+</tr>
+<tr>
+<td><code>-100</code></td>
+<td>Operation failed — check stderr for Rust error details</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Stderr logging</p>
+<p>When <code>-100</code> is returned, the Rust core logs the actual database error to stderr before returning. Run with stderr visible to diagnose connection or schema issues.</p>
+</div>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "navigation.expand", "navigation.top", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
