@@ -1,0 +1,28 @@
+title: PardoX — Hyper-Fast Data Engine
+description: PardoX is a high-performance DataFrame engine for modern ETL and analytics. A Rust core powers SDKs in Python, Node.js, and PHP, with native database I/O and an ultra-fast binary format.
+baseurl: ""
+url: "https://pardox.io"
+
+remote_theme: just-the-docs/just-the-docs
+
+plugins:
+  - jekyll-remote-theme
+
+# Navigation
+nav_sort: case_sensitive
+
+# Search
+search_enabled: true
+
+# Footer
+footer_content: "Copyright &copy; 2026 PardoX. Distributed under the MIT License."
+
+# Color scheme
+color_scheme: dark
+
+# Aux links in header
+aux_links:
+  "GitHub":
+    - "https://github.com/betoalien/PardoX"
+
+aux_links_new_tab: true

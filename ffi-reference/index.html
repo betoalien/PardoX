@@ -1,0 +1,3139 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The Hyper-Fast Data Engine powered by Rust.">
+      
+      
+      
+        <link rel="canonical" href="https://www.pardox.io/ffi-reference/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>FFI Exports Reference - PardoX Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pardox-core-ffi-exports-v034" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="PardoX Documentation" class="md-header__button md-logo" aria-label="PardoX Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            PardoX Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              FFI Exports Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/betoalien/PardoX" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    betoalien/pardox
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="PardoX Documentation" class="md-nav__button md-logo" aria-label="PardoX Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    PardoX Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/betoalien/PardoX" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    betoalien/pardox
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IO Operations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/mutation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Mutation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guide/aggregations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aggregations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pardox_cpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pardox_cpu
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="pardox_cpu">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#engine-init-1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Engine Init (1)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#apirs-core-lifecycle-6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        api.rs — Core Lifecycle (6)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api_corers-mutation-transformation-3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        api_core.rs — Mutation &amp; Transformation (3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api_readerrs-data-ingestion-13" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        api_reader.rs — Data Ingestion (13)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api_writersrs-export-persistence-21" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        api_writers.rs — Export &amp; Persistence (21)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#api_extrs-advanced-operations-118" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        api_ext.rs — Advanced Operations (118+)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="api_ext.rs — Advanced Operations (118+)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#arrow-memory" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Arrow &amp; Memory
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inspection-serialization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspection &amp; Serialization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sql-database-readers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQL Database Readers
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#json-export" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        JSON Export
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eda" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EDA
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#slicing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Slicing
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-casting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Type Casting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#series-arithmetic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Series Arithmetic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#filtering-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filtering &amp; Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aggregations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Aggregations
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#math" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Math
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sorting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sorting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#buffer-access-numpy-ml-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Buffer Access (NumPy / ML integration)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#groupby" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        GroupBy
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-specific-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap-specific Functions
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Gap-specific Functions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gap-2-string-date" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 2 — String &amp; Date
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-3-decimal-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 3 — Decimal Type
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-4-window-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 4 — Window Functions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-5-lazy-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 5 — Lazy Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-8-pivot-melt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 8 — Pivot &amp; Melt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-9-time-series-fill" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 9 — Time Series Fill
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-10-nested-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 10 — Nested Data
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-11-spill-to-disk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 11 — Spill to Disk
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-14-external-sort-streaming-groupby" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 14 — External Sort / Streaming GroupBy
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-15-cloud-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 15 — Cloud Storage
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-16-live-query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 16 — Live Query
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-18-encryption" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 18 — Encryption
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-19-data-contracts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 19 — Data Contracts
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-20-time-travel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 20 — Time Travel
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-21-arrow-flight" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 21 — Arrow Flight
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-22-distributed-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 22 — Distributed Cluster
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-23-sql-server-fix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 23 — SQL Server Fix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-28-linear-algebra" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 28 — Linear Algebra
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-29-rest-connector" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 29 — REST Connector
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gap-30-sql-cursor-api-added-v033" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Gap 30 — SQL Cursor API (added v0.3.3)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pardox_gpu" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pardox_gpu
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="pardox_gpu">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#init" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Init
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#binary-arithmetic-element-wise-f64" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Binary Arithmetic (element-wise, f64)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reductions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Reductions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sorting_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sorting
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#unary-math" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Unary Math
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pardox_napi" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pardox_napi
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="pardox_napi">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dataframe-class-30-instance-methods" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataFrame class (30+ instance methods)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pardox_wasm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pardox_wasm
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pardox_server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pardox_server
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#architectural-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architectural Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architectural Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#memory-ownership" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Memory Ownership
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#error-signaling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Error Signaling
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ffi-calling-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FFI Calling Conventions
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-ffi-gotchas" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key FFI Gotchas
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#platform-binaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Platform Binaries
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="pardox-core-ffi-exports-v034">PardoX Core FFI Exports — v0.3.4</h1>
+<p>Complete reference for all C-ABI functions exported by the PardoX Rust core. Use this to build custom bindings, audit SDK integrations, or test functions directly.</p>
+<p><strong>Total exports:</strong> 186 functions across 5 crates
+<strong>Last updated:</strong> 2026-04-01</p>
+<hr />
+<h2 id="table-of-contents">Table of Contents</h2>
+<ol>
+<li><a href="#pardox_cpu">pardox_cpu — Main CPU Engine (161 functions)</a></li>
+<li><a href="#pardox_gpu">pardox_gpu — GPU Acceleration (20 functions)</a></li>
+<li><a href="#pardox_napi">pardox_napi — Node.js Bindings (60+ functions)</a></li>
+<li><a href="#pardox_wasm">pardox_wasm — WebAssembly (stub)</a></li>
+<li><a href="#pardox_server">pardox_server — Server Component (stub)</a></li>
+<li><a href="#architectural-patterns">Architectural Patterns</a></li>
+</ol>
+<hr />
+<h2 id="pardox_cpu">pardox_cpu</h2>
+<p><strong>Path:</strong> <code>Pardox-Core-v0.3.4/pardox_cpu/</code>
+<strong>Crate type:</strong> <code>cdylib</code>
+<strong>Output:</strong> <code>pardox-cpu-Linux-x64.so</code> / <code>pardox-cpu-Darwin-x64.dylib</code> / <code>pardox-cpu-Win-x64.dll</code></p>
+<h3 id="engine-init-1">Engine Init (1)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Signature</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_init_engine</code></td>
+<td><code>() -&gt; void</code></td>
+<td>Initialize engine, MiMalloc allocator, attempt GPU plugin load</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="apirs-core-lifecycle-6">api.rs — Core Lifecycle (6)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_reset</code></td>
+<td><code>()</code></td>
+<td><code>void</code></td>
+<td>Clear global HyperBlockManager state</td>
+</tr>
+<tr>
+<td><code>pardox_create_block</code></td>
+<td><code>(col_names_json: *const c_char, col_types_json: *const c_char)</code></td>
+<td><code>*mut HyperBlock</code></td>
+<td>Allocate a new HyperBlock</td>
+</tr>
+<tr>
+<td><code>pardox_append_block</code></td>
+<td><code>(block_ptr: *mut HyperBlock)</code></td>
+<td><code>i64</code></td>
+<td>Append HyperBlock to global manager</td>
+</tr>
+<tr>
+<td><code>pardox_free_manager</code></td>
+<td><code>(mgr_ptr: *mut HyperBlockManager)</code></td>
+<td><code>void</code></td>
+<td><strong>UNSAFE</strong> — release Rust-allocated manager</td>
+</tr>
+<tr>
+<td><code>pardox_hash_join</code></td>
+<td><code>(left_mgr: *mut HyperBlockManager, right_mgr: *mut HyperBlockManager, left_key: *const c_char, right_key: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Hash join two managers on key columns</td>
+</tr>
+<tr>
+<td><code>pardox_get_system_report</code></td>
+<td><code>()</code></td>
+<td><code>*const c_char</code></td>
+<td>JSON system info (CPU, memory, version)</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="api_corers-mutation-transformation-3">api_core.rs — Mutation &amp; Transformation (3)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_add_column</code></td>
+<td><code>(target_mgr: *mut HyperBlockManager, source_mgr: *mut HyperBlockManager, name: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Add column from source manager into target</td>
+</tr>
+<tr>
+<td><code>pardox_fill_na</code></td>
+<td><code>(mgr: *mut HyperBlockManager, col_name: *const c_char, value: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Fill null values with given value</td>
+</tr>
+<tr>
+<td><code>pardox_round</code></td>
+<td><code>(mgr: *mut HyperBlockManager, col_name: *const c_char, decimals: i32)</code></td>
+<td><code>i64</code></td>
+<td>Round float column to N decimal places</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="api_readerrs-data-ingestion-13">api_reader.rs — Data Ingestion (13)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_load_manager_csv</code></td>
+<td><code>(path: *const c_char, schema_json: *const c_char, config_json: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Load CSV file (3 args — all required)</td>
+</tr>
+<tr>
+<td><code>pardox_scan_csv</code></td>
+<td><code>(path: *const c_char, schema_json: *const c_char, config_json: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Scan CSV into global manager</td>
+</tr>
+<tr>
+<td><code>pardox_read_json_bytes</code></td>
+<td><code>(bytes_ptr: *const u8, len: usize)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Ingest JSON from raw bytes</td>
+</tr>
+<tr>
+<td><code>pardox_load_manager_prdx</code></td>
+<td><code>(path: *const c_char, limit: i64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Load .prdx binary file with row limit</td>
+</tr>
+<tr>
+<td><code>pardox_load_manager_parquet</code></td>
+<td><code>(path: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Load Parquet file</td>
+</tr>
+<tr>
+<td><code>pardox_read_head_json</code></td>
+<td><code>(path: *const c_char, limit: i64)</code></td>
+<td><code>*const c_char</code></td>
+<td>Read first N rows of .prdx as JSON string</td>
+</tr>
+<tr>
+<td><code>pardox_column_sum</code></td>
+<td><code>(path: *const c_char, col: *const c_char)</code></td>
+<td><code>f64</code></td>
+<td>Sum a column directly from .prdx file</td>
+</tr>
+<tr>
+<td><code>pardox_query_sql</code></td>
+<td><code>(path: *const c_char, query: *const c_char)</code></td>
+<td><code>*const c_char</code></td>
+<td>Run SQL query on .prdx file, return JSON</td>
+</tr>
+<tr>
+<td><code>pardox_prdx_min</code></td>
+<td><code>(path: *const c_char, col: *const c_char)</code></td>
+<td><code>f64</code></td>
+<td>Min value directly from .prdx file</td>
+</tr>
+<tr>
+<td><code>pardox_prdx_max</code></td>
+<td><code>(path: *const c_char, col: *const c_char)</code></td>
+<td><code>f64</code></td>
+<td>Max value directly from .prdx file</td>
+</tr>
+<tr>
+<td><code>pardox_prdx_mean</code></td>
+<td><code>(path: *const c_char, col: *const c_char)</code></td>
+<td><code>f64</code></td>
+<td>Mean value directly from .prdx file</td>
+</tr>
+<tr>
+<td><code>pardox_prdx_count</code></td>
+<td><code>(path: *const c_char)</code></td>
+<td><code>f64</code></td>
+<td>Row count directly from .prdx file</td>
+</tr>
+<tr>
+<td><code>pardox_groupby_agg_prdx</code></td>
+<td><code>(path: *const c_char, group_cols_json: *const c_char, agg_json: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>GroupBy aggregation directly from .prdx file</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="api_writersrs-export-persistence-21">api_writers.rs — Export &amp; Persistence (21)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_to_csv</code></td>
+<td><code>(mgr: *mut HyperBlockManager, path: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Write manager to CSV file</td>
+</tr>
+<tr>
+<td><code>pardox_to_prdx</code></td>
+<td><code>(mgr: *mut HyperBlockManager, path: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Write manager to .prdx binary format</td>
+</tr>
+<tr>
+<td><code>pardox_write_parquet</code></td>
+<td><code>(path: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Write global manager to Parquet</td>
+</tr>
+<tr>
+<td><code>pardox_write_sharded_parquet</code></td>
+<td><code>(mgr: *mut HyperBlockManager, directory: *const c_char, shards: i32)</code></td>
+<td><code>i64</code></td>
+<td>Shard-write to Parquet files</td>
+</tr>
+<tr>
+<td><code>pardox_hyper_copy_v3</code></td>
+<td><code>(src_pattern: *const c_char, out_path: *const c_char, schema_json: *const c_char, config_json: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Convert CSV glob pattern → .prdx (bulk ingest)</td>
+</tr>
+<tr>
+<td><code>pardox_version</code></td>
+<td><code>()</code></td>
+<td><code>*const c_char</code></td>
+<td>Return library version string</td>
+</tr>
+<tr>
+<td><code>pardox_read_schema</code></td>
+<td><code>(path: *const c_char)</code></td>
+<td><code>*const c_char</code></td>
+<td>Read schema from .prdx file as JSON</td>
+</tr>
+<tr>
+<td><code>pardox_read_head</code></td>
+<td><code>(path: *const c_char, rows: i64)</code></td>
+<td><code>*const c_char</code></td>
+<td>Read first N rows as JSON</td>
+</tr>
+<tr>
+<td><code>pardox_legacy_ping</code></td>
+<td><code>(system_name: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Backward compat ping</td>
+</tr>
+<tr>
+<td><code>pardox_import_mainframe_dat</code></td>
+<td><code>(path: *const c_char, schema_json: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Import mainframe fixed-width .dat files</td>
+</tr>
+<tr>
+<td><code>pardox_free_string</code></td>
+<td><code>(ptr: *mut c_char)</code></td>
+<td><code>void</code></td>
+<td>Free Rust-allocated string pointer</td>
+</tr>
+<tr>
+<td><code>pardox_write_sql</code></td>
+<td><code>(mgr: *mut HyperBlockManager, conn_str: *const c_char, table_name: *const c_char, mode: *const c_char, conflict_cols_json: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Write HyperBlockManager to PostgreSQL (COPY for &gt;10k rows, INSERT otherwise)</td>
+</tr>
+<tr>
+<td><code>pardox_write_sql_prdx</code></td>
+<td><code>(prdx_path: *const c_char, conn_str: *const c_char, table_name: *const c_char, mode: *const c_char, conflict_cols_json: *const c_char, batch_rows: i64)</code></td>
+<td><code>i64</code></td>
+<td><strong>Stream .prdx file directly to PostgreSQL via COPY FROM STDIN — O(block) RAM.</strong> Added v0.3.2. Error codes: -1=invalid path, -2=invalid conn, -3=invalid table, -4=invalid mode, -5=invalid JSON, -10=file not found, -20=empty conn, -100=engine error</td>
+</tr>
+<tr>
+<td><code>pardox_write_mysql</code></td>
+<td><code>(mgr: *mut HyperBlockManager, conn_str: *const c_char, table_name: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Write to MySQL</td>
+</tr>
+<tr>
+<td><code>pardox_write_sqlserver</code></td>
+<td><code>(mgr: *mut HyperBlockManager, conn_str: *const c_char, table_name: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Write to SQL Server</td>
+</tr>
+<tr>
+<td><code>pardox_write_mongodb</code></td>
+<td><code>(mgr: *mut HyperBlockManager, conn_str: *const c_char, db_collection: *const c_char)</code></td>
+<td><code>i64</code></td>
+<td>Write to MongoDB</td>
+</tr>
+<tr>
+<td><code>pardox_sql_query</code></td>
+<td><code>(mgr: *mut HyperBlockManager, sql: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Run SQL on in-memory manager</td>
+</tr>
+<tr>
+<td><code>pardox_execute_sql</code></td>
+<td><code>(conn_str: *const c_char, query: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Execute SQL on PostgreSQL, return results</td>
+</tr>
+<tr>
+<td><code>pardox_execute_mysql</code></td>
+<td><code>(conn_str: *const c_char, query: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Execute SQL on MySQL, return results</td>
+</tr>
+<tr>
+<td><code>pardox_execute_sqlserver</code></td>
+<td><code>(conn_str: *const c_char, query: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Execute SQL on SQL Server, return results</td>
+</tr>
+<tr>
+<td><code>pardox_execute_mongodb</code></td>
+<td><code>(conn_str: *const c_char, db_collection: *const c_char, query_json: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Execute query on MongoDB</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="api_extrs-advanced-operations-118">api_ext.rs — Advanced Operations (118+)</h3>
+<h4 id="arrow-memory">Arrow &amp; Memory</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_ingest_arrow_stream</code></td>
+<td><code>(array_ptr: *const u8, schema_ptr: *const u8)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_ingest_buffer</code></td>
+<td><code>(buffer_ptr: *const u8, buffer_len: usize, layout_json: *const c_char, schema_json: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="inspection-serialization">Inspection &amp; Serialization</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_manager_to_json</code></td>
+<td><code>(mgr: *mut HyperBlockManager, limit: i64)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+<tr>
+<td><code>pardox_manager_to_ascii</code></td>
+<td><code>(mgr: *mut HyperBlockManager, limit: i64)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+<tr>
+<td><code>pardox_manager_to_json_range</code></td>
+<td><code>(mgr: *mut HyperBlockManager, start: i64, limit: i64)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+<tr>
+<td><code>pardox_get_row_count</code></td>
+<td><code>(mgr: *mut HyperBlockManager)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_get_schema_json</code></td>
+<td><code>(mgr: *mut HyperBlockManager)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="sql-database-readers">SQL Database Readers</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_scan_sql</code></td>
+<td><code>(conn_str: *const c_char, query: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_read_mysql</code></td>
+<td><code>(conn_str: *const c_char, query: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_read_sqlserver</code></td>
+<td><code>(conn_str: *const c_char, query: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_read_mongodb</code></td>
+<td><code>(conn_str: *const c_char, db_dot_collection: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="json-export">JSON Export</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_to_json_records</code></td>
+<td><code>(mgr: *mut HyperBlockManager)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+<tr>
+<td><code>pardox_to_json_arrays</code></td>
+<td><code>(mgr: *mut HyperBlockManager)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="eda">EDA</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_value_counts</code></td>
+<td><code>(mgr: *mut HyperBlockManager, col_name: *const c_char)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+<tr>
+<td><code>pardox_unique</code></td>
+<td><code>(mgr: *mut HyperBlockManager, col_name: *const c_char)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="slicing">Slicing</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_slice_manager</code></td>
+<td><code>(mgr: *mut HyperBlockManager, start: i64, len: i64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_tail_manager</code></td>
+<td><code>(mgr: *mut HyperBlockManager, n: i64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="type-casting">Type Casting</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_cast_column</code></td>
+<td><code>(mgr: *mut HyperBlockManager, col_name: *const c_char, target_type_str: *const c_char)</code></td>
+<td><code>i32</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="series-arithmetic">Series Arithmetic</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_series_add</code></td>
+<td><code>(left_mgr, left_col, right_mgr, right_col)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_series_sub</code></td>
+<td>same pattern</td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_series_mul</code></td>
+<td>same pattern</td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_series_div</code></td>
+<td>same pattern</td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_series_mod</code></td>
+<td>same pattern</td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="filtering-comparison">Filtering &amp; Comparison</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_filter_compare</code></td>
+<td><code>(left_mgr, left_col, right_mgr, right_col, op_code: i32)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_filter_compare_scalar</code></td>
+<td><code>(mgr, col_name, val_f64: f64, val_i64: i64, is_float: i32, op_code: i32)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_apply_filter</code></td>
+<td><code>(data_mgr, mask_mgr, mask_col)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="aggregations">Aggregations</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_agg_sum</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>f64</code></td>
+</tr>
+<tr>
+<td><code>pardox_agg_mean</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>f64</code></td>
+</tr>
+<tr>
+<td><code>pardox_agg_min</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>f64</code></td>
+</tr>
+<tr>
+<td><code>pardox_agg_max</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>f64</code></td>
+</tr>
+<tr>
+<td><code>pardox_agg_count</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>f64</code></td>
+</tr>
+<tr>
+<td><code>pardox_agg_std</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>f64</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="math">Math</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_math_add</code></td>
+<td><code>(mgr, col_a, col_b)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_math_sub</code></td>
+<td><code>(mgr, col_a, col_b)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_math_stddev</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>f64</code></td>
+</tr>
+<tr>
+<td><code>pardox_math_minmax</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="sorting">Sorting</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_sort_values</code></td>
+<td><code>(mgr, col_name, descending: i32)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_gpu_sort</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="buffer-access-numpy-ml-integration">Buffer Access (NumPy / ML integration)</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_get_f64_buffer</code></td>
+<td><code>(mgr, col_name, out_len: *mut usize)</code></td>
+<td><code>*const f64</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="groupby">GroupBy</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_groupby_agg</code></td>
+<td><code>(mgr, group_cols_json, agg_json)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="gap-specific-functions">Gap-specific Functions</h3>
+<h4 id="gap-2-string-date">Gap 2 — String &amp; Date</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_str_upper</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_str_lower</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_str_contains</code></td>
+<td><code>(mgr, col_name, pattern)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_str_replace</code></td>
+<td><code>(mgr, col_name, old_str, new_str)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_str_trim</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_str_len</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_date_extract</code></td>
+<td><code>(mgr, col_name, part: *const c_char)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_date_format</code></td>
+<td><code>(mgr, col_name, format)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_date_diff</code></td>
+<td><code>(mgr, col1, col2, unit)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_date_add</code></td>
+<td><code>(mgr, col_name, days: i64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-3-decimal-type">Gap 3 — Decimal Type</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_decimal_from_float</code></td>
+<td><code>(mgr, col_name, scale: i32)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_decimal_sum</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>f64</code></td>
+</tr>
+<tr>
+<td><code>pardox_decimal_get_scale</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>i32</code></td>
+</tr>
+<tr>
+<td><code>pardox_decimal_add</code></td>
+<td><code>(mgr, col_name, val: f64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_decimal_sub</code></td>
+<td><code>(mgr, col_name, val: f64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_decimal_mul_float</code></td>
+<td><code>(mgr, col_name, factor: f64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_decimal_round</code></td>
+<td><code>(mgr, col_name, scale: i32)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_decimal_to_float</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-4-window-functions">Gap 4 — Window Functions</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_row_number</code></td>
+<td><code>(mgr, order_col)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_rank</code></td>
+<td><code>(mgr, order_col)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_lag</code></td>
+<td><code>(mgr, col_name, offset: i64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_lead</code></td>
+<td><code>(mgr, col_name, offset: i64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_rolling_mean</code></td>
+<td><code>(mgr, col_name, window_size: i64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-5-lazy-pipeline">Gap 5 — Lazy Pipeline</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_lazy_scan_csv</code></td>
+<td><code>(path, schema_json, config_json)</code></td>
+<td><code>*mut LazyFrame</code></td>
+</tr>
+<tr>
+<td><code>pardox_lazy_scan_prdx</code></td>
+<td><code>(path)</code></td>
+<td><code>*mut LazyFrame</code></td>
+</tr>
+<tr>
+<td><code>pardox_lazy_select</code></td>
+<td><code>(lazy_ptr, cols_json)</code></td>
+<td><code>*mut LazyFrame</code></td>
+</tr>
+<tr>
+<td><code>pardox_lazy_filter</code></td>
+<td><code>(lazy_ptr, col_name, op, value: f64)</code></td>
+<td><code>*mut LazyFrame</code></td>
+</tr>
+<tr>
+<td><code>pardox_lazy_limit</code></td>
+<td><code>(lazy_ptr, n: i64)</code></td>
+<td><code>*mut LazyFrame</code></td>
+</tr>
+<tr>
+<td><code>pardox_lazy_collect</code></td>
+<td><code>(lazy_ptr)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_lazy_describe</code></td>
+<td><code>(lazy_ptr)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+<tr>
+<td><code>pardox_lazy_optimize</code></td>
+<td><code>(lazy_ptr)</code></td>
+<td><code>*mut LazyFrame</code></td>
+</tr>
+<tr>
+<td><code>pardox_lazy_stats</code></td>
+<td><code>(lazy_ptr)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+<tr>
+<td><code>pardox_lazy_free</code></td>
+<td><code>(lazy_ptr)</code></td>
+<td><code>void</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-8-pivot-melt">Gap 8 — Pivot &amp; Melt</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_pivot_table</code></td>
+<td><code>(mgr, index_col, columns_col, values_col, agg_func)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_melt</code></td>
+<td><code>(mgr, id_vars_json, value_vars_json)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-9-time-series-fill">Gap 9 — Time Series Fill</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_ffill</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_bfill</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_interpolate</code></td>
+<td><code>(mgr, col_name, method)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-10-nested-data">Gap 10 — Nested Data</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_json_extract</code></td>
+<td><code>(mgr, col_name, json_path)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_explode</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_unnest</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-11-spill-to-disk">Gap 11 — Spill to Disk</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_spill_to_disk</code></td>
+<td><code>(mgr, path)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_spill_from_disk</code></td>
+<td><code>(path)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_memory_usage</code></td>
+<td><code>(mgr)</code></td>
+<td><code>i64</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-14-external-sort-streaming-groupby">Gap 14 — External Sort / Streaming GroupBy</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_external_sort</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_chunked_groupby</code></td>
+<td><code>(mgr, group_cols_json, chunk_size: i64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-15-cloud-storage">Gap 15 — Cloud Storage</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_cloud_read_csv</code></td>
+<td><code>(url, config_json)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_cloud_read_prdx</code></td>
+<td><code>(url)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_cloud_write_prdx</code></td>
+<td><code>(mgr, url, config_json)</code></td>
+<td><code>i64</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-16-live-query">Gap 16 — Live Query</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_live_query_start</code></td>
+<td><code>(mgr, poll_interval_ms: i64)</code></td>
+<td><code>*mut LiveQuery</code></td>
+</tr>
+<tr>
+<td><code>pardox_live_query_version</code></td>
+<td><code>(lq_ptr)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_live_query_take</code></td>
+<td><code>(lq_ptr, n_rows: i64)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_live_query_free</code></td>
+<td><code>(lq_ptr)</code></td>
+<td><code>void</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-18-encryption">Gap 18 — Encryption</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_write_prdx_encrypted</code></td>
+<td><code>(mgr, path, password)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_read_prdx_encrypted</code></td>
+<td><code>(path, password)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-19-data-contracts">Gap 19 — Data Contracts</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_validate_contract</code></td>
+<td><code>(mgr, schema_json)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_contract_violation_count</code></td>
+<td><code>()</code></td>
+<td><code>i64</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-20-time-travel">Gap 20 — Time Travel</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_version_write</code></td>
+<td><code>(mgr, path, version_id)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_version_read</code></td>
+<td><code>(path, version_id)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_version_list</code></td>
+<td><code>(path)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+<tr>
+<td><code>pardox_version_delete</code></td>
+<td><code>(path, version_id)</code></td>
+<td><code>i64</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-21-arrow-flight">Gap 21 — Arrow Flight</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_flight_start</code></td>
+<td><code>(port: i32)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_flight_register</code></td>
+<td><code>(path, mgr)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_flight_stop</code></td>
+<td><code>()</code></td>
+<td><code>i32</code></td>
+</tr>
+<tr>
+<td><code>pardox_flight_read</code></td>
+<td><code>(table_ref)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-22-distributed-cluster">Gap 22 — Distributed Cluster</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_cluster_worker_start</code></td>
+<td><code>(listen_addr, port: i32)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_cluster_worker_stop</code></td>
+<td><code>()</code></td>
+<td><code>i32</code></td>
+</tr>
+<tr>
+<td><code>pardox_cluster_worker_register</code></td>
+<td><code>(name, listen_addr)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_cluster_connect</code></td>
+<td><code>(worker_addresses_json)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_cluster_scatter</code></td>
+<td><code>(mgr, partitions: i32)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+<tr>
+<td><code>pardox_cluster_scatter_resilient</code></td>
+<td><code>(mgr, partitions: i32, replication_factor: i32)</code></td>
+<td><code>*const c_char</code></td>
+</tr>
+<tr>
+<td><code>pardox_cluster_sql</code></td>
+<td><code>(sql_query)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_cluster_sql_resilient</code></td>
+<td><code>(sql_query)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_cluster_ping</code></td>
+<td><code>(worker_name)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_cluster_ping_all</code></td>
+<td><code>()</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_cluster_checkpoint</code></td>
+<td><code>(path)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>pardox_cluster_free</code></td>
+<td><code>()</code></td>
+<td><code>void</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-23-sql-server-fix">Gap 23 — SQL Server Fix</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_sqlserver_config_ok</code></td>
+<td><code>()</code></td>
+<td><code>i32</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-28-linear-algebra">Gap 28 — Linear Algebra</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_matmul</code></td>
+<td><code>(left_mgr, left_col, right_mgr, right_col)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_l2_normalize</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_l1_normalize</code></td>
+<td><code>(mgr, col_name)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+<tr>
+<td><code>pardox_cosine_sim</code></td>
+<td><code>(left_mgr, left_col, right_mgr, right_col)</code></td>
+<td><code>f64</code></td>
+</tr>
+<tr>
+<td><code>pardox_pca</code></td>
+<td><code>(mgr, n_components: i32)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-29-rest-connector">Gap 29 — REST Connector</h4>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_read_rest</code></td>
+<td><code>(url, method, headers_json)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="gap-30-sql-cursor-api-added-v033">Gap 30 — SQL Cursor API (added v0.3.3)</h4>
+<p>Server-side PostgreSQL streaming cursor. Opens a <code>DECLARE ... NO SCROLL CURSOR</code> on the server and fetches rows in chunks. Memory usage is O(chunk_size) regardless of query result size. All 5 symbols verified in <code>libpardox.so</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pardox_scan_sql_cursor_open</code></td>
+<td><code>(conn_str: *const c_char, query: *const c_char, chunk_size: usize)</code></td>
+<td><code>*mut SqlCursor</code></td>
+<td>Open server-side cursor. Returns opaque pointer. <code>BEGIN</code> + <code>DECLARE</code> issued on the connection</td>
+</tr>
+<tr>
+<td><code>pardox_scan_sql_cursor_fetch</code></td>
+<td><code>(cursor: *mut SqlCursor)</code></td>
+<td><code>*mut HyperBlockManager</code></td>
+<td>Fetch next chunk. Returns <code>null</code> when exhausted</td>
+</tr>
+<tr>
+<td><code>pardox_scan_sql_cursor_offset</code></td>
+<td><code>(cursor: *mut SqlCursor)</code></td>
+<td><code>usize</code></td>
+<td>Total rows fetched so far</td>
+</tr>
+<tr>
+<td><code>pardox_scan_sql_cursor_close</code></td>
+<td><code>(cursor: *mut SqlCursor)</code></td>
+<td><code>void</code></td>
+<td><strong>MUST CALL</strong> — issues <code>CLOSE cursor</code> + <code>COMMIT</code>, drops <code>Box&lt;SqlCursor&gt;</code></td>
+</tr>
+<tr>
+<td><code>pardox_scan_sql_to_parquet</code></td>
+<td><code>(conn_str: *const c_char, query: *const c_char, output_pattern: *const c_char, chunk_size: i64)</code></td>
+<td><code>i64</code></td>
+<td>Stream SQL → <code>.prdx</code> files using <code>{i}</code> pattern. Returns total rows written</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Python usage:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">px</span><span class="o">.</span><span class="n">query_to_results</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">50_000</span><span class="p">):</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">records</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">total</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">sql_to_parquet</span><span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="s2">&quot;/tmp/chunk_</span><span class="si">{i}</span><span class="s2">.prdx&quot;</span><span class="p">,</span> <span class="n">chunk_size</span><span class="o">=</span><span class="mi">100_000</span><span class="p">)</span>
+</code></pre></div></p>
+<hr />
+<h2 id="pardox_gpu">pardox_gpu</h2>
+<p><strong>Path:</strong> <code>Pardox-Core-v0.3.4/pardox_gpu/</code>
+<strong>Crate type:</strong> <code>cdylib</code>
+<strong>Output:</strong> <code>pardox-gpu-Linux-x64.so</code>
+<strong>Backend:</strong> <code>wgpu</code> (WebGPU — cross-platform: Vulkan, Metal, DX12, OpenGL ES)</p>
+<h3 id="init">Init</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gpu_init</code></td>
+<td><code>()</code></td>
+<td><code>i64</code></td>
+<td>Initialize wgpu device; 0 = success, -1 = no adapter</td>
+</tr>
+</tbody>
+</table>
+<h3 id="binary-arithmetic-element-wise-f64">Binary Arithmetic (element-wise, f64)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gpu_add_f64</code></td>
+<td><code>(ptr_a: *const f64, ptr_b: *const f64, len: usize, ptr_out: *mut f64)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_sub_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_mul_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_div_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_mod_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_pow_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_max_elementwise_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_min_elementwise_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="reductions">Reductions</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gpu_sum_f64</code></td>
+<td><code>(ptr_in: *const f64, len: usize, ptr_out: *mut f64)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_min_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_max_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_reduce_sum_f64</code></td>
+<td>same pattern (multi-pass)</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_reduce_min_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_reduce_max_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="sorting_1">Sorting</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gpu_sort_f64</code></td>
+<td><code>(ptr_in: *const f64, len: usize, ptr_out: *mut f64, descending: i32)</code></td>
+<td><code>i64</code></td>
+<td>Bitonic sort on GPU</td>
+</tr>
+</tbody>
+</table>
+<h3 id="unary-math">Unary Math</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Parameters</th>
+<th>Return</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>gpu_sqrt_f64</code></td>
+<td><code>(ptr_in: *const f64, len: usize, ptr_out: *mut f64)</code></td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_exp_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_log_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+<tr>
+<td><code>gpu_abs_f64</code></td>
+<td>same pattern</td>
+<td><code>i64</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="pardox_napi">pardox_napi</h2>
+<p><strong>Path:</strong> <code>Pardox-Core-v0.3.4/pardox_napi/</code>
+<strong>Crate type:</strong> <code>cdylib</code>
+<strong>Output:</strong> <code>pardox.node</code> (Node.js native addon)
+<strong>Binding framework:</strong> <code>napi-rs</code></p>
+<h3 id="dataframe-class-30-instance-methods">DataFrame class (30+ instance methods)</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>fromCsv(path, schema, config)</code></td>
+<td>Load CSV</td>
+</tr>
+<tr>
+<td><code>fromPrdx(path, limit)</code></td>
+<td>Load .prdx</td>
+</tr>
+<tr>
+<td><code>toJson(limit)</code></td>
+<td>Serialize to JSON records</td>
+</tr>
+<tr>
+<td><code>toAscii(limit)</code></td>
+<td>Pretty-print table</td>
+</tr>
+<tr>
+<td><code>groupBy(groupCols, aggJson)</code></td>
+<td>GroupBy aggregation</td>
+</tr>
+<tr>
+<td><code>sortValues(col, desc)</code></td>
+<td>Sort</td>
+</tr>
+<tr>
+<td><code>filter(col, op, value)</code></td>
+<td>Scalar filter</td>
+</tr>
+<tr>
+<td><code>select(cols)</code></td>
+<td>Column selection</td>
+</tr>
+<tr>
+<td><code>head(n)</code> / <code>tail(n)</code></td>
+<td>Row slicing</td>
+</tr>
+<tr>
+<td><code>getSchema()</code></td>
+<td>Schema as JSON</td>
+</tr>
+<tr>
+<td><code>rowCount()</code></td>
+<td>Row count</td>
+</tr>
+<tr>
+<td><code>sum/mean/min/max/std(col)</code></td>
+<td>Aggregations</td>
+</tr>
+<tr>
+<td><code>toCsv(path)</code> / <code>toPrdx(path)</code></td>
+<td>Export</td>
+</tr>
+<tr>
+<td><code>strUpper/Lower/Contains/Replace/Trim(col, ...)</code></td>
+<td>String ops</td>
+</tr>
+<tr>
+<td><code>dateExtract/Format/Diff/Add(col, ...)</code></td>
+<td>Date ops</td>
+</tr>
+<tr>
+<td><code>lag/lead/rank/rowNumber/rollingMean(col, ...)</code></td>
+<td>Window ops</td>
+</tr>
+<tr>
+<td><code>pivot/melt(...)</code></td>
+<td>Reshape</td>
+</tr>
+<tr>
+<td><code>ffill/bfill/interpolate(col, ...)</code></td>
+<td>Time series fill</td>
+</tr>
+<tr>
+<td><code>jsonExtract/explode/unnest(col, ...)</code></td>
+<td>Nested data</td>
+</tr>
+<tr>
+<td><code>spillToDisk/spillFromDisk(path)</code></td>
+<td>Spill</td>
+</tr>
+<tr>
+<td><code>encryptedWrite/encryptedRead(path, key)</code></td>
+<td>Encryption</td>
+</tr>
+<tr>
+<td><code>validateContract(schemaJson)</code></td>
+<td>Contracts</td>
+</tr>
+<tr>
+<td><code>versionWrite/Read/List/Delete(...)</code></td>
+<td>Time travel</td>
+</tr>
+<tr>
+<td><code>l2Normalize/l1Normalize/cosineSim/pca/matmul(...)</code></td>
+<td>LinAlg</td>
+</tr>
+<tr>
+<td><code>free()</code></td>
+<td>Release memory</td>
+</tr>
+</tbody>
+</table>
+<p>All pardox_cpu functions are also exposed as module-level exports with camelCase naming (60+ total).</p>
+<hr />
+<h2 id="pardox_wasm">pardox_wasm</h2>
+<p><strong>Path:</strong> <code>Pardox-Core-v0.3.4/pardox_wasm/</code>
+<strong>Target:</strong> <code>wasm32-unknown-unknown</code>
+<strong>Binding framework:</strong> <code>wasm-bindgen</code>
+<strong>Status:</strong> Stub / development placeholder</p>
+<p>Exports a minimal <code>PardoXWasm</code> class with placeholder methods. Full WASM port planned.</p>
+<hr />
+<h2 id="pardox_server">pardox_server</h2>
+<p><strong>Path:</strong> <code>Pardox-Core-v0.3.4/pardox_server/</code>
+<strong>Status:</strong> Empty scaffold — no exported functions</p>
+<p>The PostgreSQL wire-protocol server is implemented in Python (<code>pardox_validation/py_validation/pardox/server/</code>), not in this Rust crate.</p>
+<hr />
+<h2 id="architectural-patterns">Architectural Patterns</h2>
+<h3 id="memory-ownership">Memory Ownership</h3>
+<ul>
+<li>All <code>*mut HyperBlockManager</code> pointers are <strong>Rust-owned</strong> — caller must call <code>pardox_free_manager(ptr)</code> when done</li>
+<li>String returns (<code>*const c_char</code>) are also Rust-owned — call <code>pardox_free_string(ptr)</code> to release</li>
+<li><code>LazyFrame*</code> pointers are consumed by <code>pardox_lazy_collect()</code> — do not free separately after collect</li>
+</ul>
+<h3 id="error-signaling">Error Signaling</h3>
+<ul>
+<li><code>i64</code> returns: <code>&gt;= 0</code> = success, <code>&lt; 0</code> = error code</li>
+<li><code>*mut T</code> returns: <code>NULL</code> = error</li>
+<li><code>f64</code> returns: <code>NaN</code> or negative sentinel for aggregation errors</li>
+</ul>
+<h3 id="ffi-calling-conventions">FFI Calling Conventions</h3>
+<ul>
+<li>All functions: <code>extern "C"</code> with <code>#[no_mangle]</code></li>
+<li>All strings: null-terminated UTF-8 C strings (<code>*const c_char</code>)</li>
+<li>Boolean flags: <code>i32</code> (0 = false, 1 = true)</li>
+</ul>
+<h3 id="key-ffi-gotchas">Key FFI Gotchas</h3>
+<ol>
+<li><code>pardox_load_manager_csv</code> requires exactly 3 args: <code>(path, schema_json, config_json)</code> — both JSON args can be <code>"{}"</code> but must not be NULL</li>
+<li><code>pardox_get_f64_buffer</code> takes <code>out_len: *mut usize</code> — caller provides pointer to receive length</li>
+<li><code>pardox_lazy_filter</code> arg order: <code>(lazy_ptr, col_name, op_str, value: f64)</code> — op is lowercase (<code>"gt"</code>, <code>"lt"</code>, <code>"eq"</code>, <code>"neq"</code>, <code>"gte"</code>, <code>"lte"</code>)</li>
+<li><code>pardox_lazy_select</code> expects JSON array string: <code>'["col1","col2"]'</code></li>
+<li>Decimal type code in schema JSON: <code>0x80 | scale</code> (e.g., scale=2 → type code <code>130</code>)</li>
+<li><code>pardox_hyper_copy_v3</code> is for CSV→PRDX bulk conversion, NOT PostgreSQL COPY protocol</li>
+</ol>
+<h3 id="platform-binaries">Platform Binaries</h3>
+<table>
+<thead>
+<tr>
+<th>Platform</th>
+<th>CPU</th>
+<th>GPU</th>
+<th>NAPI</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Linux x64</td>
+<td><code>pardox-cpu-Linux-x64.so</code></td>
+<td><code>pardox-gpu-Linux-x64.so</code></td>
+<td><code>pardox-Linux-x64.node</code></td>
+</tr>
+<tr>
+<td>macOS Intel</td>
+<td><code>pardox-cpu-Darwin-x64.dylib</code></td>
+<td><code>pardox-gpu-Darwin-x64.dylib</code></td>
+<td><code>pardox-Darwin-x64.node</code></td>
+</tr>
+<tr>
+<td>macOS ARM</td>
+<td><code>pardox-cpu-Darwin-arm64.dylib</code></td>
+<td><code>pardox-gpu-Darwin-arm64.dylib</code></td>
+<td><code>pardox-Darwin-arm64.node</code></td>
+</tr>
+<tr>
+<td>Windows</td>
+<td><code>pardox-cpu-Win-x64.dll</code></td>
+<td><code>pardox-gpu-Win-x64.dll</code></td>
+<td><code>pardox-Win-x64.node</code></td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+  
+  
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["content.code.copy", "navigation.expand", "navigation.top", "search.suggest", "search.highlight"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

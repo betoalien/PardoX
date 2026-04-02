@@ -1,0 +1,1941 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The Hyper-Fast Data Engine powered by Rust.">
+      
+      
+      
+        <link rel="canonical" href="https://www.pardox.io/documentation_sdk/db_integration/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>PardoX — Database Integration Guide - PardoX Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="deep-orange">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#pardox-database-integration-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="PardoX Documentation" class="md-header__button md-logo" aria-label="PardoX Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            PardoX Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              PardoX — Database Integration Guide
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="deep-orange"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/betoalien/PardoX" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    betoalien/pardox
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="PardoX Documentation" class="md-nav__button md-logo" aria-label="PardoX Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    PardoX Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/betoalien/PardoX" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    betoalien/pardox
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../started/installation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    IO Operations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/mutation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Mutation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/aggregations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Aggregations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#supported-databases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Supported Databases
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connection-string-formats" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Connection String Formats
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Connection String Formats">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sql-server-adonet-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQL Server (ADO.NET format)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mongodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MongoDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#postgresql_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PostgreSQL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PostgreSQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#php" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PHP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#write-modes-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Write Modes — PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bulk-performance-postgresql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bulk Performance — PostgreSQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mysql_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MySQL">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodejs_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#php_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PHP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#write-modes-mysql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Write Modes — MySQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bulk-performance-mysql" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bulk Performance — MySQL
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sql-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQL Server
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SQL Server">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodejs_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#php_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PHP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#write-modes-sql-server" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Write Modes — SQL Server
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#mongodb_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MongoDB
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="MongoDB">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodejs_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#php_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PHP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#write-modes-mongodb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Write Modes — MongoDB
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#api-reference-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        API Reference Summary
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="API Reference Summary">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#python-pardoxio" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python (pardox.io)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dataframe-write-methods-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataFrame write methods — Python
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nodejs-pardoxsrciojs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Node.js (pardox/src/io.js)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dataframe-write-methods-nodejs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataFrame write methods — Node.js
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#php-pardoxio-pardoxdataframe" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PHP (PardoX\IO + PardoX\DataFrame)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dataframe-write-methods-php" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DataFrame write methods — PHP
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#return-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Return Values
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bulk-write-performance-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Bulk Write Performance Summary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#known-limitations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Known Limitations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Known Limitations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sql-server-special-characters-in-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        SQL Server — Special Characters in Password
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#mysql-load-data-local-infile-requires-server-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MySQL — LOAD DATA LOCAL INFILE Requires Server Configuration
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#table-must-exist-before-writing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table Must Exist Before Writing
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validated-versions-v031" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validated Versions (v0.3.1)
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="pardox-database-integration-guide">PardoX — Database Integration Guide</h1>
+<p><strong>Version:</strong> v0.3.1
+<strong>SDKs covered:</strong> Python · Node.js · PHP</p>
+<hr />
+<h2 id="overview">Overview</h2>
+<p>PardoX uses native Rust drivers for all database operations. There is no Python/Node.js/PHP database library involved — the host language passes a connection string and a pointer to the DataFrame; the Rust core handles the entire connection, serialization, and transfer. This means:</p>
+<ul>
+<li>Zero Python/JS/PHP dependencies for database I/O</li>
+<li>No ORM or query builder overhead</li>
+<li>Bulk write paths operate at the wire level (COPY, LOAD DATA, batch INSERT)</li>
+</ul>
+<hr />
+<h2 id="supported-databases">Supported Databases</h2>
+<table>
+<thead>
+<tr>
+<th>Database</th>
+<th>Rust driver</th>
+<th>Read</th>
+<th>Write</th>
+<th>Execute DDL/DML</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL</td>
+<td><code>tokio-postgres</code></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>MySQL</td>
+<td><code>mysql</code> v25</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>SQL Server</td>
+<td><code>tiberius</code> v0.12</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td>MongoDB</td>
+<td><code>mongodb</code> v2.8</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="connection-string-formats">Connection String Formats</h2>
+<h3 id="postgresql">PostgreSQL</h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>postgresql://user:password@host:port/database
+</code></pre></div>
+Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>postgresql://pardox:pardox123@localhost:5432/pardox_test
+</code></pre></div></p>
+<h3 id="mysql">MySQL</h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>mysql://user:password@host:port/database
+</code></pre></div>
+Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>mysql://pardox:pardoxpassword@localhost:3306/pardox_test
+</code></pre></div></p>
+<h3 id="sql-server-adonet-format">SQL Server (ADO.NET format)</h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>Server=host,port;Database=db;UID=user;PWD=password;TrustServerCertificate=Yes
+</code></pre></div>
+Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>Server=localhost,1433;Database=mydb;UID=sa;PWD=MyPassword;TrustServerCertificate=Yes
+</code></pre></div></p>
+<blockquote>
+<p><strong>Note:</strong> Avoid special characters (particularly <code>!</code>) in SQL Server passwords. See <a href="#known-limitations">Known Limitations</a>.</p>
+</blockquote>
+<h3 id="mongodb">MongoDB</h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>mongodb://user:password@host:port
+</code></pre></div>
+Example:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>mongodb://admin:secret@localhost:27017
+</code></pre></div></p>
+<hr />
+<h2 id="postgresql_1">PostgreSQL</h2>
+<h3 id="python">Python</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_sql</span><span class="p">,</span> <span class="n">execute_sql</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pardox</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a><span class="c1"># Read</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_sql</span><span class="p">(</span><span class="s2">&quot;postgresql://pardox:pardox123@localhost:5432/mydb&quot;</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM orders&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="c1"># Execute DDL / DML</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a><span class="n">execute_sql</span><span class="p">(</span><span class="s2">&quot;postgresql://...&quot;</span><span class="p">,</span> <span class="s2">&quot;DROP TABLE IF EXISTS orders&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a><span class="n">execute_sql</span><span class="p">(</span><span class="s2">&quot;postgresql://...&quot;</span><span class="p">,</span> <span class="s2">&quot;CREATE TABLE orders (id BIGINT, amount FLOAT)&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a><span class="c1"># Write — append (auto-activates COPY FROM STDIN for &gt; 10,000 rows)</span>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="s2">&quot;postgresql://...&quot;</span><span class="p">,</span> <span class="s2">&quot;orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a><span class="c1"># Write — upsert (INSERT … ON CONFLICT DO UPDATE)</span>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="s2">&quot;postgresql://...&quot;</span><span class="p">,</span> <span class="s2">&quot;orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;upsert&quot;</span><span class="p">,</span> <span class="n">conflict_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+</code></pre></div>
+<h3 id="nodejs">Node.js</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">read_sql</span><span class="p">,</span><span class="w"> </span><span class="nx">executeSql</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./pardox/src/io&#39;</span><span class="p">);</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">DataFrame</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./pardox/src/DataFrame&#39;</span><span class="p">);</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1">// Read</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a><span class="kd">const</span><span class="w"> </span><span class="nx">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">read_sql</span><span class="p">(</span><span class="s1">&#39;postgresql://pardox:pardox123@localhost:5432/mydb&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;SELECT * FROM orders&#39;</span><span class="p">);</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a><span class="c1">// Execute DDL / DML</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a><span class="nx">executeSql</span><span class="p">(</span><span class="s1">&#39;postgresql://...&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;DROP TABLE IF EXISTS orders&#39;</span><span class="p">);</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a><span class="nx">executeSql</span><span class="p">(</span><span class="s1">&#39;postgresql://...&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;CREATE TABLE orders (id BIGINT, amount FLOAT)&#39;</span><span class="p">);</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a><span class="c1">// Write — append</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a><span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">df</span><span class="p">.</span><span class="nx">toSql</span><span class="p">(</span><span class="s1">&#39;postgresql://...&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;orders&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;append&#39;</span><span class="p">);</span>
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a><span class="c1">// Write — upsert</span>
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a><span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">df</span><span class="p">.</span><span class="nx">toSql</span><span class="p">(</span><span class="s1">&#39;postgresql://...&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;orders&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;upsert&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]);</span>
+</code></pre></div>
+<h3 id="php">PHP</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="x">use PardoX\DataFrame;</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="x">use PardoX\IO;</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="x">// Read</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="x">$df = IO::read_sql(&#39;postgresql://pardox:pardox123@localhost:5432/mydb&#39;, &#39;SELECT * FROM orders&#39;);</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="x">// Execute DDL / DML</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="x">IO::executeSql(&#39;postgresql://...&#39;, &#39;DROP TABLE IF EXISTS orders&#39;);</span>
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a><span class="x">IO::executeSql(&#39;postgresql://...&#39;, &#39;CREATE TABLE orders (id BIGINT, amount FLOAT)&#39;);</span>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a><span class="x">// Write — append</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="x">$rows = $df-&gt;to_sql(&#39;postgresql://...&#39;, &#39;orders&#39;, &#39;append&#39;);</span>
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="x">// Write — upsert</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a><span class="x">$rows = $df-&gt;to_sql(&#39;postgresql://...&#39;, &#39;orders&#39;, &#39;upsert&#39;, [&#39;id&#39;]);</span>
+</code></pre></div>
+<h3 id="write-modes-postgresql">Write Modes — PostgreSQL</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>append</code></td>
+<td><code>INSERT INTO … VALUES …</code>. Auto-upgrades to <code>COPY FROM STDIN</code> when rows &gt; 10,000.</td>
+</tr>
+<tr>
+<td><code>upsert</code></td>
+<td><code>INSERT … ON CONFLICT (cols) DO UPDATE SET …</code>. Requires <code>conflict_cols</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="bulk-performance-postgresql">Bulk Performance — PostgreSQL</h3>
+<p>For DataFrames with more than 10,000 rows and <code>mode="append"</code>, the Rust core automatically switches to <code>COPY FROM STDIN</code>. The CSV data is serialized in memory and streamed directly into PostgreSQL — no temp files.</p>
+<hr />
+<h2 id="mysql_1">MySQL</h2>
+<h3 id="python_1">Python</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_mysql</span><span class="p">,</span> <span class="n">execute_mysql</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pardox</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a><span class="n">CONN</span> <span class="o">=</span> <span class="s2">&quot;mysql://pardox:pardoxpassword@localhost:3306/mydb&quot;</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a><span class="c1"># Read</span>
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_mysql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM sales&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>
+<a id="__codelineno-11-9" name="__codelineno-11-9" href="#__codelineno-11-9"></a><span class="c1"># Execute DDL / DML</span>
+<a id="__codelineno-11-10" name="__codelineno-11-10" href="#__codelineno-11-10"></a><span class="n">execute_mysql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;DROP TABLE IF EXISTS sales&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-11" name="__codelineno-11-11" href="#__codelineno-11-11"></a><span class="n">execute_mysql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="p">(</span>
+<a id="__codelineno-11-12" name="__codelineno-11-12" href="#__codelineno-11-12"></a>    <span class="s2">&quot;CREATE TABLE sales (&quot;</span>
+<a id="__codelineno-11-13" name="__codelineno-11-13" href="#__codelineno-11-13"></a>    <span class="s2">&quot;id BIGINT, amount DOUBLE, category TEXT)&quot;</span>
+<a id="__codelineno-11-14" name="__codelineno-11-14" href="#__codelineno-11-14"></a><span class="p">))</span>
+<a id="__codelineno-11-15" name="__codelineno-11-15" href="#__codelineno-11-15"></a>
+<a id="__codelineno-11-16" name="__codelineno-11-16" href="#__codelineno-11-16"></a><span class="c1"># Write — append</span>
+<a id="__codelineno-11-17" name="__codelineno-11-17" href="#__codelineno-11-17"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_mysql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;sales&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+<a id="__codelineno-11-18" name="__codelineno-11-18" href="#__codelineno-11-18"></a>
+<a id="__codelineno-11-19" name="__codelineno-11-19" href="#__codelineno-11-19"></a><span class="c1"># Write — upsert (ON DUPLICATE KEY UPDATE)</span>
+<a id="__codelineno-11-20" name="__codelineno-11-20" href="#__codelineno-11-20"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_mysql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;sales&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;upsert&quot;</span><span class="p">,</span> <span class="n">conflict_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+</code></pre></div>
+<h3 id="nodejs_1">Node.js</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">read_mysql</span><span class="p">,</span><span class="w"> </span><span class="nx">execute_mysql</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./pardox/src/io&#39;</span><span class="p">);</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">CONN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;mysql://pardox:pardoxpassword@localhost:3306/mydb&#39;</span><span class="p">;</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1">// Read</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="kd">const</span><span class="w"> </span><span class="nx">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">read_mysql</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;SELECT * FROM sales&#39;</span><span class="p">);</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a><span class="c1">// Execute DDL / DML</span>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a><span class="nx">execute_mysql</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;DROP TABLE IF EXISTS sales&#39;</span><span class="p">);</span>
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a><span class="nx">execute_mysql</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;CREATE TABLE sales (id BIGINT, amount DOUBLE, category TEXT)&#39;</span><span class="p">);</span>
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a><span class="c1">// Write — append</span>
+<a id="__codelineno-12-13" name="__codelineno-12-13" href="#__codelineno-12-13"></a><span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">df</span><span class="p">.</span><span class="nx">toMysql</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;sales&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;append&#39;</span><span class="p">);</span>
+<a id="__codelineno-12-14" name="__codelineno-12-14" href="#__codelineno-12-14"></a>
+<a id="__codelineno-12-15" name="__codelineno-12-15" href="#__codelineno-12-15"></a><span class="c1">// Write — replace (DELETE existing rows then INSERT)</span>
+<a id="__codelineno-12-16" name="__codelineno-12-16" href="#__codelineno-12-16"></a><span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">df</span><span class="p">.</span><span class="nx">toMysql</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;sales&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;replace&#39;</span><span class="p">);</span>
+<a id="__codelineno-12-17" name="__codelineno-12-17" href="#__codelineno-12-17"></a>
+<a id="__codelineno-12-18" name="__codelineno-12-18" href="#__codelineno-12-18"></a><span class="c1">// Write — upsert</span>
+<a id="__codelineno-12-19" name="__codelineno-12-19" href="#__codelineno-12-19"></a><span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">df</span><span class="p">.</span><span class="nx">toMysql</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;sales&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;upsert&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]);</span>
+</code></pre></div>
+<h3 id="php_1">PHP</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="x">use PardoX\DataFrame;</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="x">use PardoX\IO;</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="x">$CONN = &#39;mysql://pardox:pardoxpassword@localhost:3306/mydb&#39;;</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="x">// Read</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="x">$df = IO::read_mysql($CONN, &#39;SELECT * FROM sales&#39;);</span>
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a><span class="x">// Execute DDL / DML</span>
+<a id="__codelineno-13-10" name="__codelineno-13-10" href="#__codelineno-13-10"></a><span class="x">IO::executeMysql($CONN, &#39;DROP TABLE IF EXISTS sales&#39;);</span>
+<a id="__codelineno-13-11" name="__codelineno-13-11" href="#__codelineno-13-11"></a><span class="x">IO::executeMysql($CONN, &#39;CREATE TABLE IF NOT EXISTS sales (id BIGINT, amount DOUBLE, category TEXT)&#39;);</span>
+<a id="__codelineno-13-12" name="__codelineno-13-12" href="#__codelineno-13-12"></a>
+<a id="__codelineno-13-13" name="__codelineno-13-13" href="#__codelineno-13-13"></a><span class="x">// Write — append</span>
+<a id="__codelineno-13-14" name="__codelineno-13-14" href="#__codelineno-13-14"></a><span class="x">$rows = $df-&gt;to_mysql($CONN, &#39;sales&#39;, &#39;append&#39;);</span>
+<a id="__codelineno-13-15" name="__codelineno-13-15" href="#__codelineno-13-15"></a>
+<a id="__codelineno-13-16" name="__codelineno-13-16" href="#__codelineno-13-16"></a><span class="x">// Write — upsert</span>
+<a id="__codelineno-13-17" name="__codelineno-13-17" href="#__codelineno-13-17"></a><span class="x">$rows = $df-&gt;to_mysql($CONN, &#39;sales&#39;, &#39;upsert&#39;, [&#39;id&#39;]);</span>
+</code></pre></div>
+<h3 id="write-modes-mysql">Write Modes — MySQL</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>append</code></td>
+<td><code>INSERT INTO … VALUES …</code> in chunks of 1,000 rows per statement. Auto-upgrades to <code>LOAD DATA LOCAL INFILE</code> when rows &gt; 10,000 <strong>and</strong> the server has <code>local_infile=ON</code>.</td>
+</tr>
+<tr>
+<td><code>replace</code></td>
+<td><code>REPLACE INTO … VALUES …</code> in chunks of 1,000 rows.</td>
+</tr>
+<tr>
+<td><code>upsert</code></td>
+<td><code>INSERT … ON DUPLICATE KEY UPDATE</code>. Requires <code>conflict_cols</code>.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="bulk-performance-mysql">Bulk Performance — MySQL</h3>
+<p>When <code>local_infile</code> is enabled on the MySQL server, appending more than 10,000 rows automatically uses <code>LOAD DATA LOCAL INFILE</code>. The CSV payload is built in memory and delivered via the MySQL binary protocol — no disk files. If the server has <code>local_infile=OFF</code> (ERROR 3948), the Rust core falls back to the 1,000-row chunked INSERT automatically, logging a notice to stderr.</p>
+<hr />
+<h2 id="sql-server">SQL Server</h2>
+<h3 id="python_2">Python</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_sqlserver</span><span class="p">,</span> <span class="n">execute_sqlserver</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pardox</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a><span class="n">CONN</span> <span class="o">=</span> <span class="s2">&quot;Server=localhost,1433;Database=mydb;UID=sa;PWD=MyPassword;TrustServerCertificate=Yes&quot;</span>
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a><span class="c1"># Read</span>
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_sqlserver</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;SELECT * FROM dbo.orders&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a><span class="c1"># Execute DDL / DML</span>
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a><span class="n">execute_sqlserver</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;DROP TABLE IF EXISTS dbo.orders&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a><span class="n">execute_sqlserver</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="p">(</span>
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    <span class="s2">&quot;CREATE TABLE dbo.orders (&quot;</span>
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>    <span class="s2">&quot;id BIGINT, amount FLOAT, category NVARCHAR(MAX))&quot;</span>
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a><span class="p">))</span>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a><span class="c1"># Write — append (batch INSERT 500 rows/statement)</span>
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_sqlserver</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;dbo.orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a>
+<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a><span class="c1"># Write — upsert (MERGE … WHEN MATCHED … WHEN NOT MATCHED …)</span>
+<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_sqlserver</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;dbo.orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;upsert&quot;</span><span class="p">,</span> <span class="n">conflict_cols</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+</code></pre></div>
+<h3 id="nodejs_2">Node.js</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">read_sqlserver</span><span class="p">,</span><span class="w"> </span><span class="nx">execute_sqlserver</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./pardox/src/io&#39;</span><span class="p">);</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">CONN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Server=localhost,1433;Database=mydb;UID=sa;PWD=MyPassword;TrustServerCertificate=Yes&#39;</span><span class="p">;</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>
+<a id="__codelineno-15-5" name="__codelineno-15-5" href="#__codelineno-15-5"></a><span class="c1">// Read</span>
+<a id="__codelineno-15-6" name="__codelineno-15-6" href="#__codelineno-15-6"></a><span class="kd">const</span><span class="w"> </span><span class="nx">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">read_sqlserver</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;SELECT * FROM dbo.orders&#39;</span><span class="p">);</span>
+<a id="__codelineno-15-7" name="__codelineno-15-7" href="#__codelineno-15-7"></a>
+<a id="__codelineno-15-8" name="__codelineno-15-8" href="#__codelineno-15-8"></a><span class="c1">// Execute DDL / DML</span>
+<a id="__codelineno-15-9" name="__codelineno-15-9" href="#__codelineno-15-9"></a><span class="nx">execute_sqlserver</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;DROP TABLE IF EXISTS dbo.orders&#39;</span><span class="p">);</span>
+<a id="__codelineno-15-10" name="__codelineno-15-10" href="#__codelineno-15-10"></a>
+<a id="__codelineno-15-11" name="__codelineno-15-11" href="#__codelineno-15-11"></a><span class="c1">// Write — append</span>
+<a id="__codelineno-15-12" name="__codelineno-15-12" href="#__codelineno-15-12"></a><span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">df</span><span class="p">.</span><span class="nx">toSqlserver</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;dbo.orders&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;append&#39;</span><span class="p">);</span>
+<a id="__codelineno-15-13" name="__codelineno-15-13" href="#__codelineno-15-13"></a>
+<a id="__codelineno-15-14" name="__codelineno-15-14" href="#__codelineno-15-14"></a><span class="c1">// Write — upsert (MERGE)</span>
+<a id="__codelineno-15-15" name="__codelineno-15-15" href="#__codelineno-15-15"></a><span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">df</span><span class="p">.</span><span class="nx">toSqlserver</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;dbo.orders&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;upsert&#39;</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]);</span>
+</code></pre></div>
+<h3 id="php_2">PHP</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="x">use PardoX\DataFrame;</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="x">use PardoX\IO;</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="x">$CONN = &#39;Server=localhost,1433;Database=mydb;UID=sa;PWD=MyPassword;TrustServerCertificate=Yes&#39;;</span>
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a><span class="x">// Read</span>
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a><span class="x">$df = IO::read_sqlserver($CONN, &#39;SELECT * FROM dbo.orders&#39;);</span>
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a><span class="x">// Execute DDL / DML</span>
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a><span class="x">IO::executeSqlserver($CONN, &#39;DROP TABLE IF EXISTS dbo.orders&#39;);</span>
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a><span class="x">// Write — append</span>
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a><span class="x">$rows = $df-&gt;to_sqlserver($CONN, &#39;dbo.orders&#39;, &#39;append&#39;);</span>
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a><span class="x">// Write — upsert (MERGE)</span>
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a><span class="x">$rows = $df-&gt;to_sqlserver($CONN, &#39;dbo.orders&#39;, &#39;upsert&#39;, [&#39;id&#39;]);</span>
+</code></pre></div>
+<h3 id="write-modes-sql-server">Write Modes — SQL Server</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>append</code></td>
+<td><code>INSERT INTO table (cols) VALUES (r1),(r2),…,(r500)</code> — 500 rows per statement.</td>
+</tr>
+<tr>
+<td><code>replace</code></td>
+<td>Same multi-row INSERT, replacing existing rows.</td>
+</tr>
+<tr>
+<td><code>upsert</code></td>
+<td><code>MERGE INTO table AS T USING (VALUES …) AS S ON (…) WHEN MATCHED … WHEN NOT MATCHED …</code> — 500 rows per MERGE statement. Requires <code>conflict_cols</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="mongodb_1">MongoDB</h2>
+<h3 id="python_3">Python</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">pardox.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_mongodb</span><span class="p">,</span> <span class="n">execute_mongodb</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="kn">import</span><span class="w"> </span><span class="nn">pardox</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a><span class="n">CONN</span> <span class="o">=</span> <span class="s2">&quot;mongodb://admin:secret@localhost:27017&quot;</span>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="c1"># Read — collection as &quot;database.collection&quot;</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="n">df</span> <span class="o">=</span> <span class="n">read_mongodb</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;mydb.orders&quot;</span><span class="p">)</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="c1"># Execute a MongoDB command</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="n">execute_mongodb</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;mydb&quot;</span><span class="p">,</span> <span class="s1">&#39;{&quot;drop&quot;: &quot;orders&quot;}&#39;</span><span class="p">)</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a><span class="c1"># Write — append</span>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_mongodb</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;mydb.orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="c1"># Write — replace (drops collection, then inserts)</span>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_mongodb</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;mydb.orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="nodejs_3">Node.js</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">read_mongodb</span><span class="p">,</span><span class="w"> </span><span class="nx">execute_mongodb</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./pardox/src/io&#39;</span><span class="p">);</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="kd">const</span><span class="w"> </span><span class="nx">CONN</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;mongodb://admin:secret@localhost:27017&#39;</span><span class="p">;</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a><span class="c1">// Read</span>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a><span class="kd">const</span><span class="w"> </span><span class="nx">df</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">read_mongodb</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;mydb.orders&#39;</span><span class="p">);</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a><span class="c1">// Execute command</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a><span class="nx">execute_mongodb</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;mydb&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;{&quot;drop&quot;: &quot;orders&quot;}&#39;</span><span class="p">);</span>
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>
+<a id="__codelineno-18-11" name="__codelineno-18-11" href="#__codelineno-18-11"></a><span class="c1">// Write — append</span>
+<a id="__codelineno-18-12" name="__codelineno-18-12" href="#__codelineno-18-12"></a><span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">df</span><span class="p">.</span><span class="nx">toMongodb</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;mydb.orders&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;append&#39;</span><span class="p">);</span>
+<a id="__codelineno-18-13" name="__codelineno-18-13" href="#__codelineno-18-13"></a>
+<a id="__codelineno-18-14" name="__codelineno-18-14" href="#__codelineno-18-14"></a><span class="c1">// Write — replace</span>
+<a id="__codelineno-18-15" name="__codelineno-18-15" href="#__codelineno-18-15"></a><span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">df</span><span class="p">.</span><span class="nx">toMongodb</span><span class="p">(</span><span class="nx">CONN</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;mydb.orders&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;replace&#39;</span><span class="p">);</span>
+</code></pre></div>
+<h3 id="php_3">PHP</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="x">use PardoX\DataFrame;</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="x">use PardoX\IO;</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a><span class="x">$CONN = &#39;mongodb://admin:secret@localhost:27017&#39;;</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a><span class="x">// Read</span>
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a><span class="x">$df = IO::read_mongodb($CONN, &#39;mydb.orders&#39;);</span>
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a><span class="x">// Execute command</span>
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a><span class="x">IO::executeMongodb($CONN, &#39;mydb&#39;, &#39;{&quot;drop&quot;: &quot;orders&quot;}&#39;);</span>
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a><span class="x">// Write — append</span>
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a><span class="x">$rows = $df-&gt;to_mongodb($CONN, &#39;mydb.orders&#39;, &#39;append&#39;);</span>
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a>
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a><span class="x">// Write — replace</span>
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a><span class="x">$rows = $df-&gt;to_mongodb($CONN, &#39;mydb.orders&#39;, &#39;replace&#39;);</span>
+</code></pre></div>
+<h3 id="write-modes-mongodb">Write Modes — MongoDB</h3>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>append</code></td>
+<td><code>insert_many</code> in batches of 10,000 documents, <code>ordered: false</code> (continues on individual document errors).</td>
+</tr>
+<tr>
+<td><code>replace</code></td>
+<td>Drops the target collection, then inserts all documents in batches of 10,000.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="api-reference-summary">API Reference Summary</h2>
+<h3 id="python-pardoxio">Python (<code>pardox.io</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>read_sql(conn, query)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read from PostgreSQL</td>
+</tr>
+<tr>
+<td><code>execute_sql(conn, query)</code></td>
+<td><code>int</code></td>
+<td>DDL/DML on PostgreSQL</td>
+</tr>
+<tr>
+<td><code>read_mysql(conn, query)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read from MySQL</td>
+</tr>
+<tr>
+<td><code>execute_mysql(conn, query)</code></td>
+<td><code>int</code></td>
+<td>DDL/DML on MySQL</td>
+</tr>
+<tr>
+<td><code>read_sqlserver(conn, query)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read from SQL Server</td>
+</tr>
+<tr>
+<td><code>execute_sqlserver(conn, query)</code></td>
+<td><code>int</code></td>
+<td>DDL/DML on SQL Server</td>
+</tr>
+<tr>
+<td><code>read_mongodb(conn, db.col)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read a MongoDB collection</td>
+</tr>
+<tr>
+<td><code>execute_mongodb(conn, db, cmd_json)</code></td>
+<td><code>int</code></td>
+<td>Run a MongoDB command</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dataframe-write-methods-python">DataFrame write methods — Python</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>df.to_sql(conn, table, mode, conflict_cols)</code></td>
+<td><code>int</code></td>
+<td>Write to PostgreSQL</td>
+</tr>
+<tr>
+<td><code>df.to_mysql(conn, table, mode, conflict_cols)</code></td>
+<td><code>int</code></td>
+<td>Write to MySQL</td>
+</tr>
+<tr>
+<td><code>df.to_sqlserver(conn, table, mode, conflict_cols)</code></td>
+<td><code>int</code></td>
+<td>Write to SQL Server</td>
+</tr>
+<tr>
+<td><code>df.to_mongodb(conn, db.col, mode)</code></td>
+<td><code>int</code></td>
+<td>Write to MongoDB</td>
+</tr>
+</tbody>
+</table>
+<h3 id="nodejs-pardoxsrciojs">Node.js (<code>pardox/src/io.js</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>read_sql(conn, query)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read from PostgreSQL</td>
+</tr>
+<tr>
+<td><code>executeSql(conn, query)</code></td>
+<td><code>number</code></td>
+<td>DDL/DML on PostgreSQL</td>
+</tr>
+<tr>
+<td><code>read_mysql(conn, query)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read from MySQL</td>
+</tr>
+<tr>
+<td><code>execute_mysql(conn, query)</code></td>
+<td><code>number</code></td>
+<td>DDL/DML on MySQL</td>
+</tr>
+<tr>
+<td><code>read_sqlserver(conn, query)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read from SQL Server</td>
+</tr>
+<tr>
+<td><code>execute_sqlserver(conn, query)</code></td>
+<td><code>number</code></td>
+<td>DDL/DML on SQL Server</td>
+</tr>
+<tr>
+<td><code>read_mongodb(conn, db.col)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read a MongoDB collection</td>
+</tr>
+<tr>
+<td><code>execute_mongodb(conn, db, cmd_json)</code></td>
+<td><code>number</code></td>
+<td>Run a MongoDB command</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dataframe-write-methods-nodejs">DataFrame write methods — Node.js</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>df.toSql(conn, table, mode, conflictCols)</code></td>
+<td><code>number</code></td>
+<td>Write to PostgreSQL</td>
+</tr>
+<tr>
+<td><code>df.toMysql(conn, table, mode, conflictCols)</code></td>
+<td><code>number</code></td>
+<td>Write to MySQL</td>
+</tr>
+<tr>
+<td><code>df.toSqlserver(conn, table, mode, conflictCols)</code></td>
+<td><code>number</code></td>
+<td>Write to SQL Server</td>
+</tr>
+<tr>
+<td><code>df.toMongodb(conn, db.col, mode)</code></td>
+<td><code>number</code></td>
+<td>Write to MongoDB</td>
+</tr>
+</tbody>
+</table>
+<h3 id="php-pardoxio-pardoxdataframe">PHP (<code>PardoX\IO</code> + <code>PardoX\DataFrame</code>)</h3>
+<table>
+<thead>
+<tr>
+<th>Function</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>IO::read_sql($conn, $query)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read from PostgreSQL</td>
+</tr>
+<tr>
+<td><code>IO::executeSql($conn, $query)</code></td>
+<td><code>int</code></td>
+<td>DDL/DML on PostgreSQL</td>
+</tr>
+<tr>
+<td><code>IO::read_mysql($conn, $query)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read from MySQL</td>
+</tr>
+<tr>
+<td><code>IO::executeMysql($conn, $query)</code></td>
+<td><code>int</code></td>
+<td>DDL/DML on MySQL</td>
+</tr>
+<tr>
+<td><code>IO::read_sqlserver($conn, $query)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read from SQL Server</td>
+</tr>
+<tr>
+<td><code>IO::executeSqlserver($conn, $query)</code></td>
+<td><code>int</code></td>
+<td>DDL/DML on SQL Server</td>
+</tr>
+<tr>
+<td><code>IO::read_mongodb($conn, $db_col)</code></td>
+<td><code>DataFrame</code></td>
+<td>Read a MongoDB collection</td>
+</tr>
+<tr>
+<td><code>IO::executeMongodb($conn, $db, $cmd_json)</code></td>
+<td><code>int</code></td>
+<td>Run a MongoDB command</td>
+</tr>
+</tbody>
+</table>
+<h3 id="dataframe-write-methods-php">DataFrame write methods — PHP</h3>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>$df-&gt;to_sql($conn, $table, $mode, $conflictCols)</code></td>
+<td><code>int</code></td>
+<td>Write to PostgreSQL</td>
+</tr>
+<tr>
+<td><code>$df-&gt;to_mysql($conn, $table, $mode, $conflictCols)</code></td>
+<td><code>int</code></td>
+<td>Write to MySQL</td>
+</tr>
+<tr>
+<td><code>$df-&gt;to_sqlserver($conn, $table, $mode, $conflictCols)</code></td>
+<td><code>int</code></td>
+<td>Write to SQL Server</td>
+</tr>
+<tr>
+<td><code>$df-&gt;to_mongodb($conn, $db_col, $mode)</code></td>
+<td><code>int</code></td>
+<td>Write to MongoDB</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="return-values">Return Values</h2>
+<p>All write methods return the number of rows written as an integer. All execute methods return the number of rows affected (0 for DDL statements like <code>CREATE TABLE</code> or <code>DROP TABLE</code>). On error, all methods throw an exception (Python: <code>RuntimeError</code>, Node.js: <code>Error</code>, PHP: <code>RuntimeException</code>).</p>
+<hr />
+<h2 id="bulk-write-performance-summary">Bulk Write Performance Summary</h2>
+<table>
+<thead>
+<tr>
+<th>Database</th>
+<th>Rows &lt; 10,000</th>
+<th>Rows ≥ 10,000 (append)</th>
+<th>Mechanism</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL</td>
+<td>Multi-row INSERT</td>
+<td><strong>COPY FROM STDIN</strong> (auto)</td>
+<td>Wire-level streaming, no temp files</td>
+</tr>
+<tr>
+<td>MySQL</td>
+<td>1,000 rows/stmt</td>
+<td><strong>LOAD DATA LOCAL INFILE</strong> (auto, if server allows) → fallback to 1,000 rows/stmt</td>
+<td>In-memory CSV buffer</td>
+</tr>
+<tr>
+<td>SQL Server</td>
+<td>500 rows/stmt</td>
+<td>500 rows/stmt</td>
+<td>Multi-row <code>INSERT … VALUES</code></td>
+</tr>
+<tr>
+<td>MongoDB</td>
+<td>10,000 docs/batch</td>
+<td>10,000 docs/batch</td>
+<td><code>insert_many(ordered: false)</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="known-limitations">Known Limitations</h2>
+<h3 id="sql-server-special-characters-in-password">SQL Server — Special Characters in Password</h3>
+<p>Passwords containing <code>!</code> (and potentially other special characters) cause the tiberius driver to send an incorrect authentication hash, resulting in a <code>Login failed (State 8)</code> error. This affects all SDKs since the issue is in the Rust core.</p>
+<p><strong>Workaround:</strong> Use a SQL Server password that contains only alphanumeric characters and <code>_</code>, <code>-</code>, <code>@</code>, <code>#</code>, <code>$</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a># Works
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>Server=localhost,1433;UID=sa;PWD=MyPassword_123;TrustServerCertificate=Yes
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a># Fails (tiberius bug with !)
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>Server=localhost,1433;UID=sa;PWD=MyP@ssw0rd!;TrustServerCertificate=Yes
+</code></pre></div>
+<p>A fix is tracked for the next release — see <code>validation_complete/suggestions.md</code>.</p>
+<h3 id="mysql-load-data-local-infile-requires-server-configuration">MySQL — LOAD DATA LOCAL INFILE Requires Server Configuration</h3>
+<p>The fast bulk path (<code>LOAD DATA LOCAL INFILE</code>) requires <code>local_infile=ON</code> on the MySQL server. If it is disabled (ERROR 3948), PardoX automatically falls back to chunked batch INSERT with no action required from the user.</p>
+<p>To enable on the server side:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">SET</span><span class="w"> </span><span class="k">GLOBAL</span><span class="w"> </span><span class="n">local_infile</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+</code></pre></div>
+Or in <code>my.cnf</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="k">[mysqld]</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="na">local_infile</span><span class="o">=</span><span class="s">1</span>
+</code></pre></div></p>
+<h3 id="table-must-exist-before-writing">Table Must Exist Before Writing</h3>
+<p>PardoX write methods (<code>to_sql</code>, <code>to_mysql</code>, etc.) append to an existing table. Create the table first using the corresponding <code>execute_*</code> function before calling a write method.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">execute_sql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;CREATE TABLE IF NOT EXISTS orders (id BIGINT, amount FLOAT)&quot;</span><span class="p">)</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="n">rows</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">CONN</span><span class="p">,</span> <span class="s2">&quot;orders&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="validated-versions-v031">Validated Versions (v0.3.1)</h2>
+<table>
+<thead>
+<tr>
+<th>Database</th>
+<th>Read</th>
+<th>Write (50k rows)</th>
+<th>SDK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PostgreSQL</td>
+<td>✅</td>
+<td>✅ COPY (0.x s)</td>
+<td>Python, Node.js</td>
+</tr>
+<tr>
+<td>MySQL</td>
+<td>✅</td>
+<td>✅ chunked batch</td>
+<td>Python, PHP</td>
+</tr>
+<tr>
+<td>SQL Server</td>
+<td>✅</td>
+<td>⚠️ password <code>!</code> bug</td>
+<td>—</td>
+</tr>
+<tr>
+<td>MongoDB</td>
+<td>✅</td>
+<td>not benchmarked</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "navigation.expand", "navigation.top", "search.suggest", "search.highlight"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
