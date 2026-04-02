@@ -32,9 +32,9 @@ class DataFrame(
         if isinstance(data, dict):
             keys = list(data.keys())
             if not keys:
-                data = []  # Diccionario vacío pasa a lista vacía
+                data = []  # Empty dict is normalized to an empty list
             else:
-                # Asumimos que todas las columnas tienen la misma longitud
+                # Assume all columns have the same length
                 length = len(data[keys[0]])
                 data = [{k: data[k][i] for k in keys} for i in range(length)]
 
@@ -47,7 +47,7 @@ class DataFrame(
 
             # CRITICAL FIX: Convert to NDJSON (Newline Delimited)
             try:
-                # Generamos un string largo con saltos de línea
+                # Build a newline-delimited JSON payload
                 ndjson_str = "\n".join([json.dumps(record) for record in data])
                 json_bytes = ndjson_str.encode('utf-8')
                 json_len = len(json_bytes)

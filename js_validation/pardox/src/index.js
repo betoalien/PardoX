@@ -85,6 +85,9 @@ const {
     lazyStats,
     // Gap 29: REST Connector
     readRest,
+    // Gap 30: SQL Cursor API (streaming batch reads)
+    queryToResults,
+    sqlToParquet,
 } = require('./io');
 const { getLib } = require('./ffi');
 
@@ -171,6 +174,10 @@ module.exports = {
 
     // Gap 29: REST Connector
     readRest,
+
+    // Gap 30: SQL Cursor API (streaming batch reads)
+    queryToResults,
+    sqlToParquet,
 
     // Low-level access (for advanced use)
     getLib,

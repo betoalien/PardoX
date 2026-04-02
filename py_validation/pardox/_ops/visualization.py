@@ -6,22 +6,22 @@ class VisualizationMixin:
 
     def __repr__(self):
         """
-        Esta es la función mágica que Jupyter llama para mostrar el objeto.
-        En lugar de devolver el objeto raw, devolvemos la tabla ASCII.
+        Magic method used by Jupyter to render the object.
+        Returns the ASCII table instead of the raw object representation.
         """
-        # Por defecto mostramos 10 filas al imprimir el objeto
+        # Show 10 rows by default when printing the object.
         return self._fetch_ascii_table(10) or "<Empty PardoX DataFrame>"
 
     def head(self, n=5):
         """
-        Ahora devuelve un NUEVO DataFrame con las primeras n filas.
-        Al devolver un objeto, Jupyter llamará a su __repr__ y se verá bonito.
+        Returns a NEW DataFrame with the first n rows.
+        By returning an object, Jupyter calls __repr__ for rich display.
         """
         return self.iloc[0:n]
 
     def tail(self, n=5):
         """
-        Devuelve un NUEVO DataFrame con las últimas n filas.
+        Returns a NEW DataFrame with the last n rows.
         """
         if not hasattr(lib, 'pardox_tail_manager'):
             raise NotImplementedError("tail() API not available in Core.")

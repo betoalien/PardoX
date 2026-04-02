@@ -15,4 +15,11 @@ return <<<'CDECL'
             // --- SQL Server Config Check ---
             int pardox_sqlserver_config_ok();
 
+            // --- Gap 30: SQL Cursor API (streaming batch reads from SQL databases) ---
+            void* pardox_scan_sql_cursor_open(const char* conn_str, const char* query, size_t chunk_size);
+            void* pardox_scan_sql_cursor_fetch(void* cursor);
+            size_t pardox_scan_sql_cursor_offset(void* cursor);
+            void pardox_scan_sql_cursor_close(void* cursor);
+            long long pardox_scan_sql_to_parquet(const char* conn_str, const char* query, const char* output_pattern, long long chunk_size);
+
 CDECL;

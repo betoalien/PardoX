@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="pardox-server",
-    version="0.3.2",
+    version="0.3.4",
     description="pardoX Server — PostgreSQL wire protocol server backed by pardox_cpu",
     packages=find_packages(exclude=["__pycache__"]),
     python_requires=">=3.9",

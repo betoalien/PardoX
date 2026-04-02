@@ -1,6 +1,6 @@
 # pardox/__init__.py
 
-__version__ = "0.3.2"
+__version__ = "0.3.4"
 
 from .frame import DataFrame
 from .series import Series
@@ -13,6 +13,9 @@ from .io import (
     read_prdx,
     write_sql_prdx,
     execute_sql,
+    # Gap 30: SQL Cursor API (streaming batch reads)
+    query_to_results,
+    sql_to_parquet,
     # SQL variants
     read_mysql,
     execute_mysql,
@@ -145,6 +148,9 @@ __all__ = [
     "load_prdx",
     "write_sql_prdx",
     "execute_sql",
+    # Gap 30: SQL Cursor API
+    "query_to_results",
+    "sql_to_parquet",
     # SQL variants
     "read_mysql",
     "execute_mysql",

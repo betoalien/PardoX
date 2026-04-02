@@ -102,4 +102,100 @@ trait SqlIOTrait
 
         return (int) $rows;
     }
+
+    /**
+     * Stream SQL query results as a generator of DataFrames (Gap 30).
+     *
+     * Reads large SQL tables in batches without loading the entire result into
+     * memory. Uses PostgreSQL server-side cursors under the hood.
+     *
+     * Only `$batchSize` rows are held in RAM per iteration.
+     *
+     * @param string $connectionString  PostgreSQL URL (e.g. "postgresql://user:pass@host:5432/db").
+     * @param string $query             SQL query to stream.
+     * @param int    $batchSize         Rows per batch. Default: 100,000.
+     * @return \Generator<int, \PardoX\DataFrame>  Yields one DataFrame per batch.
+     * @throws \RuntimeException If cursor cannot be opened or batch fetch fails.
+     *
+     * @example
+     *   foreach (IO::queryToResults($conn, 'SELECT * FROM orders', 50000) as $chunk) {
+     *       $arrowData = $chunk->toArrow();
+     *   }
+     */
+    public static function queryToResults(
+        string $connectionString,
+        string $query,
+        int $batchSize = 100_000
+    ): \Generator {
+        $ffi = \PardoX\Core\FFI::getInstance();
+
+        try {
+            $cursor = $ffi->pardox_scan_sql_cursor_open($connectionString, $query, $batchSize);
+        } catch (\FFI\Exception $e) {
+            throw new \RuntimeException(
+                'The current PardoX Core build does not export pardox_scan_sql_cursor_open. ' .
+                'Re-compile the Rust core with Gap 30 (SQL Cursor API) enabled. ' .
+                'FFI error: ' . $e->getMessage()
+            );
+        }
+
+        if ($cursor === null || (is_int($cursor) && $cursor === 0)) {
+            throw new \RuntimeException(
+                'pardox_scan_sql_cursor_open returned null. ' .
+                'Check the connection string and SQL syntax.'
+            );
+        }
+
+        try {
+            while (true) {
+                $mgr = $ffi->pardox_scan_sql_cursor_fetch($cursor);
+                if ($mgr === null || (is_int($mgr) && $mgr === 0)) {
+                    break;
+                }
+                yield new \PardoX\DataFrame($mgr);
+            }
+        } finally {
+            $ffi->pardox_scan_sql_cursor_close($cursor);
+        }
+    }
+
+    /**
+     * Export a SQL query directly to multiple Parquet files without loading into RAM (Gap 30).
+     *
+     * @param string $connectionString  PostgreSQL URL.
+     * @param string $query             SQL query to export.
+     * @param string $outputPattern     File path pattern with `{i}` placeholder
+     *                                  (e.g. `"/data/orders_chunk_{i}.parquet"`).
+     * @param int    $chunkSize         Rows per Parquet file. Default: 100,000.
+     * @return int                      Total rows exported.
+     * @throws \RuntimeException        If the export fails.
+     *
+     * @example
+     *   $total = IO::sqlToParquet($conn, 'SELECT * FROM orders', '/data/orders_{i}.parquet');
+     *   echo "Exported {$total} rows\n";
+     */
+    public static function sqlToParquet(
+        string $connectionString,
+        string $query,
+        string $outputPattern,
+        int $chunkSize = 100_000
+    ): int {
+        $ffi = \PardoX\Core\FFI::getInstance();
+
+        try {
+            $total = $ffi->pardox_scan_sql_to_parquet($connectionString, $query, $outputPattern, $chunkSize);
+        } catch (\FFI\Exception $e) {
+            throw new \RuntimeException(
+                'The current PardoX Core build does not export pardox_scan_sql_to_parquet. ' .
+                'Re-compile the Rust core with Gap 30 (SQL Cursor API) enabled. ' .
+                'FFI error: ' . $e->getMessage()
+            );
+        }
+
+        if ($total < 0) {
+            throw new \RuntimeException("sqlToParquet failed with error code: {$total}");
+        }
+
+        return (int) $total;
+    }
 }

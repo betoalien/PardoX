@@ -190,4 +190,13 @@ module.exports = function bindAll(_lib) {
     _lib.pardox_get_system_report   = () => _readAndFreeStr(_lib._raw_pardox_get_system_report(), free);
     _lib.pardox_version             = () => _lib._raw_pardox_version() || null;
     _lib.pardox_hyper_copy_v3       = (src, dst, schema, config) => Number(_lib._raw_pardox_hyper_copy_v3(src, dst, schema, config));
+
+    // Gap 30 — SQL Cursor API wrappers
+    if (_lib._raw_pardox_scan_sql_cursor_open) {
+        _lib.pardox_scan_sql_cursor_open   = (conn, query, chunkSize) => _lib._raw_pardox_scan_sql_cursor_open(conn, query, chunkSize) || null;
+        _lib.pardox_scan_sql_cursor_fetch  = (cursor) => _lib._raw_pardox_scan_sql_cursor_fetch(cursor) || null;
+        _lib.pardox_scan_sql_cursor_offset = (cursor) => Number(_lib._raw_pardox_scan_sql_cursor_offset(cursor));
+        _lib.pardox_scan_sql_cursor_close  = (cursor) => _lib._raw_pardox_scan_sql_cursor_close(cursor);
+        _lib.pardox_scan_sql_to_parquet    = (conn, query, pattern, chunkSize) => Number(_lib._raw_pardox_scan_sql_to_parquet(conn, query, pattern, chunkSize));
+    }
 };

@@ -67,4 +67,87 @@ function write_sql_prdx(prdxPath, connectionString, tableName, mode = 'append', 
     return rows;
 }
 
-module.exports = { read_sql, executeSql, write_sql_prdx };
+/**
+ * Stream SQL query results as an async generator of DataFrames.
+ *
+ * Reads large SQL tables in batches without loading the entire result into
+ * memory. Only `batchSize` rows are held in RAM at any time.
+ *
+ * Requires the Rust core to export `pardox_scan_sql_cursor_open`.
+ *
+ * @param {string} connectionString  PostgreSQL connection URL.
+ * @param {string} query             SQL query to stream.
+ * @param {number} [batchSize=100000] Rows per chunk.
+ * @yields {DataFrame} One DataFrame per batch.
+ *
+ * @example
+ * const { queryToResults } = require('@pardox/pardox');
+ * for await (const chunk of queryToResults(conn, 'SELECT * FROM orders', 50_000)) {
+ *   const arrow = chunk.toArrow();
+ * }
+ */
+async function* queryToResults(connectionString, query, batchSize = 100_000) {
+    const lib = getLib();
+    if (!lib.pardox_scan_sql_cursor_open) {
+        throw new Error(
+            "The current PardoX Core build does not export 'pardox_scan_sql_cursor_open'. " +
+            "Re-compile the Rust core with Gap 30 (SQL Cursor API) enabled."
+        );
+    }
+
+    const cursor = lib.pardox_scan_sql_cursor_open(connectionString, query, batchSize);
+    if (!cursor) {
+        throw new Error(
+            'pardox_scan_sql_cursor_open returned null. ' +
+            'Check the connection string and SQL syntax.'
+        );
+    }
+
+    try {
+        while (true) {
+            const mgr = lib.pardox_scan_sql_cursor_fetch(cursor);
+            if (!mgr) break;
+            yield new DataFrame(mgr);
+        }
+    } finally {
+        lib.pardox_scan_sql_cursor_close(cursor);
+    }
+}
+
+/**
+ * Export a SQL query directly to multiple Parquet files without loading into RAM.
+ *
+ * Streams query results in chunks and writes each chunk as a separate Parquet
+ * file using the pattern provided.
+ *
+ * Requires the Rust core to export `pardox_scan_sql_to_parquet`.
+ *
+ * @param {string} connectionString  PostgreSQL connection URL.
+ * @param {string} query             SQL query to export.
+ * @param {string} outputPattern     File path pattern with `{i}` placeholder
+ *                                   (e.g. `"/data/orders_chunk_{i}.parquet"`).
+ * @param {number} [chunkSize=100000] Rows per Parquet file.
+ * @returns {number} Total rows exported.
+ *
+ * @example
+ * const { sqlToParquet } = require('@pardox/pardox');
+ * const total = sqlToParquet(conn, 'SELECT * FROM orders', '/data/orders_{i}.parquet', 100_000);
+ * console.log(`Exported ${total} rows`);
+ */
+function sqlToParquet(connectionString, query, outputPattern, chunkSize = 100_000) {
+    const lib = getLib();
+    if (!lib.pardox_scan_sql_to_parquet) {
+        throw new Error(
+            "The current PardoX Core build does not export 'pardox_scan_sql_to_parquet'. " +
+            "Re-compile the Rust core with Gap 30 (SQL Cursor API) enabled."
+        );
+    }
+
+    const total = lib.pardox_scan_sql_to_parquet(connectionString, query, outputPattern, chunkSize);
+    if (total < 0) {
+        throw new Error(`sqlToParquet failed with error code: ${total}`);
+    }
+    return total;
+}
+
+module.exports = { read_sql, executeSql, write_sql_prdx, queryToResults, sqlToParquet };

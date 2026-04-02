@@ -1,6 +1,6 @@
 from .arrow      import from_arrow, ArrowSchema, ArrowArray
 from .csv        import read_csv
-from .sql        import read_sql, execute_sql, write_sql_prdx
+from .sql        import read_sql, execute_sql, write_sql_prdx, query_to_results, sql_to_parquet
 from .databases  import (read_mysql, execute_mysql, read_sqlserver,
                           execute_sqlserver, read_mongodb, execute_mongodb,
                           sqlserver_config_ok)

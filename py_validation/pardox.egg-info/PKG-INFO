@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: pardox
-Version: 0.3.2
+Version: 0.3.4
 Summary: High-Performance DataFrame Engine powered by Rust (The PardoX Project)
 Author-email: Alberto Cardenas <iam@albertocardenas.com>
 License-Expression: MIT
@@ -27,7 +27,7 @@ Dynamic: license-file
 
 PardoX is a next-generation DataFrame engine for high-performance ETL, data analysis, and database integration. A single **Rust core** powers the entire computation layer — Python is just the interface.
 
-> **v0.3.2 is now available.** PRDX streaming to PostgreSQL (150M rows validated), GroupBy, String & Date ops, Window functions, Lazy pipeline, SQL over DataFrames, Encryption, Data Contracts, Time Travel, Arrow Flight, Distributed Cluster, Linear Algebra, REST Connector, Cloud Storage — 29 gap features total.
+> **v0.3.4 is now available.** PRDX streaming to PostgreSQL (150M rows validated), GroupBy, String & Date ops, Window functions, Lazy pipeline, SQL over DataFrames, Encryption, Data Contracts, Time Travel, Arrow Flight, Distributed Cluster, Linear Algebra, REST Connector, Cloud Storage — 29 gap features total.
 
 ---
 
@@ -92,7 +92,7 @@ df.to_prdx("sales_processed.prdx")
 
 ---
 
-## 🗄️ What's New in v0.3.2
+## 🗄️ What's New in v0.3.4
 
 ### PRDX Streaming to PostgreSQL
 
@@ -191,6 +191,69 @@ print(f"{result.shape[0]} rows")
 # Run SQL directly on a DataFrame in memory
 result = df.sql("SELECT state, SUM(revenue) as total FROM df GROUP BY state")
 ```
+
+---
+
+### Out-of-Core Processing (Large Datasets > RAM)
+
+Stream a SQL table to a `.prdx` file with O(batch) RAM, then run analytics on it
+without ever loading the full dataset — ideal for 100M+ row workloads.
+
+```python
+import pardox as px
+
+# Step 1: Stream SQL table to disk (O(batch) RAM — ~200 MB regardless of table size)
+rows = px.write_sql_prdx(
+    "orders.prdx",
+    "postgresql://user:pass@localhost:5432/db",
+    "orders",
+    mode="append",
+    conflict_cols=[],
+    batch_rows=1_000_000
+)
+print(f"Saved {rows:,} rows")   # validated: 150M rows / ~490s / ~306k rows/s
+
+# Step 2: GroupBy directly on .prdx — memory = O(distinct groups), not O(rows)
+result = px.prdx_groupby(
+    "orders.prdx",
+    ["product_id", "region"],
+    {"amount": "sum", "qty": "count"}
+)
+result.show(20)
+
+# Aggregate statistics without loading the file
+total  = px.prdx_count("orders.prdx")
+avg    = px.prdx_mean("orders.prdx",  "amount")
+top    = px.prdx_max("orders.prdx",   "amount")
+bottom = px.prdx_min("orders.prdx",   "amount")
+```
+
+In-memory chunked processing (when data is already loaded):
+
+```python
+# GroupBy in configurable chunks — peak RAM = chunk_size × row_bytes
+result = df.chunked_groupby(
+    "product_id",
+    {"amount": "sum", "qty": "count"},
+    chunk_size=1_000_000
+)
+
+# External merge sort — handles datasets larger than RAM
+sorted_df = df.external_sort("amount", ascending=False, chunk_size=1_000_000)
+
+# Spill manager to disk and restore
+df.spill_to_disk("/tmp/orders_spill")
+df2 = px.DataFrame.spill_from_disk("/tmp/orders_spill")
+
+# Current memory usage
+print(f"RSS: {px.DataFrame.memory_usage() / 1e6:.1f} MB")
+```
+
+| Approach | RAM used |
+|----------|----------|
+| `read_sql()` on 100M rows | ~2–4 GB (full result in memory) |
+| `write_sql_prdx()` + `prdx_groupby()` | O(batch) write + O(groups) query |
+| `chunked_groupby()` | O(chunk_size × row_bytes) |
 
 ---
 
@@ -340,7 +403,7 @@ rows = df.to_mongodb(MG, "mydb.orders_archive", mode="append")
 | SQL Server | INSERT 500/stmt | INSERT 500/stmt | MERGE INTO |
 | MongoDB | insert_many 10k/batch | drop + insert_many | — |
 
-> **Note on SQL Server passwords:** Avoid using `!` in SQL Server passwords. A known issue in the tiberius v0.12 Rust driver causes authentication failure when `!` is present. Use only `[A-Za-z0-9_\-@#$]`. Fix planned for v0.4.0.
+> **Note on SQL Server passwords:** Avoid using `!` in SQL Server passwords. A known issue in the tiberius v0.12 Rust driver causes authentication failure when `!` is present. Use only `[A-Za-z0-9_\-@#$]`.
 
 ---
 
@@ -365,6 +428,13 @@ px.write_prdx_encrypted("file.prdx", df, "key")
 df = px.version_read(path, label)
 labels = px.version_list(path)
 px.version_write(df, path, label)
+
+# Out-of-core / streaming PRDX
+result  = px.prdx_groupby("file.prdx", ["col1"], {"col2": "sum"})
+total   = px.prdx_count("file.prdx")
+avg     = px.prdx_mean("file.prdx", "col")
+maximum = px.prdx_max("file.prdx", "col")
+minimum = px.prdx_min("file.prdx", "col")
 ```
 
 ### DataFrame — Properties & Inspection
@@ -391,6 +461,16 @@ df.sub("revenue", "cost")         # → DataFrame with 'result_sub'
 df.min_max_scale("price")         # → DataFrame with 'result_minmax'
 df.std("price")                   # float
 df.sort_values("price", ascending=True, gpu=False)
+```
+
+### DataFrame — Out-of-Core
+
+```python
+df.chunked_groupby("col", {"val": "sum"}, chunk_size=1_000_000)
+df.external_sort("col", ascending=True, chunk_size=1_000_000)
+df.spill_to_disk("/tmp/spill_path")
+px.DataFrame.spill_from_disk("/tmp/spill_path")    # → DataFrame
+px.DataFrame.memory_usage()                         # → bytes (RSS)
 ```
 
 ### DataFrame — GroupBy & Aggregation
@@ -487,7 +567,7 @@ model = LinearRegression().fit(X, y)
 
 Hardware: MacBook Pro M2, 16 GB RAM.
 
-| Operation | Pandas v2.x | PardoX v0.3.2 | Speedup |
+| Operation | Pandas v2.x | PardoX v0.3.4 | Speedup |
 |-----------|------------|---------------|---------|
 | Read CSV (1 GB) | 4.2s | 0.8s | **5.2x** |
 | Column multiply | 0.15s | 0.02s | **7.5x** |
@@ -503,10 +583,7 @@ Hardware: MacBook Pro M2, 16 GB RAM.
 
 | Version | Status | Highlights |
 |---------|--------|------------|
-| v0.1 | ✅ Released | CSV, arithmetic, aggregations, .prdx format |
-| v0.3.1 | ✅ Released | Databases (PG/MySQL/MSSQL/MongoDB), Observer, Math, GPU sort, NumPy bridge |
-| v0.3.2 | ✅ Released | PRDX Streaming, GroupBy, Window, String/Date, Lazy, SQL over DF, Encryption, Data Contracts, Time Travel, Arrow Flight, Distributed Cluster, Linear Algebra, REST Connector, Cloud Storage — 29 features |
-| v0.4.0 | 🔜 Planned | SQL Server `!` password fix, structured error codes, Apache Parquet, Kafka, S3 |
+| v0.3.4 | ✅ Current | PRDX Streaming, GroupBy, Window, String/Date, Lazy, SQL over DF, Encryption, Data Contracts, Time Travel, Arrow Flight, Distributed Cluster, Linear Algebra, REST Connector, Cloud Storage, Out-of-Core Processing — 29 features |
 
 ---
 

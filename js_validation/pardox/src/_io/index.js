@@ -1,7 +1,7 @@
 'use strict';
 
 const { read_csv, DEFAULT_CSV_CONFIG } = require('./csv');
-const { read_sql, executeSql, write_sql_prdx } = require('./sql');
+const { read_sql, executeSql, write_sql_prdx, queryToResults, sqlToParquet } = require('./sql');
 const {
     read_mysql, execute_mysql,
     read_sqlserver, execute_sqlserver,
@@ -43,6 +43,9 @@ module.exports = {
     read_sql,
     executeSql,
     write_sql_prdx,
+    // Gap 30: SQL Cursor API (streaming batch reads)
+    queryToResults,
+    sqlToParquet,
     // Databases
     read_mysql,
     execute_mysql,

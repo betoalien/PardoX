@@ -22,7 +22,7 @@ class SelectionMixin:
             if not hasattr(lib, 'pardox_apply_filter'):
                 raise NotImplementedError("Filter application API missing in Core.")
 
-            # Ahora sí accedemos al puntero a través del dataframe padre de la serie
+            # Access the mask pointer through the parent DataFrame of the Series.
             mask_ptr = key._df._ptr
             mask_col = key.name.encode('utf-8')
 

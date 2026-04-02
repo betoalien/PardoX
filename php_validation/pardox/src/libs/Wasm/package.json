@@ -1,7 +1,7 @@
 {
   "name": "pardox-wasm",
   "description": "PardoX WebAssembly DataFrame Engine",
-  "version": "0.3.2",
+  "version": "0.3.4",
   "files": [
     "pardox_wasm_bg.wasm",
     "pardox_wasm.js",

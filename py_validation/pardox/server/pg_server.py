@@ -587,7 +587,7 @@ class QueryHandler:
         # ── SELECT version() ──────────────────────────────────────────────
         if re.match(r'SELECT\s+VERSION\s*\(\s*\)', upper):
             cols = [('version', 25, -1)]
-            rows = [['PostgreSQL 14.0 (pardoX Server 0.3.2)']]
+            rows = [['PostgreSQL 14.0 (pardoX Server 0.3.4)']]
             return cols, rows, "SELECT 1"
 
         # ── SHOW ───────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 from ._io import (
     from_arrow, ArrowSchema, ArrowArray,
     read_csv,
-    read_sql, execute_sql, write_sql_prdx,
+    read_sql, execute_sql, write_sql_prdx, query_to_results, sql_to_parquet,
     read_mysql, execute_mysql, read_sqlserver, execute_sqlserver,
     read_mongodb, execute_mongodb, sqlserver_config_ok,
     read_prdx, load_prdx, read_prdx_schema, query_sql_prdx,

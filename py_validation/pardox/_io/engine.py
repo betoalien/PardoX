@@ -72,7 +72,7 @@ def engine_version() -> str:
     Return the PardoX Core library version string.
 
     Returns:
-        str: Version string (e.g. "pardoX v0.3.2").
+        str: Version string (e.g. "pardoX v0.3.4").
     """
     import ctypes as _ct
     if not hasattr(lib, 'pardox_version'):

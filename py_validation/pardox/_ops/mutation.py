@@ -54,7 +54,7 @@ class MutationMixin:
         Enables column assignment: df['new_col'] = df['a'] * df['b']
         """
         # 1. Check if value is a PardoX Series (Result of arithmetic)
-        # CORRECCIÓN: Cambiamos '_col_name' por 'name' para coincidir con series.py
+        # FIX: Use 'name' instead of '_col_name' to match series.py.
         if hasattr(value, '_df') and hasattr(value, 'name'):
             # It's a Series! We need to fuse it into this DataFrame.
 
@@ -84,7 +84,7 @@ class MutationMixin:
         #     self._assign_scalar(key, value)
 
         else:
-            # Tip de Debugging: Imprimimos los atributos disponibles para ver qué pasó
+            # Debug tip: print available attributes to inspect unsupported values.
             available_attrs = dir(value)
             raise TypeError(f"Assignment only supported for PardoX Series. Got: {type(value)}. Attributes detected: {available_attrs}")
 

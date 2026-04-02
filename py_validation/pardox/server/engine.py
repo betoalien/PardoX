@@ -23,7 +23,7 @@ def _find_lib(explicit_path: str | None = None) -> str:
         # gap_validations alongside the project
         os.path.join(here, "..", "gap_validations", "libpardox.so"),
         # Rust build output
-        os.path.join(here, "..", "Pardox-Core-v0.3.2", "pardox_cpu",
+        os.path.join(here, "..", "Pardox-Core-v0.3.4", "pardox_cpu",
                      "target", "release", "libpardox_cpu.so"),
     ]
     for p in candidates:

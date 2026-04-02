@@ -9,7 +9,7 @@
 
 PardoX is a next-generation DataFrame engine for high-performance ETL, data analysis, and database integration. A single **Rust core** powers the entire computation layer — Python is just the interface.
 
-> **v0.3.2 is now available.** PRDX streaming to PostgreSQL (150M rows validated), GroupBy, String & Date ops, Window functions, Lazy pipeline, SQL over DataFrames, Encryption, Data Contracts, Time Travel, Arrow Flight, Distributed Cluster, Linear Algebra, REST Connector, Cloud Storage — 29 gap features total.
+> **v0.3.4 is now available.** PRDX streaming to PostgreSQL (150M rows validated), GroupBy, String & Date ops, Window functions, Lazy pipeline, SQL over DataFrames, Encryption, Data Contracts, Time Travel, Arrow Flight, Distributed Cluster, Linear Algebra, REST Connector, Cloud Storage — 29 gap features total.
 
 ---
 
@@ -74,7 +74,7 @@ df.to_prdx("sales_processed.prdx")
 
 ---
 
-## 🗄️ What's New in v0.3.2
+## 🗄️ What's New in v0.3.4
 
 ### PRDX Streaming to PostgreSQL
 
@@ -549,7 +549,7 @@ model = LinearRegression().fit(X, y)
 
 Hardware: MacBook Pro M2, 16 GB RAM.
 
-| Operation | Pandas v2.x | PardoX v0.3.2 | Speedup |
+| Operation | Pandas v2.x | PardoX v0.3.4 | Speedup |
 |-----------|------------|---------------|---------|
 | Read CSV (1 GB) | 4.2s | 0.8s | **5.2x** |
 | Column multiply | 0.15s | 0.02s | **7.5x** |
@@ -565,9 +565,7 @@ Hardware: MacBook Pro M2, 16 GB RAM.
 
 | Version | Status | Highlights |
 |---------|--------|------------|
-| v0.1 | ✅ Released | CSV, arithmetic, aggregations, .prdx format |
-| v0.3.1 | ✅ Released | Databases (PG/MySQL/MSSQL/MongoDB), Observer, Math, GPU sort, NumPy bridge |
-| v0.3.2 | ✅ Released | PRDX Streaming, GroupBy, Window, String/Date, Lazy, SQL over DF, Encryption, Data Contracts, Time Travel, Arrow Flight, Distributed Cluster, Linear Algebra, REST Connector, Cloud Storage, Out-of-Core Processing — 29 features |
+| v0.3.4 | ✅ Current | PRDX Streaming, GroupBy, Window, String/Date, Lazy, SQL over DF, Encryption, Data Contracts, Time Travel, Arrow Flight, Distributed Cluster, Linear Algebra, REST Connector, Cloud Storage, Out-of-Core Processing — 29 features |
 
 ---
 
