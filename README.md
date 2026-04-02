@@ -3,13 +3,29 @@
 [![PyPI version](https://badge.fury.io/py/pardox.svg)](https://badge.fury.io/py/pardox)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Powered By Rust](https://img.shields.io/badge/powered%20by-Rust-orange.svg)](https://www.rust-lang.org/)
-[![Version](https://img.shields.io/badge/version-0.3.2-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-0.3.4-blue.svg)]()
 
 **The Speed of Rust. The Simplicity of Python.**
 
 PardoX is a high-performance DataFrame engine for modern ETL and analytics. A **Rust** core powers SDKs in **Python, Node.js, and PHP**, with native database I/O, an ultra-fast binary format, and out-of-core processing for datasets larger than RAM.
 
-> **v0.3.2 is now available.** PRDX Streaming to PostgreSQL (150M rows validated), GroupBy, Window Functions, String & Date ops, Lazy Pipeline, SQL over DataFrames, Encryption, Data Contracts, Time Travel, Arrow Flight, Linear Algebra, REST Connector, Cloud Storage — 29 feature gaps total.
+> **v0.3.4 is now available.** SQL Cursor API (Gap 30) — streaming iterator over SQL results validated in Python, JS, PHP. Plus all 29 previous feature gaps: GroupBy, Window Functions, String & Date ops, Lazy Pipeline, Encryption, Data Contracts, Time Travel, Arrow Flight, Linear Algebra, REST Connector, Cloud Storage, PRDX Streaming to PostgreSQL (150M rows validated), and more.
+
+---
+
+## ✅ What's New in v0.3.4
+
+| Feature | Status |
+|---------|--------|
+| **SQL Cursor API** (Gap 30) | `query_to_results(conn, query, batch_size)` — streaming iterator over SQL results with O(batch) RAM. `sql_to_parquet(conn, query, pattern, chunk_size)` — stream SQL → PardoX binary files. Validated: 3 SDKs × 11/11 tests. Requested by GitHub @Prussian1870 |
+
+---
+
+## ✅ What's New in v0.3.3
+
+| Feature | Status |
+|---------|--------|
+| **SQL Cursor API** (Gap 30) — Rust Core | 5 new FFI exports: `pardox_scan_sql_cursor_open`, `pardox_scan_sql_cursor_fetch`, `pardox_scan_sql_cursor_offset`, `pardox_scan_sql_cursor_close`, `pardox_scan_sql_to_parquet`. SqlCursor struct with server-side PostgreSQL DECLARE cursor |
 
 ---
 
@@ -33,7 +49,7 @@ PardoX is a high-performance DataFrame engine for modern ETL and analytics. A **
 | **Linear Algebra** (Gap 28) | `cosine_sim`, `l2_normalize`, `matmul`, `pca` |
 | **REST Connector** (Gap 29) | `read_rest(url, method, headers_json)` → DataFrame |
 | **Cloud Storage** (Gap 15) | `read_cloud_csv` from S3, GCS, Azure |
-| **29 Gaps Total** | All 29 feature gaps implemented in the Rust core across Python, JS, PHP |
+| **30 Gaps Total** | All 30 feature gaps implemented in the Rust core across Python, JS, PHP |
 
 ---
 
@@ -96,7 +112,7 @@ result = px.prdx_groupby("sales_150m.prdx", ["region"], {"revenue": "sum"})
 
 ---
 
-## 📊 Benchmarks (v0.3.2)
+## 📊 Benchmarks (v0.3.4)
 
 | Operation | Baseline | PardoX v0.3.2 | Speedup |
 |-----------|----------|---------------|---------|

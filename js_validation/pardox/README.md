@@ -9,7 +9,7 @@
 
 PardoX is a high-performance DataFrame engine for Node.js. A single **Rust core** handles all computation — CSV parsing, arithmetic, database I/O, sorting, GroupBy, Window functions, and more — exposed to JavaScript through [koffi](https://koffi.dev/) FFI. No Python. No native Node addons to compile. No database drivers.
 
-> **v0.3.2 is now available.** PRDX streaming to PostgreSQL (150M rows validated), GroupBy, String & Date ops, Window functions, Lazy pipeline, SQL over DataFrames, WebAssembly, Encryption, Data Contracts, Time Travel, Arrow Flight, Linear Algebra, REST Connector — all from Node.js.
+> **v0.3.4 is now available.** SQL Cursor API (Gap 30) — `queryToResults()` streaming iterator validated in 11/11 tests. Plus: PRDX streaming to PostgreSQL (150M rows validated), GroupBy, String & Date ops, Window functions, Lazy pipeline, SQL over DataFrames, WebAssembly, Encryption, Data Contracts, Time Travel, Arrow Flight, Linear Algebra, REST Connector — all from Node.js.
 
 ---
 

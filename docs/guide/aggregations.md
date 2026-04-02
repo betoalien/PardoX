@@ -243,23 +243,22 @@ print(f"\nExported {len(records):,} records to Python list")
 
 ---
 
-## 8. GroupBy (Roadmap)
+## 8. GroupBy
 
-Vectorized `groupby` with a Rust hash-aggregation engine is planned for **v0.3.2**.
+Vectorized `groupby` with a Rust hash-aggregation engine (Gap 1, added in v0.3.2).
 
 ```python
-# Coming in v0.3.2
-summary = df.groupby("region").agg({
+summary = df.groupby("region", {
     "revenue": "sum",
     "quantity": "mean",
     "transaction_id": "count"
 })
 ```
 
-For now, use `value_counts` for frequency analysis and filter + aggregate on subsets:
+You can also use `value_counts` for frequency analysis and filter + aggregate on subsets:
 
 ```python
-# Workaround: filter then aggregate
+# Filter then aggregate
 tx_mask = df['state'].eq("TX")
 tx_df   = df.filter(tx_mask)
 print(f"TX revenue: ${tx_df['amount'].sum():,.2f}")

@@ -77,6 +77,22 @@ All items below were delivered in this release.
 
 ---
 
+## v0.3.4 — Released (2026-04-01)
+
+| Feature | Status |
+|---------|--------|
+| **SQL Cursor API — all 3 SDKs** (Gap 30) | `query_to_results()` generator + `sql_to_parquet()` validated in Python, JavaScript, PHP (11/11 tests each) |
+
+---
+
+## v0.3.3 — Released (2026-03-17)
+
+| Feature | Status |
+|---------|--------|
+| **SQL Cursor API — Rust Core** (Gap 30) | `SqlCursor` struct in `engine/sql/postgres.rs`. 5 new FFI exports: `pardox_scan_sql_cursor_open`, `pardox_scan_sql_cursor_fetch`, `pardox_scan_sql_cursor_offset`, `pardox_scan_sql_cursor_close`, `pardox_scan_sql_to_parquet`. Zero warnings, zero errors |
+
+---
+
 ## v0.4.0 — Planned
 
 ### SQL Server — Password Special Character Fix

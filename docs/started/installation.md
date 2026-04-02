@@ -38,7 +38,7 @@ pip install pardox
 
 ```python
 import pardox as px
-print(px.__version__)    # e.g. "0.3.2"
+print(px.__version__)    # e.g. "0.3.4"
 
 df = px.read_csv("my_data.csv")
 print(df.shape)

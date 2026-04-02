@@ -6,7 +6,7 @@ nav_order: 4
 
 # API Reference
 
-Complete documentation of all classes, functions, and methods in the PardoX Python SDK v0.3.2.
+Complete documentation of all classes, functions, and methods in the PardoX Python SDK v0.3.4.
 
 ---
 
@@ -130,7 +130,7 @@ execute_sqlserver(CONN, "DROP TABLE IF EXISTS dbo.orders_bak")
 ```
 
 !!! warning "Password special characters"
-    Avoid `!` in SQL Server passwords. Known tiberius v0.12 bug — fix planned for v0.3.2.
+    Avoid `!` in SQL Server passwords. Known tiberius v0.12 bug — fix tracked for v0.4.0.
 
 ---
 
@@ -638,3 +638,78 @@ All database functions raise `RuntimeError` with a descriptive message on failur
 
 !!! tip "Stderr logging"
     When `-100` is returned, the Rust core logs the actual database error to stderr before returning. Run with stderr visible to diagnose connection or schema issues.
+
+---
+
+## SQL Cursor API (Gap 30)
+
+*Added in v0.3.4*
+
+Streaming iterator over PostgreSQL query results. Each batch yields a `DataFrame` without loading the full result set into memory.
+
+### `query_to_results`
+
+```python
+def query_to_results(connection_string: str, query: str, batch_size: int = 100_000) -> Generator[DataFrame, None, None]
+```
+
+Generator that opens a server-side PostgreSQL cursor and yields `DataFrame` objects one batch at a time. Uses `DECLARE ... NO SCROLL CURSOR` internally — the connection remains open for the duration of the iteration. Memory usage is O(batch_size rows).
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `connection_string` | `str` | PostgreSQL connection string (`postgresql://user:pass@host:port/db`) |
+| `query` | `str` | SQL query to execute (SELECT statement) |
+| `batch_size` | `int` | Rows per batch (default: 100,000) |
+
+**Yields:** `DataFrame` — one batch per iteration. Columns match the query result schema.
+
+**Raises:** `RuntimeError` if the cursor cannot be opened.
+
+```python
+import pardox as px
+
+CONN  = "postgresql://user:pass@localhost:5432/db"
+QUERY = "SELECT * FROM sales ORDER BY date"
+
+# Streaming iterator — exact pattern from GitHub issue @Prussian1870
+for batch_df in px.query_to_results(CONN, QUERY, batch_size=50_000):
+    records = batch_df.to_dict()     # list of dicts
+    json_str = batch_df.to_json()    # JSON string
+    rows, cols = batch_df.shape      # inspect shape
+```
+
+---
+
+### `sql_to_parquet`
+
+```python
+def sql_to_parquet(connection_string: str, query: str, output_pattern: str, chunk_size: int = 100_000) -> int
+```
+
+Streams a SQL query result directly to PardoX binary files (`.prdx`) using a filename pattern. No full result set is loaded into RAM — memory usage is O(chunk_size rows).
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `connection_string` | `str` | PostgreSQL connection string |
+| `query` | `str` | SQL query to execute |
+| `output_pattern` | `str` | Output file path pattern. Use `{i}` as the chunk index placeholder, e.g. `"/tmp/chunk_{i}.prdx"` |
+| `chunk_size` | `int` | Rows per output file (default: 100,000) |
+
+**Returns:** `int` — total rows written across all files. **Raises:** `RuntimeError` on failure.
+
+```python
+import pardox as px
+
+total = px.sql_to_parquet(
+    "postgresql://user:pass@localhost:5432/db",
+    "SELECT * FROM sales",
+    "/data/sales_chunk_{i}.prdx",
+    chunk_size=100_000
+)
+print(f"Exported {total:,} rows")
+
+# Read individual chunks back
+df = px.read_prdx("/data/sales_chunk_0.prdx")
+```
+
+**Validated:** 250,000 rows streamed across 3 chunk files — 11/11 tests in Python, JavaScript, and PHP.

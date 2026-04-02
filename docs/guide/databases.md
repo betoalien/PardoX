@@ -7,7 +7,7 @@ nav_order: 2
 
 # Database Integration
 
-PardoX v0.3.2 provides native database connectivity via Rust drivers — no Python, PHP, or Node.js database libraries required. The same Rust core powers identical APIs across all three SDKs.
+PardoX provides native database connectivity via Rust drivers — no Python, PHP, or Node.js database libraries required. The same Rust core powers identical APIs across all three SDKs.
 
 ---
 
@@ -257,7 +257,7 @@ $rows = $df->to_sqlserver($CONN, 'dbo.orders_bak', 'upsert', ['id']);
 | `upsert` | `MERGE INTO table AS T USING (VALUES …) AS S (cols) ON (key) WHEN MATCHED … WHEN NOT MATCHED …` |
 
 !!! warning "Password special characters"
-    A known issue in tiberius v0.12 causes authentication failure when the SQL Server password contains `!`. Use passwords with only `[A-Za-z0-9_\-@#$]`. A fix is tracked for v0.3.2.
+    A known issue in tiberius v0.12 causes authentication failure when the SQL Server password contains `!`. Use passwords with only `[A-Za-z0-9_\-@#$]`. A fix is tracked for v0.4.0.
 
 ---
 
@@ -387,9 +387,70 @@ echo "Streamed $rows rows\n";
 
 ---
 
-## Validated Results (v0.3.2)
+## SQL Cursor API — Streaming Iterator (Gap 30, added v0.3.4)
 
-### PRDX → PostgreSQL — 150M rows (3.8 GB)
+Stream PostgreSQL query results as `DataFrame` batches without loading the full result set into RAM. Uses a server-side `DECLARE ... NO SCROLL CURSOR`. Memory usage is O(batch_size rows).
+
+### Python
+
+```python
+import pardox as px
+
+CONN  = "postgresql://user:pass@localhost:5432/db"
+QUERY = "SELECT * FROM sales ORDER BY date"
+
+# Streaming iterator — exact pattern from GitHub issue @Prussian1870
+for batch_df in px.query_to_results(CONN, QUERY, batch_size=50_000):
+    records = batch_df.to_dict()     # list of dicts per batch
+    rows, cols = batch_df.shape      # inspect shape
+```
+
+Stream directly to `.prdx` files — no intermediate RAM accumulation:
+
+```python
+total = px.sql_to_parquet(CONN, QUERY, "/data/sales_chunk_{i}.prdx", chunk_size=100_000)
+print(f"Exported {total:,} rows")
+```
+
+### JavaScript
+
+```js
+const { queryToResults, sqlToParquet } = require('./pardox/src/index');
+
+for await (const batchDf of queryToResults(CONN, QUERY, 50_000)) {
+    const jsonStr = batchDf.toJson(100);
+    const rows = batchDf.shape[0];
+}
+
+const total = sqlToParquet(CONN, QUERY, '/data/sales_chunk_{i}.prdx', 100_000);
+```
+
+### PHP
+
+```php
+use PardoX\IO;
+
+foreach (IO::queryToResults($conn, $query, 50_000) as $batchDf) {
+    $data = $batchDf->to_dict();   // list of dicts per batch
+    [$rows,] = $batchDf->shape();
+}
+
+$total = IO::sqlToParquet($conn, $query, '/data/sales_chunk_{i}.prdx', 100_000);
+```
+
+---
+
+## Validated Results
+
+### SQL Cursor API — 250k rows (v0.3.4)
+
+| SDK | Tests | Result |
+|-----|-------|--------|
+| Python | 11/11 | ✅ 250,000 rows streamed in 5 batches of 50,000 |
+| JavaScript | 11/11 | ✅ 250,000 rows streamed in 5 batches of 50,000 |
+| PHP | 11/11 | ✅ 250,000 rows streamed in 5 batches of 50,000 |
+
+### PRDX → PostgreSQL — 150M rows (3.8 GB, v0.3.2)
 
 | SDK | Rows | Time | Throughput | Protocol |
 |-----|------|------|------------|----------|
@@ -405,5 +466,5 @@ echo "Streamed $rows rows\n";
 | PostgreSQL | Node.js | ✅ 50,000 rows — COPY FROM STDIN |
 | MySQL | Python | ✅ 50,000 rows — chunked batch (LOAD DATA disabled server-side) |
 | MySQL | PHP | ✅ 50,000 rows — chunked batch |
-| SQL Server | all | ⚠️ Authentication fails with `!` in password |
+| SQL Server | all | ⚠️ Authentication fails with `!` in password (fix in v0.4.0) |
 | MongoDB | — | Implemented; bulk benchmarks planned |

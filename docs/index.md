@@ -9,7 +9,7 @@ nav_order: 1
 [![PyPI version](https://badge.fury.io/py/pardox.svg)](https://badge.fury.io/py/pardox)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Powered By Rust](https://img.shields.io/badge/powered%20by-Rust-orange.svg)](https://www.rust-lang.org/)
-[![Version](https://img.shields.io/badge/version-0.3.2-blue.svg)]()
+[![Version](https://img.shields.io/badge/version-0.3.4-blue.svg)]()
 
 **The Speed of Rust. The Simplicity of Python.**
 
@@ -48,10 +48,10 @@ PardoX is a high-performance DataFrame engine designed for modern data engineeri
 - [**FFI Exports Reference**](ffi-reference.md) — All 181 C-ABI functions exported by the Rust core across 5 crates. Use this to build custom bindings or validate SDK integrations.
 
 ### 📂 Base Knowledge
-- [**Base Knowledge**](base_knowledge/) — Validation scripts for all 29 feature gaps across Python, Node.js, and PHP SDKs.
-  - [Python validation scripts](base_knowledge/python_code/) — 28 files (`validate_gap1_sdk.py` → `validate_gap29_sdk.py`)
-  - [Node.js validation scripts](base_knowledge/js_code/) — 18 files (`validate_gap1_sdk.js` → `validate_gap18_sdk.js`)
-  - [PHP validation scripts](base_knowledge/php_code/) — 28 files (`validate_gap1_sdk.php` → `validate_gap29_sdk.php`)
+- [**Base Knowledge**](base_knowledge/) — Validation scripts for all 30 feature gaps across Python, Node.js, and PHP SDKs.
+  - [Python validation scripts](base_knowledge/python_code/) — 29 files (`validate_gap1_sdk.py` → `validate_gap30_sdk.py`)
+  - [Node.js validation scripts](base_knowledge/js_code/) — 19 files (`validate_gap1_sdk.js` → `validate_gap30_sdk.js`)
+  - [PHP validation scripts](base_knowledge/php_code/) — 29 files (`validate_gap1_sdk.php` → `validate_gap30_sdk.php`)
 
 ### 📘 SDK Documentation
 - [**SDK Documentation**](documentation_sdk/) — In-depth guides for each SDK.
@@ -74,6 +74,19 @@ pip install pardox
 ```
 
 ---
+
+## What's New in v0.3.4
+
+| Pillar | What was added |
+|--------|----------------|
+| **SQL Cursor API** (Gap 30) | `query_to_results(conn, query, batch_size)` — streaming iterator over PostgreSQL results yielding `DataFrame` batches with O(batch) RAM. `sql_to_parquet(conn, query, pattern, chunk_size)` — stream SQL → PardoX binary files using `{i}` pattern. Validated: 3 SDKs × 11/11 tests. Requested by GitHub @Prussian1870 |
+| **30 Gaps Total** | Gap 30 (SQL Cursor API) added to all 3 SDKs — Python, JavaScript, PHP |
+
+## What's New in v0.3.3
+
+| Pillar | What was added |
+|--------|----------------|
+| **SQL Cursor API — Rust Core** | `SqlCursor` struct with server-side PostgreSQL `DECLARE ... NO SCROLL CURSOR`. 5 new FFI exports: `pardox_scan_sql_cursor_open`, `pardox_scan_sql_cursor_fetch`, `pardox_scan_sql_cursor_offset`, `pardox_scan_sql_cursor_close`, `pardox_scan_sql_to_parquet`. Zero warnings, zero errors |
 
 ## What's New in v0.3.2
 

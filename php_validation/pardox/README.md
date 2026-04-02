@@ -9,7 +9,7 @@
 
 PardoX is a high-performance DataFrame engine for PHP. A single **Rust core** handles all computation — CSV parsing, arithmetic, database I/O, sorting, GroupBy, Window functions, and more — exposed to PHP through the native FFI extension. No Python. No Node. No middleware.
 
-> **v0.3.2 is now available.** PRDX streaming to PostgreSQL (150M rows validated), GroupBy, String & Date ops, Window functions, Lazy pipeline, SQL over DataFrames, Encryption, Data Contracts, Time Travel, Arrow Flight, Linear Algebra, REST Connector, and 29 total gap features — all from PHP.
+> **v0.3.4 is now available.** SQL Cursor API (Gap 30) — `queryToResults()` streaming iterator validated in 11/11 tests. Plus: PRDX streaming to PostgreSQL (150M rows validated), GroupBy, String & Date ops, Window functions, Lazy pipeline, SQL over DataFrames, Encryption, Data Contracts, Time Travel, Arrow Flight, Linear Algebra, REST Connector, and 30 total gap features — all from PHP.
 
 ---
 

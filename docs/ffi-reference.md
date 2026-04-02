@@ -4,12 +4,12 @@ title: "FFI Exports Reference"
 nav_order: 5
 ---
 
-# PardoX Core FFI Exports — v0.3.2
+# PardoX Core FFI Exports — v0.3.4
 
 Complete reference for all C-ABI functions exported by the PardoX Rust core. Use this to build custom bindings, audit SDK integrations, or test functions directly.
 
-**Total exports:** 181 functions across 5 crates
-**Last updated:** 2026-03-15
+**Total exports:** 186 functions across 5 crates
+**Last updated:** 2026-04-01
 
 ---
 
@@ -26,7 +26,7 @@ Complete reference for all C-ABI functions exported by the PardoX Rust core. Use
 
 ## pardox_cpu
 
-**Path:** `Pardox-Core-v0.3.2/pardox_cpu/`
+**Path:** `Pardox-Core-v0.3.4/pardox_cpu/`
 **Crate type:** `cdylib`
 **Output:** `pardox-cpu-Linux-x64.so` / `pardox-cpu-Darwin-x64.dylib` / `pardox-cpu-Win-x64.dll`
 
@@ -404,11 +404,31 @@ Complete reference for all C-ABI functions exported by the PardoX Rust core. Use
 |----------|-----------|--------|
 | `pardox_read_rest` | `(url, method, headers_json)` | `*mut HyperBlockManager` |
 
+#### Gap 30 — SQL Cursor API (added v0.3.3)
+
+Server-side PostgreSQL streaming cursor. Opens a `DECLARE ... NO SCROLL CURSOR` on the server and fetches rows in chunks. Memory usage is O(chunk_size) regardless of query result size. All 5 symbols verified in `libpardox.so`.
+
+| Function | Parameters | Return | Description |
+|----------|-----------|--------|-------------|
+| `pardox_scan_sql_cursor_open` | `(conn_str: *const c_char, query: *const c_char, chunk_size: usize)` | `*mut SqlCursor` | Open server-side cursor. Returns opaque pointer. `BEGIN` + `DECLARE` issued on the connection |
+| `pardox_scan_sql_cursor_fetch` | `(cursor: *mut SqlCursor)` | `*mut HyperBlockManager` | Fetch next chunk. Returns `null` when exhausted |
+| `pardox_scan_sql_cursor_offset` | `(cursor: *mut SqlCursor)` | `usize` | Total rows fetched so far |
+| `pardox_scan_sql_cursor_close` | `(cursor: *mut SqlCursor)` | `void` | **MUST CALL** — issues `CLOSE cursor` + `COMMIT`, drops `Box<SqlCursor>` |
+| `pardox_scan_sql_to_parquet` | `(conn_str: *const c_char, query: *const c_char, output_pattern: *const c_char, chunk_size: i64)` | `i64` | Stream SQL → `.prdx` files using `{i}` pattern. Returns total rows written |
+
+**Python usage:**
+```python
+for df in px.query_to_results(conn, query, batch_size=50_000):
+    records = df.to_dict()
+
+total = px.sql_to_parquet(conn, query, "/tmp/chunk_{i}.prdx", chunk_size=100_000)
+```
+
 ---
 
 ## pardox_gpu
 
-**Path:** `Pardox-Core-v0.3.2/pardox_gpu/`
+**Path:** `Pardox-Core-v0.3.4/pardox_gpu/`
 **Crate type:** `cdylib`
 **Output:** `pardox-gpu-Linux-x64.so`
 **Backend:** `wgpu` (WebGPU — cross-platform: Vulkan, Metal, DX12, OpenGL ES)
@@ -462,7 +482,7 @@ Complete reference for all C-ABI functions exported by the PardoX Rust core. Use
 
 ## pardox_napi
 
-**Path:** `Pardox-Core-v0.3.2/pardox_napi/`
+**Path:** `Pardox-Core-v0.3.4/pardox_napi/`
 **Crate type:** `cdylib`
 **Output:** `pardox.node` (Node.js native addon)
 **Binding framework:** `napi-rs`
@@ -503,7 +523,7 @@ All pardox_cpu functions are also exposed as module-level exports with camelCase
 
 ## pardox_wasm
 
-**Path:** `Pardox-Core-v0.3.2/pardox_wasm/`
+**Path:** `Pardox-Core-v0.3.4/pardox_wasm/`
 **Target:** `wasm32-unknown-unknown`
 **Binding framework:** `wasm-bindgen`
 **Status:** Stub / development placeholder
@@ -514,7 +534,7 @@ Exports a minimal `PardoXWasm` class with placeholder methods. Full WASM port pl
 
 ## pardox_server
 
-**Path:** `Pardox-Core-v0.3.2/pardox_server/`
+**Path:** `Pardox-Core-v0.3.4/pardox_server/`
 **Status:** Empty scaffold — no exported functions
 
 The PostgreSQL wire-protocol server is implemented in Python (`pardox_validation/py_validation/pardox/server/`), not in this Rust crate.

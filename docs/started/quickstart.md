@@ -7,7 +7,7 @@ nav_order: 2
 
 # Quick Start
 
-This guide walks through a complete v0.3.2 data pipeline: loading a CSV, running vectorized math, inspecting results, and writing to a relational database — all in native Rust speed.
+This guide walks through a complete v0.3.4 data pipeline: loading a CSV, running vectorized math, inspecting results, and writing to a relational database — all in native Rust speed.
 
 ---
 

@@ -248,10 +248,10 @@ rows = df.to_sqlserver(CONN, "dbo.orders_bak", mode="upsert", conflict_cols=["id
 ```
 
 !!! warning "Password special characters"
-    Avoid using `!` in SQL Server passwords. A known issue in tiberius v0.12 causes authentication failure when `!` is present in the password when connecting via TCP from an external host. Use only `[A-Za-z0-9_\-@#$]`. A fix is tracked for v0.3.2.
+    Avoid using `!` in SQL Server passwords. A known issue in tiberius v0.12 causes authentication failure when `!` is present in the password when connecting via TCP from an external host. Use only `[A-Za-z0-9_\-@#$]`. A fix is tracked for v0.4.0.
 
 !!! info "Bulk performance"
-    SQL Server writes use 500-row multi-value `INSERT` statements. For 50,000 rows this results in 100 round-trips instead of 50,000. A `BULK INSERT` / `bcp` path is planned for v0.3.2.
+    SQL Server writes use 500-row multi-value `INSERT` statements. For 50,000 rows this results in 100 round-trips instead of 50,000. A `BULK INSERT` / `bcp` path is planned for v0.4.0.
 
 ---
 
